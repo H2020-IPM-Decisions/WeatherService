@@ -43,11 +43,7 @@ public class WeatherData {
         return timeStart;
     }
     
-    public ZonedDateTime getTimeStartInOslo()
-    {
-        return timeStart.atZone(ZoneId.of("Europe/Oslo"));
-    }
-
+    
     /**
      * @param timeStart the timeStart to set
      */
@@ -62,10 +58,6 @@ public class WeatherData {
         return timeEnd;
     }
     
-    public ZonedDateTime getTimeEndInOslo()
-    {
-        return timeEnd.atZone(ZoneId.of("Europe/Oslo"));
-    }
 
     /**
      * @param timeEnd the timeEnd to set
