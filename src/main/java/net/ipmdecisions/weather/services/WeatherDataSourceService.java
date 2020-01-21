@@ -19,8 +19,11 @@
 
 package net.ipmdecisions.weather.services;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
+import java.io.BufferedInputStream;
+import java.io.IOException;
+import java.util.HashMap;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -29,7 +32,6 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 import net.ipmdecisions.weather.datasourceadapters.ParseWeatherDataException;
 import net.ipmdecisions.weather.datasourceadapters.YrWeatherForecastAdapter;
-import net.ipmdecisions.weather.entity.LocationWeatherData;
 import net.ipmdecisions.weather.entity.WeatherData;
 import org.jboss.resteasy.annotations.GZIP;
 
@@ -70,5 +72,23 @@ public class WeatherDataSourceService {
             return Response.serverError().entity(ex.getMessage()).build();
         }
 
+    }
+    
+    @GET
+    @Path("parameter/list")
+    @Produces("application/json;charset=UTF-8")
+    public Response listWeatherParameters()
+    {
+        try
+        {
+            BufferedInputStream inputStream = new BufferedInputStream(this.getClass().getResourceAsStream("/weather_parameters_draft_v2.yaml"));
+            ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
+            return Response.ok().entity(mapper.readValue(inputStream, HashMap.class)).build();
+        }
+        catch(IOException ex)
+        {
+            ex.printStackTrace();
+            return Response.serverError().entity(ex.getMessage()).build();
+        }
     }
 }
