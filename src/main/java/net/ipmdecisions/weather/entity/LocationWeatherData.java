@@ -24,8 +24,8 @@ package net.ipmdecisions.weather.entity;
  * @author Tor-Einar Skog <tor-einar.skog@nibio.no>
  */
 public class LocationWeatherData {
-    private final Double longitude;
-    private final Double latitude;
+    private Double longitude;
+    private Double latitude;
     private final Double[][] data;
     
     public LocationWeatherData(Double longitude, Double latitude, int rows, int columns){
@@ -96,5 +96,33 @@ public class LocationWeatherData {
             retVal += "\n";
         }
         return retVal;
+    }
+
+    /**
+     * @return the longitude
+     */
+    public Double getLongitude() {
+        return longitude;
+    }
+
+    /**
+     * @param longitude the longitude to set
+     */
+    public void setLongitude(Double longitude) {
+        this.longitude = longitude;
+    }
+
+    /**
+     * @return the latitude
+     */
+    public Double getLatitude() {
+        return latitude;
+    }
+
+    /**
+     * @param latitude the latitude to set
+     */
+    public void setLatitude(Double latitude) {
+        this.latitude = latitude;
     }
 }

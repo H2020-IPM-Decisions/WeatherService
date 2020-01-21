@@ -142,7 +142,8 @@ public class YrWeatherForecastAdapter {
                 yrValues.setValue(row.intValue(), 2, Double.valueOf(RRMap.get(row).split("_")[1]));
             }
             yrValues = this.createHourlyDataFromYr(yrValues);
-        
+            yrValues.setLongitude(longitude);
+            yrValues.setLatitude(latitude);
             WeatherData retVal = new WeatherData();
             retVal.setInterval(3600);
             retVal.setWeatherParameters(this.parameters);
