@@ -59,7 +59,6 @@ public class YrWeatherForecastAdapter {
     
     public WeatherData getWeatherForecasts(Double longitude, Double latitude, Double altitude) throws ParseWeatherDataException 
     {
-        
         URL yrURL;
         LocationWeatherData yrValues;
         try {
@@ -152,7 +151,7 @@ public class YrWeatherForecastAdapter {
             retVal.addLocationWeatherData(yrValues);
             return retVal;
         }
-        catch(IOException | ParserConfigurationException | SAXException ex)
+        catch(IOException | ParserConfigurationException | SAXException | NullPointerException ex)
         {
             ex.printStackTrace();
             throw new ParseWeatherDataException(ex.getClass().getName() + ": " + ex.getMessage());

@@ -14,18 +14,6 @@ parameters:
  - id: 1004
    name: Maximum air temperature at 2m
    unit: Celcius
- - id: 1011
-   name: Instantaneous temperature at 10m
-   unit: Celcius
- - id: 1012
-   name: Mean air temperature at 10m
-   unit: Celcius
- - id: 1013
-   name: Minimum air temperature at 10m
-   unit: Celcius
- - id: 1014
-   name: Maximum air temperature at 10m
-   unit: Celcius
  - id: 1021
    name: Instantaneous temperature in canopy
    unit: Celcius
@@ -45,23 +33,11 @@ parameters:
  - id: 1102
    name: Mean temperature at -5cm
    unit: Celcius
- - id: 1103
-   name: Minimum temperature at -5cm
-   unit: Celcius
- - id: 1104
-   name: Maximum temperature at -5cm
-   unit: Celcius
  - id: 1111
    name: Instantaneous temperature at -10cm (Celcius)
    unit: Celcius
  - id: 1112
    name: Mean temperature at -10cm
-   unit: Celcius
- - id: 1113
-   name: Minimum temperature at -10cm
-   unit: Celcius
- - id: 1114
-   name: Maximum temperature at -10cm
    unit: Celcius
  - id: 1121
    name: Instantaneous temperature at -20cm (Celcius)
@@ -69,23 +45,11 @@ parameters:
  - id: 1122
    name: Mean temperature at -20cm
    unit: Celcius
- - id: 1123
-   name: Minimum temperature at -20cm
-   unit: Celcius
- - id: 1124
-   name: Maximum temperature at -20cm
-   unit: Celcius
  - id: 1131
    name: Instantaneous temperature at -30cm (Celcius)
    unit: Celcius
  - id: 1132
    name: Mean temperature at -30cm
-   unit: Celcius
- - id: 1133
-   name: Minimum temperature at -30cm
-   unit: Celcius
- - id: 1134
-   name: Maximum temperature at -30cm
    unit: Celcius
  - id: 1141
    name: Instantaneous temperature at -40cm (Celcius)
@@ -93,23 +57,11 @@ parameters:
  - id: 1142
    name: Mean temperature at -40cm
    unit: Celcius
- - id: 1143
-   name: Minimum temperature at -40cm
-   unit: Celcius
- - id: 1144
-   name: Maximum temperature at -40cm
-   unit: Celcius
  - id: 1151
    name: Instantaneous temperature at -50cm (Celcius)
    unit: Celcius
  - id: 1152
    name: Mean temperature at -50cm
-   unit: Celcius
- - id: 1153
-   name: Minimum temperature at -50cm
-   unit: Celcius
- - id: 1154
-   name: Maximum temperature at -50cm
    unit: Celcius
 
 
@@ -131,18 +83,6 @@ parameters:
    unit: "%"
  - id: 3004
    name: Maximum RH at 2m
-   unit: "%"
- - id: 3011
-   name: Instantaneous RH at 10m
-   unit: "%"
- - id: 3012
-   name: Mean RH at 10m
-   unit: "%"
- - id: 3013
-   name: Minimum RH at 10m
-   unit: "%"
- - id: 3014
-   name: Maximum RH at 10m
    unit: "%"
  - id: 3021
    name: Instantaneous RH in canopy

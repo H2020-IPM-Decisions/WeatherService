@@ -61,6 +61,15 @@ public class WeatherDataSourceService {
                     @QueryParam("altitude") Double altitude
     )
     {
+        if(longitude == null || latitude == null)
+        {
+            return Response.status(Response.Status.BAD_REQUEST).entity("Missing longitude and/or altitude. Please correct this.").build();
+        }
+        if(altitude == null)
+        {
+            altitude = 0.0;
+        }
+        
         try 
         {
             WeatherData theData = new YrWeatherForecastAdapter().getWeatherForecasts(longitude, latitude, altitude);
