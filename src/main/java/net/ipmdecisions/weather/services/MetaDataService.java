@@ -19,26 +19,33 @@
 
 package net.ipmdecisions.weather.services;
 
-import java.util.Set;
-import javax.ws.rs.ApplicationPath;
-import javax.ws.rs.core.Application;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.kjetland.jackson.jsonSchema.JsonSchemaGenerator;
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+import javax.ws.rs.core.Response;
+import net.ipmdecisions.weather.entity.WeatherData;
+import org.jboss.resteasy.annotations.GZIP;
 
 /**
  * @copyright 2020 <a href="http://www.nibio.no/">NIBIO</a>
  * @author Tor-Einar Skog <tor-einar.skog@nibio.no>
  */
-@ApplicationPath("")
-public class JAXActivator extends Application{
-     @Override
-    public Set<Class<?>> getClasses() {
-        Set<Class<?>> resources = new java.util.HashSet<>();
-        addRestResourceClasses(resources);
-        return resources;
-    }
+@Path("rest/schema")
+public class MetaDataService {
+    private final ObjectMapper objectMapper = new ObjectMapper();
+    private final JsonSchemaGenerator schemaGen = new JsonSchemaGenerator(objectMapper);
+    
+    @GET
+    @Path("weatherdata")
+    @GZIP
+    @Produces("application/json;charset=UTF-8")
+    public Response getWeatherDataSchema()
+    {
 
-    private void addRestResourceClasses(Set<Class<?>> resources) {
-        resources.add(net.ipmdecisions.weather.services.JacksonConfig.class);
-        resources.add(net.ipmdecisions.weather.services.MetaDataService.class);
-        resources.add(net.ipmdecisions.weather.services.WeatherDataSourceService.class);
+            JsonNode schema = schemaGen.generateJsonSchema(WeatherData.class);
+            return Response.ok().entity(schema).build();
     }
 }

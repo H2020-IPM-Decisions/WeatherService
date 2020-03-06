@@ -85,7 +85,7 @@ public class YrWeatherForecastAdapter {
             Instant timeEnd = Instant.parse(nodes.item(nodes.getLength()-1).getAttributes().getNamedItem("to").getNodeValue());
             Integer interval = 3600; // Hourly intervals
             Long rows = 1 + timeStart.until(timeEnd,ChronoUnit.SECONDS)/interval;
-            yrValues = new LocationWeatherData(longitude,latitude, rows.intValue(), parameters.length);
+            yrValues = new LocationWeatherData(longitude,latitude, altitude, rows.intValue(), parameters.length);
             for(int i=0;i<nodes.getLength();i++)
             {
                 Node node = nodes.item(i);
@@ -143,6 +143,7 @@ public class YrWeatherForecastAdapter {
             yrValues = this.createHourlyDataFromYr(yrValues);
             yrValues.setLongitude(longitude);
             yrValues.setLatitude(latitude);
+            yrValues.setAltitude(altitude);
             WeatherData retVal = new WeatherData();
             retVal.setInterval(3600);
             retVal.setWeatherParameters(this.parameters);

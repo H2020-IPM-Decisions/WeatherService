@@ -26,11 +26,13 @@ package net.ipmdecisions.weather.entity;
 public class LocationWeatherData {
     private Double longitude;
     private Double latitude;
+    private Double altitude;
     private final Double[][] data;
     
-    public LocationWeatherData(Double longitude, Double latitude, int rows, int columns){
+    public LocationWeatherData(Double longitude, Double latitude, Double altitude, int rows, int columns){
         this.longitude = longitude;
         this.latitude = latitude;
+        this.altitude = altitude;
         this.data = new Double[rows][columns];
     }
     
@@ -124,5 +126,19 @@ public class LocationWeatherData {
      */
     public void setLatitude(Double latitude) {
         this.latitude = latitude;
+    }
+
+    /**
+     * @return the altitude
+     */
+    public Double getAltitude() {
+        return altitude;
+    }
+
+    /**
+     * @param altitude the altitude to set
+     */
+    public void setAltitude(Double altitude) {
+        this.altitude = altitude;
     }
 }

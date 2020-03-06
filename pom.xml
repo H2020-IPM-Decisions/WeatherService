@@ -57,6 +57,11 @@
             <type>jar</type>
         </dependency>
         <dependency>
+            <groupId>com.kjetland</groupId>
+            <artifactId>mbknor-jackson-jsonschema_2.13</artifactId>
+            <version>1.0.36</version>
+        </dependency>
+        <dependency>
             <groupId>javax</groupId>
             <artifactId>javaee-web-api</artifactId>
             <version>8.0.1</version>
