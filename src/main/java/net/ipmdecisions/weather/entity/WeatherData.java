@@ -19,11 +19,15 @@
 
 package net.ipmdecisions.weather.entity;
 
+import com.kjetland.jackson.jsonSchema.annotations.JsonSchemaDescription;
+import com.kjetland.jackson.jsonSchema.annotations.JsonSchemaExamples;
 import com.kjetland.jackson.jsonSchema.annotations.JsonSchemaInject;
 import com.kjetland.jackson.jsonSchema.annotations.JsonSchemaString;
 import com.kjetland.jackson.jsonSchema.annotations.JsonSchemaTitle;
 import java.time.Instant;
+import java.time.OffsetDateTime;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
@@ -35,8 +39,14 @@ import javax.validation.constraints.Size;
  * @copyright 2020 <a href="http://www.nibio.no/">NIBIO</a>
  * @author Tor-Einar Skog <tor-einar.skog@nibio.no>
  */
-@JsonSchemaInject(strings = {@JsonSchemaString(path = "$id", value="https://ipmdecisions.nibio.no/WeatherService/rest/schema/weatherdata")})
+@JsonSchemaInject(strings = {
+    @JsonSchemaString(path = "$id", value="https://ipmdecisions.nibio.no/WeatherService/rest/schema/weatherdata"),
+    @JsonSchemaString(path = "properties/timeStart/type", value="string")
+    }
+)
 @JsonSchemaTitle("Weather Data")
+@JsonSchemaExamples("http://ipmdecisions.nibio.no/WeatherService/rest/forecasts/yr/?longitude=14.3711&latitude=67.2828&altitude=70")
+@JsonSchemaDescription("Version 0.1. The schema describes the weather data format for the IPM Decisions platform. See an example here: http://ipmdecisions.nibio.no/WeatherService/rest/forecasts/yr/?longitude=14.3711&latitude=67.2828&altitude=70")
 public class WeatherData {
     @NotNull
     private Instant timeStart; // Timestamp of first observation

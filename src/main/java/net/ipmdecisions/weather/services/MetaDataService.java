@@ -23,6 +23,11 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kjetland.jackson.jsonSchema.JsonSchemaConfig;
 import com.kjetland.jackson.jsonSchema.JsonSchemaGenerator;
+import java.time.Instant;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Optional;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
@@ -36,10 +41,38 @@ import org.jboss.resteasy.annotations.GZIP;
  */
 @Path("rest/schema")
 public class MetaDataService {
+    private JsonSchemaGenerator schemaGen;
+    
     private final ObjectMapper objectMapper = new ObjectMapper();
-    // Documentation found here: https://github.com/mbknor/mbknor-jackson-jsonSchema
-    JsonSchemaConfig config = JsonSchemaConfig.nullableJsonSchemaDraft4();
-    private final JsonSchemaGenerator schemaGen = new JsonSchemaGenerator(objectMapper);
+    
+    public MetaDataService()
+    {
+        super();
+        // Documentation found here: https://github.com/mbknor/mbknor-jackson-jsonSchema
+        
+        Map<String,String> customFormatMapping = new HashMap<>(); 
+        customFormatMapping.put(Instant.class.getName(), "date-time");
+        Map<Class<?>,Class<?>> customClassMapping = new HashMap<>();
+        customClassMapping.put(Instant.class, String.class);    
+        JsonSchemaConfig config = JsonSchemaConfig.create(
+            JsonSchemaConfig.vanillaJsonSchemaDraft4().autoGenerateTitleForProperties(), 
+            Optional.empty(), 
+            JsonSchemaConfig.vanillaJsonSchemaDraft4().useOneOfForOption(), 
+            JsonSchemaConfig.vanillaJsonSchemaDraft4().useOneOfForNullables(), 
+            JsonSchemaConfig.vanillaJsonSchemaDraft4().usePropertyOrdering(), 
+            JsonSchemaConfig.vanillaJsonSchemaDraft4().hidePolymorphismTypeProperty(), 
+            JsonSchemaConfig.vanillaJsonSchemaDraft4().disableWarnings(), 
+            JsonSchemaConfig.vanillaJsonSchemaDraft4().useMinLengthForNotNull(), 
+            JsonSchemaConfig.vanillaJsonSchemaDraft4().useTypeIdForDefinitionName(), 
+            customFormatMapping, 
+            JsonSchemaConfig.vanillaJsonSchemaDraft4().useMultipleEditorSelectViaProperty(), 
+            new HashSet<>(), 
+            customClassMapping, 
+            new HashMap<>()
+        );
+        schemaGen = new JsonSchemaGenerator(objectMapper,config);
+    }
+
     
     @GET
     @Path("weatherdata")
