@@ -21,6 +21,7 @@ package net.ipmdecisions.weather.services;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.kjetland.jackson.jsonSchema.JsonSchemaConfig;
 import com.kjetland.jackson.jsonSchema.JsonSchemaGenerator;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -37,6 +38,7 @@ import org.jboss.resteasy.annotations.GZIP;
 public class MetaDataService {
     private final ObjectMapper objectMapper = new ObjectMapper();
     // Documentation found here: https://github.com/mbknor/mbknor-jackson-jsonSchema
+    JsonSchemaConfig config = JsonSchemaConfig.nullableJsonSchemaDraft4();
     private final JsonSchemaGenerator schemaGen = new JsonSchemaGenerator(objectMapper);
     
     @GET

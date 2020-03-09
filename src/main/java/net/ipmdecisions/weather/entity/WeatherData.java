@@ -19,6 +19,9 @@
 
 package net.ipmdecisions.weather.entity;
 
+import com.kjetland.jackson.jsonSchema.annotations.JsonSchemaInject;
+import com.kjetland.jackson.jsonSchema.annotations.JsonSchemaString;
+import com.kjetland.jackson.jsonSchema.annotations.JsonSchemaTitle;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
@@ -32,6 +35,8 @@ import javax.validation.constraints.Size;
  * @copyright 2020 <a href="http://www.nibio.no/">NIBIO</a>
  * @author Tor-Einar Skog <tor-einar.skog@nibio.no>
  */
+@JsonSchemaInject(strings = {@JsonSchemaString(path = "$id", value="https://ipmdecisions.nibio.no/WeatherService/rest/schema/weatherdata")})
+@JsonSchemaTitle("Weather Data")
 public class WeatherData {
     @NotNull
     private Instant timeStart; // Timestamp of first observation
