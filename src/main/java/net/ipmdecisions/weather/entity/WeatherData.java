@@ -22,15 +22,26 @@ package net.ipmdecisions.weather.entity;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Positive;
+import javax.validation.constraints.Size;
 
 /**
+ * We are using this tool to serialize to Json Schema: https://github.com/mbknor/mbknor-jackson-jsonSchema
+ * 
  * @copyright 2020 <a href="http://www.nibio.no/">NIBIO</a>
  * @author Tor-Einar Skog <tor-einar.skog@nibio.no>
  */
 public class WeatherData {
+    @NotNull
     private Instant timeStart; // Timestamp of first observation
+    @NotNull
     private Instant timeEnd; // Timestamp of last observation
+    @NotNull
+    @Positive
     private Integer interval; // Sampling frequency in seconds
+    @NotNull
+    @Size(min=1)
     private Integer[] weatherParameters;
     private List<LocationWeatherData> locationWeatherData;
 

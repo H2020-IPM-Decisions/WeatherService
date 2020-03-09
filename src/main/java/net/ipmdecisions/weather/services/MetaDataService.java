@@ -36,6 +36,7 @@ import org.jboss.resteasy.annotations.GZIP;
 @Path("rest/schema")
 public class MetaDataService {
     private final ObjectMapper objectMapper = new ObjectMapper();
+    // Documentation found here: https://github.com/mbknor/mbknor-jackson-jsonSchema
     private final JsonSchemaGenerator schemaGen = new JsonSchemaGenerator(objectMapper);
     
     @GET

@@ -19,14 +19,19 @@
 
 package net.ipmdecisions.weather.entity;
 
+import javax.validation.constraints.NotNull;
+
 /**
  * @copyright 2020 <a href="http://www.nibio.no/">NIBIO</a>
  * @author Tor-Einar Skog <tor-einar.skog@nibio.no>
  */
 public class WeatherParameter {
+    @NotNull
     private Integer parameterCode;
+    @NotNull
     private String name;
     private String description;
+    @NotNull
     private String unit;
 
     /**

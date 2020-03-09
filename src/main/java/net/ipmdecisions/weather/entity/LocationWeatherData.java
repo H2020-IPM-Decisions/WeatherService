@@ -19,12 +19,16 @@
 
 package net.ipmdecisions.weather.entity;
 
+import javax.validation.constraints.NotNull;
+
 /**
  * @copyright 2020 <a href="http://www.nibio.no/">NIBIO</a>
  * @author Tor-Einar Skog <tor-einar.skog@nibio.no>
  */
 public class LocationWeatherData {
+    @NotNull
     private Double longitude;
+    @NotNull
     private Double latitude;
     private Double altitude;
     private final Double[][] data;
