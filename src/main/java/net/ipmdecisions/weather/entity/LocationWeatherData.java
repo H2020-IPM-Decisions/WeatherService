@@ -19,6 +19,7 @@
 
 package net.ipmdecisions.weather.entity;
 
+import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import javax.validation.constraints.NotNull;
 
 /**
@@ -27,10 +28,14 @@ import javax.validation.constraints.NotNull;
  */
 public class LocationWeatherData {
     @NotNull
+    @JsonPropertyDescription("The longitude of the location. Decimal degrees (WGS84)")
     private Double longitude;
     @NotNull
+    @JsonPropertyDescription("The latitude of the location. Decimal degrees (WGS84)")
     private Double latitude;
+    @JsonPropertyDescription("The altitude of the location. Measured in meters")
     private Double altitude;
+    @JsonPropertyDescription("The data. In rows, ordered chronologically. Columns ordered as given in weatherParameters.")
     private final Double[][] data;
     
     public LocationWeatherData(Double longitude, Double latitude, Double altitude, int rows, int columns){

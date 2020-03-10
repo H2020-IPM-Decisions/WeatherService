@@ -19,6 +19,7 @@
 
 package net.ipmdecisions.weather.entity;
 
+import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import com.kjetland.jackson.jsonSchema.annotations.JsonSchemaDescription;
 import com.kjetland.jackson.jsonSchema.annotations.JsonSchemaExamples;
 import com.kjetland.jackson.jsonSchema.annotations.JsonSchemaInject;
@@ -49,15 +50,20 @@ import javax.validation.constraints.Size;
 @JsonSchemaDescription("Version 0.1. The schema describes the weather data format for the IPM Decisions platform. See an example here: http://ipmdecisions.nibio.no/WeatherService/rest/forecasts/yr/?longitude=14.3711&latitude=67.2828&altitude=70")
 public class WeatherData {
     @NotNull
-    private Instant timeStart; // Timestamp of first observation
+    @JsonPropertyDescription("The timestamp of the first weather observation")
+    private Instant timeStart;
     @NotNull
-    private Instant timeEnd; // Timestamp of last observation
+    @JsonPropertyDescription("The timestamp of the last weather observation")
+    private Instant timeEnd;
     @NotNull
     @Positive
-    private Integer interval; // Sampling frequency in seconds
+    @JsonPropertyDescription("The sampling frequency in seconds. E.g. 3600 = hourly values")
+    private Integer interval; 
     @NotNull
     @Size(min=1)
+    @JsonPropertyDescription("The weather parameters. For reference, see https://ipmdecisions.nibio.no/WeatherService/rest/parameter/list")
     private Integer[] weatherParameters;
+    @JsonPropertyDescription("The weather data per location.")
     private List<LocationWeatherData> locationWeatherData;
 
     /**
