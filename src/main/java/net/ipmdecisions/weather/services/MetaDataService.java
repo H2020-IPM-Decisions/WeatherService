@@ -21,19 +21,30 @@ package net.ipmdecisions.weather.services;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.fge.jsonschema.core.exceptions.ProcessingException;
 import com.kjetland.jackson.jsonSchema.JsonSchemaConfig;
 import com.kjetland.jackson.jsonSchema.JsonSchemaGenerator;
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.time.Instant;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Optional;
+import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import net.ipmdecisions.weather.entity.WeatherData;
+import net.ipmdecisions.weather.util.SchemaUtils;
 import org.jboss.resteasy.annotations.GZIP;
+import org.jboss.resteasy.spi.HttpRequest;
 
 /**
  * @copyright 2020 <a href="http://www.nibio.no/">NIBIO</a>
@@ -41,7 +52,12 @@ import org.jboss.resteasy.annotations.GZIP;
  */
 @Path("rest/schema")
 public class MetaDataService {
-    private JsonSchemaGenerator schemaGen;
+    @Context
+    private HttpRequest httpRequest;
+    @Context
+    private HttpServletRequest httpServletRequest;
+    
+    private final JsonSchemaGenerator schemaGen;
     
     private final ObjectMapper objectMapper = new ObjectMapper();
     
@@ -80,8 +96,29 @@ public class MetaDataService {
     @Produces("application/json;charset=UTF-8")
     public Response getWeatherDataSchema()
     {
-
+        JsonNode schema = schemaGen.generateJsonSchema(WeatherData.class);
+        return Response.ok().entity(schema).build();
+    }
+    
+    @POST
+    @Path("weatherdata/validate")
+    @GZIP
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response validateWeatherData(JsonNode weatherData)
+    {
+        try
+        {
             JsonNode schema = schemaGen.generateJsonSchema(WeatherData.class);
-            return Response.ok().entity(schema).build();
+            SchemaUtils sUtils = new SchemaUtils();
+            // If we don't create a string from the schema, it will always pass with a well formed but non conforming JSON document
+            // Don't ask me why!!!
+            boolean isValid = sUtils.isJsonValid(schema.toString(), weatherData); 
+            return Response.ok().entity(Map.of("isValid", isValid)).build();
+        }
+        catch(ProcessingException | IOException ex)
+        {
+            return Response.status(Response.Status.BAD_REQUEST).entity(ex.getMessage()).build();
+        }
     }
 }
