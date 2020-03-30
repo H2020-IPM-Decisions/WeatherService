@@ -19,9 +19,11 @@
 
 package net.ipmdecisions.weather.services;
 
+import java.util.HashSet;
 import java.util.Set;
 import javax.ws.rs.ApplicationPath;
 import javax.ws.rs.core.Application;
+import org.jboss.resteasy.plugins.interceptors.CorsFilter;
 
 /**
  * @copyright 2020 <a href="http://www.nibio.no/">NIBIO</a>
@@ -34,6 +36,16 @@ public class JAXActivator extends Application{
         Set<Class<?>> resources = new java.util.HashSet<>();
         addRestResourceClasses(resources);
         return resources;
+    }
+    
+    @Override
+    public Set<Object> getSingletons(){
+        CorsFilter corsFilter = new CorsFilter();
+        corsFilter.getAllowedOrigins().add("*");
+        corsFilter.setAllowedMethods("OPTIONS, GET, POST, DELETE, PUT, PATCH");
+        Set<Object> singletons = new HashSet<>();
+        singletons.add(corsFilter);
+        return singletons;
     }
 
     private void addRestResourceClasses(Set<Class<?>> resources) {

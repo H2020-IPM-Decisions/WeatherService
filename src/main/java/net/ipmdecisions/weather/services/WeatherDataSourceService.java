@@ -29,6 +29,7 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import net.ipmdecisions.weather.datasourceadapters.ParseWeatherDataException;
 import net.ipmdecisions.weather.datasourceadapters.YrWeatherForecastAdapter;
@@ -41,20 +42,12 @@ import org.jboss.resteasy.annotations.GZIP;
  */
 @Path("rest")
 public class WeatherDataSourceService {
-@GET
-    @Path("test")
-    @Produces("text/plain;charset=UTF-8")
-    public Response test()
-    {
-        return Response.ok().entity("Hello world of weather").build();
-    }
-    
     
     @GET
     @POST
     @Path("forecasts/yr/")
     @GZIP
-    @Produces("application/json;charset=UTF-8")
+    @Produces(MediaType.APPLICATION_JSON)
     public Response getYRForecasts(
                     @QueryParam("longitude") Double longitude,
                     @QueryParam("latitude") Double latitude,
@@ -85,12 +78,29 @@ public class WeatherDataSourceService {
     
     @GET
     @Path("parameter/list")
-    @Produces("application/json;charset=UTF-8")
+    @Produces(MediaType.APPLICATION_JSON)
     public Response listWeatherParameters()
     {
         try
         {
             BufferedInputStream inputStream = new BufferedInputStream(this.getClass().getResourceAsStream("/weather_parameters_draft_v2.yaml"));
+            ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
+            return Response.ok().entity(mapper.readValue(inputStream, HashMap.class)).build();
+        }
+        catch(IOException ex)
+        {
+            ex.printStackTrace();
+            return Response.serverError().entity(ex.getMessage()).build();
+        }
+    }
+    
+    @GET
+    @Path("weatherdatasource/list")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response listWeatherDataSources(){
+        try
+        {
+            BufferedInputStream inputStream = new BufferedInputStream(this.getClass().getResourceAsStream("/weather_datasources_draft_1.yaml"));
             ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
             return Response.ok().entity(mapper.readValue(inputStream, HashMap.class)).build();
         }
