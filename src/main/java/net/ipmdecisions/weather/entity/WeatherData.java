@@ -26,9 +26,7 @@ import com.kjetland.jackson.jsonSchema.annotations.JsonSchemaInject;
 import com.kjetland.jackson.jsonSchema.annotations.JsonSchemaString;
 import com.kjetland.jackson.jsonSchema.annotations.JsonSchemaTitle;
 import java.time.Instant;
-import java.time.OffsetDateTime;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
@@ -50,19 +48,24 @@ import javax.validation.constraints.Size;
 @JsonSchemaDescription("Version 0.1. The schema describes the weather data format for the IPM Decisions platform. See an example here: https://ipmdecisions.nibio.no/WeatherService/rest/forecasts/yr/?longitude=14.3711&latitude=67.2828&altitude=70")
 public class WeatherData {
     @NotNull
-    @JsonPropertyDescription("The timestamp of the first weather observation")
+    @JsonSchemaTitle("Time start (yyyy-MM-dd'T'HH:mm:ssXXX)")
+    @JsonPropertyDescription("The timestamp of the first weather observation. Format: \"yyyy-MM-dd'T'HH:mm:ssXXX\", e.g. 2020-04-09T18:00:00+02:00")
     private Instant timeStart;
     @NotNull
-    @JsonPropertyDescription("The timestamp of the last weather observation")
+    @JsonSchemaTitle("Time end (yyyy-MM-dd'T'HH:mm:ssXXX)")
+    @JsonPropertyDescription("The timestamp of the last weather observation. Format: \"yyyy-MM-dd'T'HH:mm:ssXXX\", e.g. 2020-04-09T18:00:00+02:00")
     private Instant timeEnd;
     @NotNull
     @Positive
+    @JsonSchemaTitle("Sampling frequency (seconds)")
     @JsonPropertyDescription("The sampling frequency in seconds. E.g. 3600 = hourly values")
     private Integer interval; 
     @NotNull
     @Size(min=1)
+    @JsonSchemaTitle("Weather parameters")
     @JsonPropertyDescription("The weather parameters. For reference, see https://ipmdecisions.nibio.no/WeatherService/rest/parameter/list")
     private Integer[] weatherParameters;
+    @JsonSchemaTitle("Weather data")
     @JsonPropertyDescription("The weather data per location.")
     private List<LocationWeatherData> locationWeatherData;
 
