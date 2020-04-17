@@ -39,7 +39,7 @@ public class LocationWeatherData {
     @JsonSchemaTitle("Altitude (Meters)")
     @JsonPropertyDescription("The altitude of the location. Measured in meters")
     private Double altitude;
-    @JsonSchemaTitle("Weather data")
+    @JsonSchemaTitle("Weather data per location")
     @JsonPropertyDescription("The data. In rows, ordered chronologically. Columns ordered as given in weatherParameters.")
     private final Double[][] data;
     
