@@ -22,6 +22,8 @@ package net.ipmdecisions.weather.services;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import java.io.BufferedInputStream;
+import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
 import java.util.HashMap;
 import javax.ws.rs.GET;
@@ -100,9 +102,9 @@ public class WeatherDataSourceService {
     public Response listWeatherDataSources(){
         try
         {
-            BufferedInputStream inputStream = new BufferedInputStream(this.getClass().getResourceAsStream("/weather_datasources_draft_1.yaml"));
+            File dsFile = new File(System.getProperty("net.ipmdecisions.weatherservice.DATASOURCE_LIST_FILE"));
             ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
-            return Response.ok().entity(mapper.readValue(inputStream, HashMap.class)).build();
+            return Response.ok().entity(mapper.readValue(dsFile, HashMap.class)).build();
         }
         catch(IOException ex)
         {
