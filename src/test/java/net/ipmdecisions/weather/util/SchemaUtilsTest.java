@@ -56,7 +56,8 @@ public class SchemaUtilsTest {
     /**
      * Test of isJsonValid method, of class SchemaUtils.
      */
-    @Test
+    //@Test
+    /*
     public void testIsJsonValid_URL_JsonNode() throws Exception {
         System.out.println("isJsonValid");
         URL schemaURL = new URL("https://ipmdecisions.nibio.no/WeatherService/rest/schema/weatherdata");
@@ -76,6 +77,6 @@ public class SchemaUtilsTest {
         result = instance.isJsonValid(schemaURL, jsonNode);
         assertEquals(expResult, result);
         
-    }
+    }*/
 
 }
