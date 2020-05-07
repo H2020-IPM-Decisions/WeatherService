@@ -48,7 +48,7 @@ import org.jboss.resteasy.spi.HttpRequest;
  * @copyright 2020 <a href="http://www.nibio.no/">NIBIO</a>
  * @author Tor-Einar Skog <tor-einar.skog@nibio.no>
  */
-@Path("rest/schema")
+@Path("rest")
 public class MetaDataService {
     @Context
     private HttpRequest httpRequest;
@@ -89,7 +89,7 @@ public class MetaDataService {
 
     
     @GET
-    @Path("weatherdata")
+    @Path("schema/weatherdata")
     @GZIP
     @Produces("application/json;charset=UTF-8")
     public Response getWeatherDataSchema()
@@ -99,7 +99,7 @@ public class MetaDataService {
     }
     
     @POST
-    @Path("weatherdata/validate")
+    @Path("schema/weatherdata/validate")
     @GZIP
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
