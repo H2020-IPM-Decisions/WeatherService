@@ -39,8 +39,7 @@ import javax.validation.constraints.Size;
  * @author Tor-Einar Skog <tor-einar.skog@nibio.no>
  */
 @JsonSchemaInject(strings = {
-    @JsonSchemaString(path = "$id", value="https://ipmdecisions.nibio.no/WeatherService/rest/schema/weatherdata"),
-    @JsonSchemaString(path = "properties/timeStart/type", value="string")
+    @JsonSchemaString(path = "$id", value="https://ipmdecisions.nibio.no/WeatherService/rest/schema/weatherdata")
     }
 )
 @JsonSchemaTitle("Weather Data")
