@@ -39,12 +39,12 @@ import javax.validation.constraints.Size;
  * @author Tor-Einar Skog <tor-einar.skog@nibio.no>
  */
 @JsonSchemaInject(strings = {
-    @JsonSchemaString(path = "$id", value="https://ipmdecisions.nibio.no/WeatherService/rest/schema/weatherdata")
+    @JsonSchemaString(path = "$id", value="https://ipmdecisions.nibio.no/weather/rest/schema/weatherdata")
     }
 )
 @JsonSchemaTitle("Weather Data")
-@JsonSchemaExamples("https://ipmdecisions.nibio.no/WeatherService/rest/forecasts/yr/?longitude=14.3711&latitude=67.2828&altitude=70")
-@JsonSchemaDescription("Version 0.1. The schema describes the weather data format for the IPM Decisions platform. See an example here: https://ipmdecisions.nibio.no/WeatherService/rest/forecasts/yr/?longitude=14.3711&latitude=67.2828&altitude=70")
+@JsonSchemaExamples("https://ipmdecisions.nibio.no/weather/rest/forecasts/yr/?longitude=14.3711&latitude=67.2828&altitude=70")
+@JsonSchemaDescription("Version 0.1. The schema describes the weather data format for the IPM Decisions platform. See an example here: https://ipmdecisions.nibio.no/weather/rest/forecasts/yr/?longitude=14.3711&latitude=67.2828&altitude=70")
 public class WeatherData {
     @NotNull
     @JsonSchemaTitle("Time start (yyyy-MM-dd'T'HH:mm:ssXXX)")
@@ -62,7 +62,7 @@ public class WeatherData {
     @NotNull
     @Size(min=1)
     @JsonSchemaTitle("Weather parameters")
-    @JsonPropertyDescription("The weather parameters. For reference, see https://ipmdecisions.nibio.no/WeatherService/rest/parameter/list")
+    @JsonPropertyDescription("The weather parameters. For reference, see https://ipmdecisions.nibio.no/weather/rest/parameter/list")
     private Integer[] weatherParameters;
     @JsonSchemaTitle("Weather data")
     @JsonPropertyDescription("The weather data per location.")
