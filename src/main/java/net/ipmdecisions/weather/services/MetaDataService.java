@@ -24,7 +24,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.fge.jsonschema.core.exceptions.ProcessingException;
 import com.kjetland.jackson.jsonSchema.JsonSchemaConfig;
 import com.kjetland.jackson.jsonSchema.JsonSchemaGenerator;
-import com.webcohesion.enunciate.metadata.rs.TypeHint;
 import java.io.IOException;
 import java.time.Instant;
 import java.util.HashMap;

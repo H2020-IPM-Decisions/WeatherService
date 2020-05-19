@@ -22,6 +22,7 @@ package net.ipmdecisions.weather.services;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.webcohesion.enunciate.metadata.rs.TypeHint;
 import java.io.BufferedInputStream;
 import java.io.File;
@@ -42,6 +43,7 @@ import javax.ws.rs.core.Response;
 import net.ipmdecisions.weather.datasourceadapters.ParseWeatherDataException;
 import net.ipmdecisions.weather.datasourceadapters.YrWeatherForecastAdapter;
 import net.ipmdecisions.weather.entity.WeatherData;
+import net.ipmdecisions.weather.entity.WeatherDataSource;
 import net.ipmdecisions.weather.entity.WeatherParameter;
 import org.jboss.resteasy.annotations.GZIP;
 
@@ -138,7 +140,14 @@ public class WeatherDataSourceService {
         {
             File dsFile = new File(System.getProperty("net.ipmdecisions.weatherservice.DATASOURCE_LIST_FILE"));
             ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
-            return Response.ok().entity(mapper.readValue(dsFile, HashMap.class)).build();
+            mapper.registerModule(new JavaTimeModule());
+            List<Map> prelim =  (List<Map>) mapper.readValue(dsFile, HashMap.class).get("datasources");
+            List<WeatherDataSource> retVal = new ArrayList<>();
+            for(Map m:prelim)
+            {
+                retVal.add(mapper.convertValue(m, new TypeReference<WeatherDataSource>(){}));
+            }
+            return Response.ok().entity(retVal).build();
         }
         catch(IOException ex)
         {
