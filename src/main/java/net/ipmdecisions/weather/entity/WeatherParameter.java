@@ -22,12 +22,15 @@ package net.ipmdecisions.weather.entity;
 import javax.validation.constraints.NotNull;
 
 /**
+ * Represents a type of agrometeorological measurement relevant to the 
+ * IPM Decisions platform
+ * 
  * @copyright 2020 <a href="http://www.nibio.no/">NIBIO</a>
  * @author Tor-Einar Skog <tor-einar.skog@nibio.no>
  */
 public class WeatherParameter {
     @NotNull
-    private Integer parameterCode;
+    private Integer id;
     @NotNull
     private String name;
     private String description;
@@ -35,21 +38,21 @@ public class WeatherParameter {
     private String unit;
 
     /**
-     * @return the parameterCode
+     * @return A numeric code for unique reference to this parameter
      */
-    public Integer getParameterCode() {
-        return parameterCode;
+    public Integer getId() {
+        return id;
     }
 
     /**
-     * @param parameterCode the parameterCode to set
+     * @param id the id to set
      */
-    public void setParameterCode(Integer parameterCode) {
-        this.parameterCode = parameterCode;
+    public void setId(Integer id) {
+        this.id = id;
     }
 
     /**
-     * @return the name
+     * @return The common name of this parameter
      */
     public String getName() {
         return name;
@@ -63,7 +66,7 @@ public class WeatherParameter {
     }
 
     /**
-     * @return the description
+     * @return Potentially, a longer description and definition of the parameter
      */
     public String getDescription() {
         return description;
@@ -77,7 +80,7 @@ public class WeatherParameter {
     }
 
     /**
-     * @return the unit
+     * @return The unit this parameter is measured in. E.g. celcius, mm, Watt/square meter
      */
     public String getUnit() {
         return unit;

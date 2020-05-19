@@ -19,13 +19,19 @@
 
 package net.ipmdecisions.weather.services;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
+import com.webcohesion.enunciate.metadata.rs.TypeHint;
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -36,15 +42,28 @@ import javax.ws.rs.core.Response;
 import net.ipmdecisions.weather.datasourceadapters.ParseWeatherDataException;
 import net.ipmdecisions.weather.datasourceadapters.YrWeatherForecastAdapter;
 import net.ipmdecisions.weather.entity.WeatherData;
+import net.ipmdecisions.weather.entity.WeatherParameter;
 import org.jboss.resteasy.annotations.GZIP;
 
 /**
+ * Provides information about the platform's weather data sources,
+ * its weather data format and the parameters in use.
  * @copyright 2020 <a href="http://www.nibio.no/">NIBIO</a>
  * @author Tor-Einar Skog <tor-einar.skog@nibio.no>
  */
 @Path("rest")
 public class WeatherDataSourceService {
     
+    /**
+     * Get 9 day weather forecasts from the Norwegian Meteorological Service. 
+     * https://api.met.no/weatherapi/locationforecast/1.9/documentation 
+     * @param longitude WGS84 Decimal degrees
+     * @param latitude WGS84 Decimal degrees
+     * @param altitude Meters above sea level. This is used for correction of 
+     * temperatures (outside of Norway, where the local topological model is used)
+     * @pathExample /rest/forecasts/yr/?longitude=14.3711&latitude=67.2828&altitude=70
+     * @return 
+     */
     @GET
     @POST
     @Path("forecasts/yr/")
@@ -78,24 +97,39 @@ public class WeatherDataSourceService {
 
     }
     
+    /**
+     * 
+     * @return A list of all the weather parameters defined in the platform
+     */
     @GET
     @Path("parameter/list")
     @Produces(MediaType.APPLICATION_JSON)
+    @TypeHint(WeatherParameter[].class)
     public Response listWeatherParameters()
     {
         try
         {
             BufferedInputStream inputStream = new BufferedInputStream(this.getClass().getResourceAsStream("/weather_parameters_draft_v2.yaml"));
             ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
-            return Response.ok().entity(mapper.readValue(inputStream, HashMap.class)).build();
+            Map prelimResult = mapper.readValue(inputStream, HashMap.class);
+            List<Map> parameters = (List<Map>) prelimResult.get("parameters");
+            List<WeatherParameter> retVal = new ArrayList<>();
+            parameters.forEach((pre) -> {
+                retVal.add(mapper.convertValue(pre, new TypeReference<WeatherParameter>(){}));
+            });
+           
+            return Response.ok().entity(retVal).build();
         }
         catch(IOException ex)
         {
-            ex.printStackTrace();
             return Response.serverError().entity(ex.getMessage()).build();
         }
     }
     
+    /**
+     * 
+     * @return A list of all the available weather data sources
+     */
     @GET
     @Path("weatherdatasource/list")
     @Produces(MediaType.APPLICATION_JSON)
@@ -108,7 +142,6 @@ public class WeatherDataSourceService {
         }
         catch(IOException ex)
         {
-            ex.printStackTrace();
             return Response.serverError().entity(ex.getMessage()).build();
         }
     }

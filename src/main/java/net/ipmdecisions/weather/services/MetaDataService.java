@@ -24,6 +24,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.fge.jsonschema.core.exceptions.ProcessingException;
 import com.kjetland.jackson.jsonSchema.JsonSchemaConfig;
 import com.kjetland.jackson.jsonSchema.JsonSchemaGenerator;
+import com.webcohesion.enunciate.metadata.rs.TypeHint;
 import java.io.IOException;
 import java.time.Instant;
 import java.util.HashMap;
@@ -45,6 +46,10 @@ import org.jboss.resteasy.annotations.GZIP;
 import org.jboss.resteasy.spi.HttpRequest;
 
 /**
+ * This service provides information (a Json schema) about the data structure of weather data in 
+ * the IPM Decisions platform. It also provides a validation service for weather data,
+ * ensuring that the data is in compliance with the schema.
+ * 
  * @copyright 2020 <a href="http://www.nibio.no/">NIBIO</a>
  * @author Tor-Einar Skog <tor-einar.skog@nibio.no>
  */
@@ -88,6 +93,10 @@ public class MetaDataService {
     }
 
     
+    /**
+     * 
+     * @return The weather data Json schema (https://json-schema.org/)
+     */
     @GET
     @Path("schema/weatherdata")
     @GZIP
@@ -98,6 +107,11 @@ public class MetaDataService {
         return Response.ok().entity(schema).build();
     }
     
+    /**
+     * Validates the posted weather data against the Json schema
+     * @param weatherData The weather data to validate
+     * @return 
+     */
     @POST
     @Path("schema/weatherdata/validate")
     @GZIP
