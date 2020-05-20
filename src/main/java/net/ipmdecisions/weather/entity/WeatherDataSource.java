@@ -20,7 +20,6 @@
 package net.ipmdecisions.weather.entity;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import java.time.Instant;
 import java.time.LocalDate;
 
 /**
@@ -28,9 +27,43 @@ import java.time.LocalDate;
  * @author Tor-Einar Skog <tor-einar.skog@nibio.no>
  */
 public class WeatherDataSource {
-    private String name, description, public_URL,endpoint, needs_data_control, access_type, spatial;
+    private String name, description, public_URL,endpoint, needs_data_control, access_type;
     private Temporal temporal;
     private Parameters parameters; 
+    private Spatial spatial;
+    
+    static class Spatial {
+        private String[] countries;
+        private String geoJSON;
+
+        /**
+         * @return the countries
+         */
+        public String[] getCountries() {
+            return countries;
+        }
+
+        /**
+         * @param countries the countries to set
+         */
+        public void setCountries(String[] countries) {
+            this.countries = countries;
+        }
+
+        /**
+         * @return the GeoJSON
+         */
+        public String getGeoJSON() {
+            return geoJSON;
+        }
+
+        /**
+         * @param GeoJSON the GeoJSON to set
+         */
+        public void setGeoJSON(String GeoJSON) {
+            this.geoJSON = GeoJSON;
+        }
+    }
     
     static class Temporal {
         private int forecast;
@@ -43,7 +76,6 @@ public class WeatherDataSource {
             /**
              * @return the start
              */
-            @JsonFormat(pattern="yyyy-MM-dd")
             public LocalDate getStart() {
                 return start;
             }
@@ -219,14 +251,14 @@ public class WeatherDataSource {
     /**
      * @return the spatial
      */
-    public String getSpatial() {
+    public Spatial getSpatial() {
         return spatial;
     }
 
     /**
      * @param spatial the spatial to set
      */
-    public void setSpatial(String spatial) {
+    public void setSpatial(Spatial spatial) {
         this.spatial = spatial;
     }
 
