@@ -19,10 +19,13 @@
 
 package net.ipmdecisions.weather.entity;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import java.time.LocalDate;
 
 /**
+ * A weather data source is an online service that provides weather data to the
+ * platform. It could be anything from a national meteorological service to a 
+ * single weather station set up by a farmer
+ * 
  * @copyright 2020 <a href="http://www.nibio.no/">NIBIO</a>
  * @author Tor-Einar Skog <tor-einar.skog@nibio.no>
  */
@@ -32,12 +35,21 @@ public class WeatherDataSource {
     private Parameters parameters; 
     private Spatial spatial;
     
+    /**
+     * Spatial is GEOJson defined. "Sphere" simply means the whole globe (NOT part of GEOJson spec!)
+     * If the resource is a gridded service, the Spatial property is a polygon or a set of polygons
+     * The polygons may be specified directly in the GeoJSON property, or it may be a referenced polygon
+     * in the countries list. Open data sources exist, such as https://github.com/datasets/geo-countries
+     * If the resource is a FeatureCollection of points, this is a weather station network of between at 
+     * least 1 and an indefinite number of stations
+     */
     static class Spatial {
         private String[] countries;
         private String geoJSON;
 
         /**
-         * @return the countries
+         * @return Array of country codes that this service is valid for. 
+         * https://en.wikipedia.org/wiki/ISO_3166-1#Current_codes
          */
         public String[] getCountries() {
             return countries;
@@ -51,7 +63,9 @@ public class WeatherDataSource {
         }
 
         /**
-         * @return the GeoJSON
+         * @return GeoJSON for the areas or locations that the service is valid for
+         * If the access type = location, it is a FeatureCollection of points representing
+         * weather stations
          */
         public String getGeoJSON() {
             return geoJSON;
@@ -65,16 +79,25 @@ public class WeatherDataSource {
         }
     }
     
+    /**
+     * Describes the period for which this data source can provide weather data
+     * 
+     */
     static class Temporal {
         private int forecast;
         private Historic historic;
         
+        /**
+         * To what extent does this data source contain historic/measured data (as opposed to
+         * forecasts)
+         */
         static class Historic {
             
             private LocalDate start, end;
 
             /**
-             * @return the start
+             * @return The date of the first observations. If null, then this data
+             * source does not contain historic/measured data
              */
             public LocalDate getStart() {
                 return start;
@@ -88,9 +111,10 @@ public class WeatherDataSource {
             }
 
             /**
-             * @return the end
+             * @return The date of the last observations. If null (and the start
+             * date is NOT null), the data source is continuously updated with new
+             * weather data observations.
              */
-            @JsonFormat(pattern="yyyy-MM-dd")
             public LocalDate getEnd() {
                 return end;
             }
@@ -104,7 +128,8 @@ public class WeatherDataSource {
         }
 
         /**
-         * @return the forecast
+         * @return The number of days ahead this data source provides weather 
+         * forecasts. If 0, then this is not a weather forecast service
          */
         public int getForecast() {
             return forecast;
@@ -132,6 +157,11 @@ public class WeatherDataSource {
         }
     }
     
+    /**
+     * A list of weather parameters that this weather data source provides.
+     * The parameters are given by their id. For lookup, see: 
+     * https://ipmdecisions.nibio.no/weather/rest/parameter/list
+     */
     static class Parameters {
         private int[] common, optional;
 
