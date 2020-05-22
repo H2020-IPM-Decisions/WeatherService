@@ -23,7 +23,7 @@ import javax.validation.constraints.NotNull;
 
 /**
  * Represents a type of agrometeorological measurement relevant to the 
- * IPM Decisions platform
+ * IPM Decisions platform. Complete list: https://ipmdecisions.nibio.no/weather/rest/parameter/list
  * 
  * @copyright 2020 <a href="http://www.nibio.no/">NIBIO</a>
  * @author Tor-Einar Skog <tor-einar.skog@nibio.no>
