@@ -26,13 +26,11 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.webcohesion.enunciate.metadata.rs.TypeHint;
 import java.io.BufferedInputStream;
 import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -135,6 +133,7 @@ public class WeatherDataSourceService {
     @GET
     @Path("weatherdatasource/list")
     @Produces(MediaType.APPLICATION_JSON)
+    @TypeHint(WeatherDataSource[].class)
     public Response listWeatherDataSources(){
         try
         {
