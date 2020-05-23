@@ -75,8 +75,8 @@ public class MetaDataService {
         JsonSchemaConfig config = JsonSchemaConfig.create(
             JsonSchemaConfig.vanillaJsonSchemaDraft4().autoGenerateTitleForProperties(), 
             Optional.empty(), 
-            JsonSchemaConfig.vanillaJsonSchemaDraft4().useOneOfForOption(), 
-            JsonSchemaConfig.vanillaJsonSchemaDraft4().useOneOfForNullables(), 
+            JsonSchemaConfig.nullableJsonSchemaDraft4().useOneOfForOption(), 
+            JsonSchemaConfig.nullableJsonSchemaDraft4().useOneOfForNullables(), 
             JsonSchemaConfig.vanillaJsonSchemaDraft4().usePropertyOrdering(), 
             JsonSchemaConfig.vanillaJsonSchemaDraft4().hidePolymorphismTypeProperty(), 
             JsonSchemaConfig.vanillaJsonSchemaDraft4().disableWarnings(), 
