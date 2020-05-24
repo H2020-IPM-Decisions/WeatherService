@@ -111,6 +111,7 @@ public class MetaDataService {
      * Validates the posted weather data against the <a href="https://json-schema.org/" target="new">Json schema</a>
      * @param weatherData The weather data to validate
      * @return @return <code>{"isValid":"true"}</code> if the data is valid, <code>{"isValid":"false"}</code> otherwise
+     * @responseExample application/json {"isValid":"true"}
      */
     @POST
     @Path("schema/weatherdata/validate")
