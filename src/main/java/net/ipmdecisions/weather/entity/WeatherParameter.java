@@ -19,6 +19,7 @@
 
 package net.ipmdecisions.weather.entity;
 
+import com.webcohesion.enunciate.metadata.DocumentationExample;
 import javax.validation.constraints.NotNull;
 
 /**
@@ -40,6 +41,7 @@ public class WeatherParameter {
     /**
      * @return A numeric code for unique reference to this parameter
      */
+    @DocumentationExample("1002")
     public Integer getId() {
         return id;
     }
@@ -54,6 +56,7 @@ public class WeatherParameter {
     /**
      * @return The common name of this parameter
      */
+    @DocumentationExample("Mean air temperature at 2m")
     public String getName() {
         return name;
     }
@@ -68,6 +71,7 @@ public class WeatherParameter {
     /**
      * @return Potentially, a longer description and definition of the parameter
      */
+    @DocumentationExample("Long and thorough description of the parameter goes here.")
     public String getDescription() {
         return description;
     }
@@ -82,6 +86,7 @@ public class WeatherParameter {
     /**
      * @return The unit this parameter is measured in. E.g. celcius, mm, Watt/square meter
      */
+    @DocumentationExample("°C")
     public String getUnit() {
         return unit;
     }

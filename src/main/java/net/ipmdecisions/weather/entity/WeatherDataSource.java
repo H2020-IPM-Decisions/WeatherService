@@ -19,6 +19,8 @@
 
 package net.ipmdecisions.weather.entity;
 
+import com.webcohesion.enunciate.metadata.DocumentationExample;
+import com.webcohesion.enunciate.metadata.rs.TypeHint;
 import java.time.LocalDate;
 
 /**
@@ -36,12 +38,18 @@ public class WeatherDataSource {
     private Spatial spatial;
     
     /**
-     * Spatial is GEOJson defined. "Sphere" simply means the whole globe (NOT part of GEOJson spec!)
+     * <p>Spatial is GEOJson defined. 
      * If the resource is a gridded service, the Spatial property is a polygon or a set of polygons
      * The polygons may be specified directly in the GeoJSON property, or it may be a referenced polygon
      * in the countries list. Open data sources exist, such as https://github.com/datasets/geo-countries
      * If the resource is a FeatureCollection of points, this is a weather station network of between at 
-     * least 1 and an indefinite number of stations
+     * least 1 and an indefinite number of stations.
+     * </p>
+     * <p>
+     * If you want to describe a spatial for a service that covers the entire globe, you can use this 
+     * GeoJson: <code>{"type": "Sphere"}</code>. "Sphere" simply means the whole globe (this is NOT part of the GEOJson spec)
+     * 
+     * </p>
      */
     static class Spatial {
         private String[] countries;
@@ -51,6 +59,7 @@ public class WeatherDataSource {
          * @return Array of country codes that this service is valid for. 
          * https://en.wikipedia.org/wiki/ISO_3166-1#Current_codes
          */
+        @DocumentationExample(value="NOR", value2="SWE")
         public String[] getCountries() {
             return countries;
         }
@@ -67,6 +76,13 @@ public class WeatherDataSource {
          * If the access type = location, it is a FeatureCollection of points representing
          * weather stations
          */
+        @DocumentationExample(value = "{\n" +
+            "\"type\": \"FeatureCollection\",\n" +
+            "\"features\": [\n" +
+            "  {\"type\": \"Feature\", \"geometry\": {\"type\": \"Point\", \"coordinates\": [8.68956,62.98474,5]}, \"properties\": {\"name\": \"Surnadal\", \"id\":\"46\",\"WMOCertified\": 5}},\n" +
+            "  {\"type\": \"Feature\", \"geometry\": {\"type\": \"Point\", \"coordinates\": [5.60533332824707,59.0185012817383]}, \"properties\": {\"name\": \"Rygg\", \"id\":\"98\"}}"
+            + "]"
+            + "}", value2 = "{\"type\": \"Sphere\"}")
         public String getGeoJSON() {
             return geoJSON;
         }
@@ -97,8 +113,10 @@ public class WeatherDataSource {
 
             /**
              * @return The date of the first observations. If null, then this data
-             * source does not contain historic/measured data
+             * source does not contain historic/measured data.
+             * @jsonExampleOverride "2010-01-01"
              */
+            @TypeHint(String.class)
             public LocalDate getStart() {
                 return start;
             }
@@ -114,7 +132,10 @@ public class WeatherDataSource {
              * @return The date of the last observations. If null (and the start
              * date is NOT null), the data source is continuously updated with new
              * weather data observations.
+             * Example value: <code>2019-01-01</code> or <code>null</code>
+             * @jsonExampleOverride null
              */
+            @TypeHint(String.class)
             public LocalDate getEnd() {
                 return end;
             }
@@ -131,6 +152,7 @@ public class WeatherDataSource {
          * @return The number of days ahead this data source provides weather 
          * forecasts. If 0, then this is not a weather forecast service
          */
+        @DocumentationExample("0")
         public int getForecast() {
             return forecast;
         }
@@ -143,7 +165,7 @@ public class WeatherDataSource {
         }
 
         /**
-         * @return the historic
+         * @return Information about the contents of measured data in this service
          */
         public Historic getHistoric() {
             return historic;
@@ -166,8 +188,10 @@ public class WeatherDataSource {
         private int[] common, optional;
 
         /**
-         * @return the common
+         * These parameters are always available from this service
+         * @return These parameters are always available from this service
          */
+        @DocumentationExample(value = "1002", value2 = "2001")
         public int[] getCommon() {
             return common;
         }
@@ -180,8 +204,11 @@ public class WeatherDataSource {
         }
 
         /**
-         * @return the optional
+         * These parameters are available from some of the stations or some of 
+         * the locations in this service, but not guaranteed from everywhere
+         * @return List of optional parameters
          */
+        @DocumentationExample(value = "1132", value2 = "3103")
         public int[] getOptional() {
             return optional;
         }
@@ -197,6 +224,7 @@ public class WeatherDataSource {
     /**
      * @return the name
      */
+    @DocumentationExample("Agromet Norway")
     public String getName() {
         return name;
     }
@@ -211,6 +239,7 @@ public class WeatherDataSource {
     /**
      * @return the description
      */
+    @DocumentationExample("Weather station network covering major agricultural areas of Norway. Data before 2010 are available by request. Email lmt@nibio.no")
     public String getDescription() {
         return description;
     }
@@ -225,6 +254,7 @@ public class WeatherDataSource {
     /**
      * @return the public_URL
      */
+    @DocumentationExample("https://lmt.nibio.no/")
     public String getPublic_URL() {
         return public_URL;
     }
@@ -239,6 +269,7 @@ public class WeatherDataSource {
     /**
      * @return the endpoint
      */
+    @DocumentationExample("https://ipmdecisions.nibio.no/lmtservices/rest/ipmdecisions/getdata/")
     public String getEndpoint() {
         return endpoint;
     }
@@ -253,6 +284,7 @@ public class WeatherDataSource {
     /**
      * @return the needs_data_control
      */
+    @DocumentationExample("true")
     public String getNeeds_data_control() {
         return needs_data_control;
     }
@@ -267,6 +299,7 @@ public class WeatherDataSource {
     /**
      * @return the access_type
      */
+    @DocumentationExample("stations")
     public String getAccess_type() {
         return access_type;
     }
@@ -281,7 +314,7 @@ public class WeatherDataSource {
     /**
      * @return the spatial
      */
-    public Spatial getSpatial() {
+        public Spatial getSpatial() {
         return spatial;
     }
 

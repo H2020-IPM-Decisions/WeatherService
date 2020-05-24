@@ -45,7 +45,7 @@ import org.jboss.resteasy.annotations.GZIP;
 import org.jboss.resteasy.spi.HttpRequest;
 
 /**
- * This service provides information (a Json schema) about the data structure of weather data in 
+ * This service provides information (a <a href="https://json-schema.org/" target="new">Json schema</a>) about the data structure of weather data in 
  * the IPM Decisions platform. It also provides a validation service for weather data,
  * ensuring that the data is in compliance with the schema.
  * 
@@ -93,8 +93,9 @@ public class MetaDataService {
 
     
     /**
-     * 
-     * @return The weather data Json schema (https://json-schema.org/)
+     * Get the schema that describes the IPM Decision platform's format for 
+     * exchange of weather data
+     * @return The weather data <a href="https://json-schema.org/" target="new">Json schema</a>
      */
     @GET
     @Path("schema/weatherdata")
@@ -107,7 +108,7 @@ public class MetaDataService {
     }
     
     /**
-     * Validates the posted weather data against the Json schema
+     * Validates the posted weather data against the <a href="https://json-schema.org/" target="new">Json schema</a>
      * @param weatherData The weather data to validate
      * @return 
      */

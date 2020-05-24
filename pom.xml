@@ -4,10 +4,18 @@
 
     <groupId>net.ipmdecisions</groupId>
     <artifactId>IPMDecisionsWeatherService</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>ALPHA-SNAPSHOT</version>
     <packaging>war</packaging>
 
-    <name>IPMDecisionsWeatherService</name>
+    <name>IPM Decisions Weather Service</name>
+    
+    <licenses>
+      <license>
+        <name>GNU Affero General Public License Version 3.0</name>
+        <url>https://www.gnu.org/licenses/agpl-3.0.txt</url>
+        <distribution>repo</distribution>
+      </license>
+    </licenses>
 
     <properties>
         <endorsed.dir>${project.build.directory}/endorsed</endorsed.dir>

@@ -46,8 +46,8 @@ import net.ipmdecisions.weather.entity.WeatherParameter;
 import org.jboss.resteasy.annotations.GZIP;
 
 /**
- * Provides information about the platform's weather data sources,
- * its weather data format and the parameters in use.
+ * This service provides information about the platform's weather data sources,
+ * its weather data format and the weather parameters in use.
  * @copyright 2020 <a href="http://www.nibio.no/">NIBIO</a>
  * @author Tor-Einar Skog <tor-einar.skog@nibio.no>
  */
@@ -55,14 +55,14 @@ import org.jboss.resteasy.annotations.GZIP;
 public class WeatherDataSourceService {
     
     /**
-     * Get 9 day weather forecasts from the Norwegian Meteorological Service. 
-     * https://api.met.no/weatherapi/locationforecast/1.9/documentation 
+     * Get 9 day weather forecasts from <a href="https://www.met.no/en" target="new">The Norwegian Meteorological Institute</a>'s 
+     * <a href="https://api.met.no/weatherapi/locationforecast/1.9/documentation" target="new">Locationforecast API</a> 
      * @param longitude WGS84 Decimal degrees
      * @param latitude WGS84 Decimal degrees
      * @param altitude Meters above sea level. This is used for correction of 
      * temperatures (outside of Norway, where the local topological model is used)
      * @pathExample /rest/forecasts/yr/?longitude=14.3711&latitude=67.2828&altitude=70
-     * @return 
+     * @return the weather forecast formatted in the IPM Decision platform's weather data format
      */
     @GET
     @POST
@@ -98,7 +98,7 @@ public class WeatherDataSourceService {
     }
     
     /**
-     * 
+     * Get a list of all the weather parameters defined in the platform
      * @return A list of all the weather parameters defined in the platform
      */
     @GET
@@ -127,7 +127,7 @@ public class WeatherDataSourceService {
     }
     
     /**
-     * 
+     * Get a list of all the available weather data sources
      * @return A list of all the available weather data sources
      */
     @GET
