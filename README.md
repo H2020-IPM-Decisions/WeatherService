@@ -1,4 +1,5 @@
 <img src="https://ipmdecisions.net/media/phdj3qhd/output-onlinepngtools.png" width="200px;"/>
+
 # IPM Decisions Weather Service
 This service is part of the <a href="https://ipmdecisions.net/" target="new">Horizon 2020 IPM Decisions project</a>.
 The service provides the system with sufficient information for a client to be able to connect to and get information from any weather data source. 
@@ -21,3 +22,6 @@ The catalogue of weather data sources is a searchable list of weather data provi
 ## 3. Adapters for weather data sources to get weather data in the standard format
 Some weather data sources may agree to deliver their weather data in the platform’s format directly. For the data sources that do not, adapters have to be programmed. The adapter's role is to download the data from the specified source and transform it into the platform's format. If the platform is using an adapter to download the weather data from a data source, the adapter's endpoint is specified in the weather data source catalogue.
 The adapters are available from the WeatherDataSourceService.
+
+If you are reading this on GitHub or locally in your repository, the documentation is available in the source code. If you are reading this from a running site, you will find all of the services and data types described in detail in the current web site, which is auto generated using <a href="https://enunciate.webcohesion.com/" target="new">Enunciate</a>
+
