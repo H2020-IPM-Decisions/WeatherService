@@ -1,0 +1,26 @@
+# QC tests
+# Ids are bitmap values, so they can be combined
+- id: 0
+  name: No quality control performed
+  description: There has been no quality control of the parameter
+- id: 1
+  name: OK. Parameter comes from a qualified external source
+  description: The external source has its own quality controls, so we can trust it
+- id: 2
+  name: OK. Quality control performed by IPM Decisions
+  description: The parameter has been QC'd by the IPM Decisions platform and found to be OK
+- id: 4
+  name: Failed. Not an actual number
+  description: TODO
+- id: 8
+  name: Failed. Interval test
+  description: TODO
+- id: 16
+  name: Failed. Logical test
+  description: TODO
+- id: 32
+  name: Failed. Step test
+  description: TODO
+- id: 64
+  name: Failed. Freeze test
+  description: TODO

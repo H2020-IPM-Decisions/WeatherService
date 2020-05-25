@@ -19,15 +19,21 @@
 
 package net.ipmdecisions.weather.services;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.github.fge.jsonschema.core.exceptions.ProcessingException;
 import com.kjetland.jackson.jsonSchema.JsonSchemaConfig;
 import com.kjetland.jackson.jsonSchema.JsonSchemaGenerator;
+import com.webcohesion.enunciate.metadata.rs.TypeHint;
+import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import javax.servlet.http.HttpServletRequest;
@@ -39,7 +45,9 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import net.ipmdecisions.weather.entity.QC;
 import net.ipmdecisions.weather.entity.WeatherData;
+import net.ipmdecisions.weather.entity.WeatherParameter;
 import net.ipmdecisions.weather.util.SchemaUtils;
 import org.jboss.resteasy.annotations.GZIP;
 import org.jboss.resteasy.spi.HttpRequest;
@@ -132,6 +140,63 @@ public class MetaDataService {
         catch(ProcessingException | IOException ex)
         {
             return Response.status(Response.Status.BAD_REQUEST).entity(ex.getMessage()).build();
+        }
+    }
+    
+    /**
+     * Get a list of all the weather parameters defined in the platform
+     * @return A list of all the weather parameters defined in the platform
+     */
+    @GET
+    @Path("parameter")
+    @Produces(MediaType.APPLICATION_JSON)
+    @TypeHint(WeatherParameter[].class)
+    public Response listWeatherParameters()
+    {
+        try
+        {
+            BufferedInputStream inputStream = new BufferedInputStream(this.getClass().getResourceAsStream("/weather_parameters_draft_v2.yaml"));
+            ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
+            Map prelimResult = mapper.readValue(inputStream, HashMap.class);
+            List<Map> parameters = (List<Map>) prelimResult.get("parameters");
+            List<WeatherParameter> retVal = new ArrayList<>();
+            parameters.forEach((pre) -> {
+                retVal.add(mapper.convertValue(pre, new TypeReference<WeatherParameter>(){}));
+            });
+           
+            return Response.ok().entity(retVal).build();
+        }
+        catch(IOException ex)
+        {
+            return Response.serverError().entity(ex.getMessage()).build();
+        }
+    }
+    
+    /**
+     * 
+     * @return The list of QC codes
+     */
+    @GET
+    @Path("qc")
+    @Produces(MediaType.APPLICATION_JSON)
+    @TypeHint(QC[].class)
+    public Response listQCCodes()
+    {
+        try
+        {
+            BufferedInputStream inputStream = new BufferedInputStream(this.getClass().getResourceAsStream("/qc_tests.yaml"));
+            ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
+            List prelimResult = mapper.readValue(inputStream, ArrayList.class);
+            List<QC> retVal = new ArrayList<>();
+            prelimResult.forEach((pre) -> {
+                retVal.add(mapper.convertValue(pre, new TypeReference<QC>(){}));
+            });
+           
+            return Response.ok().entity(retVal).build();
+        }
+        catch(IOException ex)
+        {
+            return Response.serverError().entity(ex.getMessage()).build();
         }
     }
 }

@@ -51,6 +51,7 @@ public class JAXActivator extends Application{
     private void addRestResourceClasses(Set<Class<?>> resources) {
         resources.add(net.ipmdecisions.weather.services.JacksonConfig.class);
         resources.add(net.ipmdecisions.weather.services.MetaDataService.class);
+        resources.add(net.ipmdecisions.weather.services.WeatherAdapterService.class);
         resources.add(net.ipmdecisions.weather.services.WeatherDataSourceService.class);
     }
 }

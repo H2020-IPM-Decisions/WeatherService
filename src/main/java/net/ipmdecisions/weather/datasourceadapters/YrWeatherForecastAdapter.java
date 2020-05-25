@@ -51,6 +51,10 @@ public class YrWeatherForecastAdapter {
         2001, // Precipitation (mm)
         4002 // Instantaneous wind speed at 2m
     };
+    // Make sure QC is just as long as parameters
+    // This indicates that each parameter has been controlled by the supplier, and that everything's OK
+    Integer[] QC = {1,1,1,1};
+    
 
     //private final static String YR_API_URL = "https://api.met.no/weatherapi/locationforecastlts/1.3/?lat={0};lon={1};msl={2}";
     private final static String YR_API_URL = "https://api.met.no/weatherapi/locationforecast/1.9/?lat={0};lon={1};msl={2}";
@@ -147,6 +151,7 @@ public class YrWeatherForecastAdapter {
             WeatherData retVal = new WeatherData();
             retVal.setInterval(3600);
             retVal.setWeatherParameters(this.parameters);
+            retVal.setQC(QC);
             retVal.setTimeStart(timeStart);
             retVal.setTimeEnd(timeEnd);
             retVal.addLocationWeatherData(yrValues);
@@ -154,7 +159,7 @@ public class YrWeatherForecastAdapter {
         }
         catch(IOException | ParserConfigurationException | SAXException | NullPointerException ex)
         {
-            ex.printStackTrace();
+            //ex.printStackTrace();
             throw new ParseWeatherDataException(ex.getClass().getName() + ": " + ex.getMessage());
         }
     }
