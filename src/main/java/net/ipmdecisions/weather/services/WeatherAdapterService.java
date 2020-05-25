@@ -32,6 +32,13 @@ import net.ipmdecisions.weather.entity.WeatherData;
 import org.jboss.resteasy.annotations.GZIP;
 
 /**
+ * Some weather data sources may agree to deliver their weather data in the 
+ * platform’s format directly. For the data sources that do not, adapters have 
+ * to be programmed. The adapter's role is to download the data from the 
+ * specified source and transform it into the platform's format. If the platform 
+ * is using an adapter to download the weather data from a data source, the 
+ * adapter's endpoint is specified in the weather data source catalogue.
+ * 
  * @copyright 2020 <a href="http://www.nibio.no/">NIBIO</a>
  * @author Tor-Einar Skog <tor-einar.skog@nibio.no>
  */
