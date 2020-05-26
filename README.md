@@ -14,7 +14,7 @@ The format is described as a <a href="https://json-schema.org/" target="new">Jso
 <li><a href="../rest/schema/weatherdata" target="new">here</a> if you are reading this from a running version of the site</li>
 <li><a href="https://ipmdecisions.nibio.no/weather/rest/schema/weatherdata" target="new">here</a> if you are looking directly at README.md in the source code. (It may not be the most recent one)</li>
 </ul>
-The schema and the validation service for weather data are part of the MetaDataService.
+The schema and the validation service for weather data are part of the MetaDataService. The MetaDataService also provides lists of the weather parameters and QC codes.
 
 ## 2. A catalogue of weather data sources available to the platform
 The catalogue of weather data sources is a searchable list of weather data providers available to the platform. Each data source is described both in human readable format and through meta data. The latter enables a client to generate a weather data request to send to the data source. The catalogue is available from the WeatherDataSourceService.
