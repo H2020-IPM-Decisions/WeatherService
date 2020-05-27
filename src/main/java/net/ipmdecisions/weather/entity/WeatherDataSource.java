@@ -38,6 +38,120 @@ public class WeatherDataSource {
     private Spatial spatial;
     
     /**
+     * A data class for identifying the Organization behind/responsible for the Weather data source
+     */
+    static class Organization {
+        private String name, country, address, postal_code, city, email, url;
+
+        /**
+         * @return the name of the Organization. E.g. ADAS, NIBIO
+         */
+        @DocumentationExample("NIBIO")
+        public String getName() {
+            return name;
+        }
+
+        /**
+         * @param name the name to set
+         */
+        public void setName(String name) {
+            this.name = name;
+        }
+
+        /**
+         * @return the country of the Organization
+         */
+        @DocumentationExample("Norway")
+        public String getCountry() {
+            return country;
+        }
+
+        /**
+         * @param country the country to set
+         */
+        public void setCountry(String country) {
+            this.country = country;
+        }
+
+        /**
+         * @return the address
+         */
+        @DocumentationExample("Postboks 115")
+        public String getAddress() {
+            return address;
+        }
+
+        /**
+         * @param address the address to set
+         */
+        public void setAddress(String address) {
+            this.address = address;
+        }
+
+        /**
+         * @return the postal_code
+         */
+        @DocumentationExample("1431")
+        public String getPostal_code() {
+            return postal_code;
+        }
+
+        /**
+         * @param postal_code the postal_code to set
+         */
+        public void setPostal_code(String postal_code) {
+            this.postal_code = postal_code;
+        }
+
+        /**
+         * @return the city
+         */
+        @DocumentationExample("Ås")
+        public String getCity() {
+            return city;
+        }
+
+        /**
+         * @param city the city to set
+         */
+        public void setCity(String city) {
+            this.city = city;
+        }
+
+        /**
+         * @return the email. Preferably the email to a person
+         * or department responsible for the DSS
+         */
+        @DocumentationExample("acme@foobar.com")
+        public String getEmail() {
+            return email;
+        }
+
+        /**
+         * @param email the email to set
+         */
+        public void setEmail(String email) {
+            this.email = email;
+        }
+
+        /**
+         * @return the url
+         */
+        public String getUrl() {
+            return url;
+        }
+
+        /**
+         * @param url the url to set
+         */
+        public void setUrl(String url) {
+            this.url = url;
+        }
+        
+    }
+    
+    
+    /**
      * <p>Spatial is GEOJson defined. 
      * If the resource is a gridded service, the Spatial property is a polygon or a set of polygons
      * The polygons may be specified directly in the GeoJSON property, or it may be a referenced polygon
@@ -51,7 +165,7 @@ public class WeatherDataSource {
      * 
      * </p>
      */
-    static class Spatial {
+    public static class Spatial {
         private String[] countries;
         private String geoJSON;
 
