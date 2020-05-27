@@ -36,6 +36,7 @@ public class WeatherDataSource {
     private Temporal temporal;
     private Parameters parameters; 
     private Spatial spatial;
+    private Organization organization;
     
     /**
      * A data class for identifying the Organization behind/responsible for the Weather data source
@@ -465,5 +466,19 @@ public class WeatherDataSource {
      */
     public void setParameters(Parameters parameters) {
         this.parameters = parameters;
+    }
+
+    /**
+     * @return the organization
+     */
+    public Organization getOrganization() {
+        return organization;
+    }
+
+    /**
+     * @param organization the organization to set
+     */
+    public void setOrganization(Organization organization) {
+        this.organization = organization;
     }
 }
