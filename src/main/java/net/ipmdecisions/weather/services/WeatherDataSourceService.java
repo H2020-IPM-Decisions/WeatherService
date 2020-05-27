@@ -27,15 +27,32 @@ import com.webcohesion.enunciate.metadata.rs.TypeHint;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
+import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import net.ipmdecisions.weather.entity.WeatherDataSource;
+import net.ipmdecisions.weather.util.GISUtils;
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.Geometry;
+import org.wololo.geojson.Feature;
+import org.wololo.geojson.FeatureCollection;
+import org.wololo.geojson.GeoJSONFactory;
+import org.wololo.geojson.Point;
+import org.wololo.jts2geojson.GeoJSONReader;
+import org.wololo.jts2geojson.GeoJSONWriter;
 
 /**
  * This service provides information about the platform's weather data sources,
@@ -57,6 +74,121 @@ public class WeatherDataSourceService {
     public Response listWeatherDataSources(){
         try
         {
+            return Response.ok().entity(this.getAllWeatherDataSources()).build();
+        }
+        catch(IOException ex)
+        {
+            return Response.serverError().entity(ex.getMessage()).build();
+        }
+    }
+    
+    /**
+     * Search for weather data sources that serve the specific location. The location
+     * can by any valid Geometry, such as Point or Polygon. 
+     * @param tolerance Add some tolerance (in meters) to allow for e.g. a point to match
+     * the location of a weather station. The default is 0 meters (no tolerance)
+     * @param geoJson valid GeoJSON https://geojson.org/
+     * @return A list of all the matching weather data sources
+     */
+    @POST
+    @Path("weatherdatasource/location")
+    @Consumes("application/json")
+    @Produces("application/json")
+    @TypeHint(WeatherDataSource[].class)
+    public Response listWeatherDataSourcesForLocation(@QueryParam("tolerance") Double tolerance, String geoJson)
+    {
+        Double toleranceFinal = tolerance == null ? 0.0 : tolerance;
+        try
+        {
+        FeatureCollection featureCollection = (FeatureCollection) GeoJSONFactory.create(geoJson);
+        GeoJSONReader reader = new GeoJSONReader();
+        // Get all geometries in request
+        List<Geometry> geometries = new ArrayList<>();
+        for(Feature feature: featureCollection.getFeatures())
+        {
+            Geometry geom = reader.read(feature.getGeometry());
+            geometries.add(geom);
+        }
+        // Loop through all weather data sources
+        GISUtils gisUtils = new GISUtils();
+        List<WeatherDataSource> retVal = this.getAllWeatherDataSources().stream().filter(dataSource->{
+            // Get all geometries in current weather data source
+            String geoJson2 = dataSource.getSpatial().getGeoJSON();
+            // We do a brute force search for the string "Sphere" in the geoJSON string
+            // to bypass any issues in deserialization of that custom type, which is 
+            // short for creating a polygon that covers the entire globe
+            if(geoJson2.contains("\"Sphere\""))
+            {
+                return true;
+            }
+            FeatureCollection featureC2 = (FeatureCollection) GeoJSONFactory.create(geoJson2);
+            // Match with all geometries in request. If found, add data source to
+            // list of matching data sources
+            List<Geometry> geom2 = Arrays.asList(featureC2.getFeatures()).stream().map(f->
+            {
+                    return reader.read(f.getGeometry());
+            }
+            ).
+            filter(g2->{
+                Boolean matching = false;
+                for(Geometry g1: geometries)
+                {
+                    if(g2.intersects(g1) || gisUtils.getDistanceInMetersWGS84(g2.distance(g1)) <= toleranceFinal)
+                    {
+                        System.out.println("Distance: " + gisUtils.getDistanceInMetersWGS84(g2.distance(g1)));
+                        matching = true;
+                    }
+                }
+                return matching;
+            }).collect(Collectors.toList());
+            
+            return geom2.size() > 0;
+        }).collect(Collectors.toList());
+        
+        return Response.ok().entity(retVal).build();
+        }catch(IOException ex)
+        {
+            return Response.serverError().entity(ex.getMessage()).build();
+        }
+    }
+    
+    /**
+     * Search for weather data sources that serve the specific point. 
+     * @param tolerance Add some tolerance (in meters) to allow for e.g. a point to match
+     * the location of a weather station. The default is 0 meters (no tolerance)
+     * @param latitude in decimal degrees (WGS84)
+     * @param longitude in decimal degrees (WGS84)
+     * @return A list of all the matching weather data sources
+     */
+    @GET
+    @Path("weatherdatasource/location/point")
+    @Produces("application/json")
+    @TypeHint(WeatherDataSource[].class)
+    public Response listWeatherDataSourcesForPoint(
+            @QueryParam("latitude") Double latitude, 
+            @QueryParam("longitude") Double longitude,
+            @QueryParam("tolerance") Double tolerance
+            )
+    {
+        tolerance = tolerance == null ? 0.0 : tolerance;
+        // Generate GeoJSON for a point and call the general method
+        double[] coordinate = new double[2];
+        coordinate[0] = longitude;
+        coordinate[1] = latitude;
+        Point point = new Point(coordinate);
+        List<Feature> features = new ArrayList<>();
+        Map<String, Object> properties = new HashMap<>();
+        features.add(new Feature(point,properties));
+        GeoJSONWriter writer = new GeoJSONWriter();
+        return this.listWeatherDataSourcesForLocation(tolerance, writer.write(features).toString());
+    }
+    
+    /**
+     * Util method to read the catalogue from a YAML file
+     * @return
+     * @throws IOException 
+     */
+    private List<WeatherDataSource> getAllWeatherDataSources() throws IOException{
             File dsFile = new File(System.getProperty("net.ipmdecisions.weatherservice.DATASOURCE_LIST_FILE"));
             ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
             mapper.registerModule(new JavaTimeModule());
@@ -65,11 +197,6 @@ public class WeatherDataSourceService {
             prelim.forEach((m) -> {
                 retVal.add(mapper.convertValue(m, new TypeReference<WeatherDataSource>(){}));
             });
-            return Response.ok().entity(retVal).build();
-        }
-        catch(IOException ex)
-        {
-            return Response.serverError().entity(ex.getMessage()).build();
-        }
+            return retVal;
     }
 }
