@@ -100,50 +100,52 @@ public class WeatherDataSourceService {
         Double toleranceFinal = tolerance == null ? 0.0 : tolerance;
         try
         {
-        FeatureCollection featureCollection = (FeatureCollection) GeoJSONFactory.create(geoJson);
+        FeatureCollection clientFeatures = (FeatureCollection) GeoJSONFactory.create(geoJson);
         GeoJSONReader reader = new GeoJSONReader();
         // Get all geometries in request
-        List<Geometry> geometries = new ArrayList<>();
-        for(Feature feature: featureCollection.getFeatures())
+        List<Geometry> clientGeometries = new ArrayList<>();
+        for(Feature feature: clientFeatures.getFeatures())
         {
             Geometry geom = reader.read(feature.getGeometry());
-            geometries.add(geom);
+            clientGeometries.add(geom);
         }
         // Loop through all weather data sources
+        // Return only data sources with geometries intersecting with the client's
+        // specified geometries
         GISUtils gisUtils = new GISUtils();
         List<WeatherDataSource> retVal = this.getAllWeatherDataSources().stream().filter(dataSource->{
             // Get all geometries in current weather data source
-            String geoJson2 = dataSource.getSpatial().getGeoJSON();
+            String dataSourceGeoJsonStr = dataSource.getSpatial().getGeoJSON();
             // We do a brute force search for the string "Sphere" in the geoJSON string
             // to bypass any issues in deserialization of that custom type, which is 
             // short for creating a polygon that covers the entire globe
-            if(geoJson2.contains("\"Sphere\""))
+            if(dataSourceGeoJsonStr.contains("\"Sphere\""))
             {
                 return true;
             }
-            FeatureCollection featureC2 = (FeatureCollection) GeoJSONFactory.create(geoJson2);
+            FeatureCollection dataSourceFeatures = (FeatureCollection) GeoJSONFactory.create(dataSourceGeoJsonStr);
             // Match with all geometries in request. If found, add data source to
             // list of matching data sources
-            List<Geometry> geom2 = Arrays.asList(featureC2.getFeatures()).stream().map(f->
-            {
-                    return reader.read(f.getGeometry());
-            }
-            ).
-            filter(g2->{
+            List<Geometry> dataSourceGeometries = Arrays.asList(dataSourceFeatures.getFeatures()).stream()
+            .map(f->{ return reader.read(f.getGeometry()); })
+            .filter(dataSourceGeometry->{
                 Boolean matching = false;
-                for(Geometry g1: geometries)
+                for(Geometry clientGeometry: clientGeometries)
                 {
-                    if(g2.intersects(g1) || gisUtils.getDistanceInMetersWGS84(g2.distance(g1)) <= toleranceFinal)
+                    if(dataSourceGeometry.intersects(clientGeometry) || gisUtils.getDistanceInMetersWGS84(dataSourceGeometry.distance(clientGeometry)) <= toleranceFinal)
                     {
-                        System.out.println("Distance: " + gisUtils.getDistanceInMetersWGS84(g2.distance(g1)));
+                        //System.out.println("Distance: " + gisUtils.getDistanceInMetersWGS84(dataSourceGeometry.distance(clientGeometry)));
                         matching = true;
                     }
                 }
                 return matching;
-            }).collect(Collectors.toList());
-            
-            return geom2.size() > 0;
-        }).collect(Collectors.toList());
+            })
+            .collect(Collectors.toList());
+            // The number of matching geometries for this weather data source
+            // Used as filter criteria
+            return dataSourceGeometries.size() > 0; 
+        })
+        .collect(Collectors.toList());
         
         return Response.ok().entity(retVal).build();
         }catch(IOException ex)
