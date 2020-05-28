@@ -85,6 +85,26 @@ public class WeatherDataSourceService {
     /**
      * Search for weather data sources that serve the specific location. The location
      * can by any valid Geometry, such as Point or Polygon. 
+     * Example GeoJson input
+     * <pre>
+     * {
+        "type": "FeatureCollection",
+        "features": [
+          {
+            "type": "Feature",
+            "properties": {},
+            "geometry": {
+              "type": "Point",
+              "coordinates": [
+                12.01629638671875,
+                59.678835236960765
+              ]
+            }
+          }
+        ]
+      }
+     * 
+     * </pre>
      * @param tolerance Add some tolerance (in meters) to allow for e.g. a point to match
      * the location of a weather station. The default is 0 meters (no tolerance)
      * @param geoJson valid GeoJSON https://geojson.org/
@@ -161,6 +181,8 @@ public class WeatherDataSourceService {
      * @param latitude in decimal degrees (WGS84)
      * @param longitude in decimal degrees (WGS84)
      * @return A list of all the matching weather data sources
+     * 
+     * @pathExample /rest/weatherdatasource/location/point/?latitude=59.678835236960765&longitude=12.01629638671875
      */
     @GET
     @Path("weatherdatasource/location/point")
