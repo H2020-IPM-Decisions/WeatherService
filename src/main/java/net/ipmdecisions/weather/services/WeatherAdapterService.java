@@ -19,6 +19,12 @@
 
 package net.ipmdecisions.weather.services;
 
+import java.time.Instant;
+import java.time.ZonedDateTime;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
+import java.util.stream.Collectors;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -26,8 +32,10 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
 import net.ipmdecisions.weather.datasourceadapters.ParseWeatherDataException;
 import net.ipmdecisions.weather.datasourceadapters.YrWeatherForecastAdapter;
+import net.ipmdecisions.weather.datasourceadapters.finnishmeteorologicalinstitute.FinnishMeteorologicalInstituteAdapter;
 import net.ipmdecisions.weather.entity.WeatherData;
 import org.jboss.resteasy.annotations.GZIP;
 
@@ -86,5 +94,55 @@ public class WeatherAdapterService {
         }
 
     }
+    
+    /**
+     * Get weather observations in the IPM Decision's weather data format from the Finnish Meteorological Institute https://en.ilmatieteenlaitos.fi/
+     * Access is made through the Institute's open data API: https://en.ilmatieteenlaitos.fi/open-data
+     * 
+     * @param weatherStationId The weather station id (FMISID) in the open data API https://en.ilmatieteenlaitos.fi/observation-stations?filterKey=groups&filterQuery=weather
+     * @param timeStart Start of weather data period (ISO-8601 Timestamp, e.g. 2020-06-12T00:00:00+03:00)
+     * @param timeEnd End of weather data period (ISO-8601 Timestamp, e.g. 2020-07-03T00:00:00+03:00)
+     * @param logInterval The measuring interval in seconds. Please note that the only allowed interval in this version is 3600 (hourly)
+     * @param parameters Comma separated list of the requested weather parameters, given by <a href="/rest/parameter" target="new">their codes</a>
+     * @param ignoreErrors Set to "true" if you want the service to return weather data regardless of there being errors in the service
+     * @pathExample /rest/weatheradapter/fmi/?weatherStationId=101104&interval=3600&ignoreErrors=true&timeStart=2020-06-12T00:00:00%2B03:00&timeEnd=2020-07-03T00:00:00%2B03:00&parameters=1002,3002
+     * @return 
+     */
+    @GET
+    @POST
+    @Path("fmi/")
+    @GZIP
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getFMIObservations(
+            @QueryParam("weatherStationId") Integer weatherStationId,
+            @QueryParam("timeStart") String timeStart,
+            @QueryParam("timeEnd") String timeEnd,
+            @QueryParam("interval") Integer logInterval,
+            @QueryParam("parameters") String parameters,
+            @QueryParam("ignoreErrors") String ignoreErrors
+    )
+    {
+        List<Integer> ipmDecisionsParameters = Arrays.asList(parameters.split(",")).stream()
+                    .map(paramstr->Integer.parseInt(paramstr.strip())).collect(Collectors.toList());
+        // Date parsing
+        Instant timeStartInstant = ZonedDateTime.parse(timeStart).toInstant();
+        Instant timeEndInstant = ZonedDateTime.parse(timeEnd).toInstant();
+        
+        Boolean ignoreErrorsB = ignoreErrors != null ? ignoreErrors.equals("true") : false;
+        
+        // We only accept requests for hourly data
+        if(!logInterval.equals(3600))
+        {
+            return Response.status(Status.BAD_REQUEST).entity("This service only provides hourly data").build();
+        }
+
+            WeatherData theData = new FinnishMeteorologicalInstituteAdapter().getHourlyData(weatherStationId, timeStartInstant, timeEndInstant, ipmDecisionsParameters, ignoreErrorsB);
+            
+            return Response.ok().entity(theData).build();       
+//            return Response.serverError().entity(ex.getMessage()).build();
+
+
+    }
+    
     
 }
