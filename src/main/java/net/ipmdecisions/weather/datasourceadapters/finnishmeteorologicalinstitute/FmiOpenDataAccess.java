@@ -21,6 +21,10 @@ package net.ipmdecisions.weather.datasourceadapters.finnishmeteorologicalinstitu
 
 import java.io.*;
 import java.net.*;
+import java.text.MessageFormat;
+import java.time.Instant;
+import java.time.format.DateTimeFormatter;
+import java.util.Scanner;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -195,6 +199,36 @@ public class FmiOpenDataAccess {
         response += fmiParser.getAsJSON(fmiResponse, temporalFactor);
         response = response.replace("][", ", ");
         return response;
+    }
+    
+    /**
+     * Global radiation data from the given FMI station id
+     * @param fmiSid
+     * @param startDateTime
+     * @param endDateTime
+     * @return 
+     */
+    public String getRadiationData(String fmiSid, Instant startDateTime, Instant endDateTime) 
+    {
+        try
+        {
+        String URLTemplate = "http://opendata.fmi.fi/wfs?request=getFeature&storedquery_id=fmi::observations::radiation::multipointcoverage&fmisid={0}&parameters=GLOB_1MIN&starttime={1}&endtime={2}";
+            /*System.out.println(MessageFormat.format(URLTemplate, 
+                    fmiSid, 
+                    DateTimeFormatter.ISO_INSTANT.format(startDateTime), 
+                    DateTimeFormatter.ISO_INSTANT.format(endDateTime)
+            ));*/
+        return new Scanner(new URL(MessageFormat.format(URLTemplate, 
+                    fmiSid, 
+                    DateTimeFormatter.ISO_INSTANT.format(startDateTime), 
+                    DateTimeFormatter.ISO_INSTANT.format(endDateTime)
+            )).openStream(), "UTF-8").useDelimiter("\\A").next();
+
+        } catch(IOException  ex)
+        {
+            ex.printStackTrace();
+        }
+        return null;
     }
     
     private String restGet(String url) {

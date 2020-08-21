@@ -17,7 +17,7 @@
  * 
  */
 
-package net.ipmdecisions.weather.datasourceadapters.finnishmeteorologicalinstitute;
+package net.ipmdecisions.weather.util.vips;
 
 
 import com.fasterxml.jackson.annotation.JsonFormat;

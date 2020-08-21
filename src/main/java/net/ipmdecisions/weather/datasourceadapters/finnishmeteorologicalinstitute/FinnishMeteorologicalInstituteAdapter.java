@@ -19,19 +19,17 @@
 
 package net.ipmdecisions.weather.datasourceadapters.finnishmeteorologicalinstitute;
 
+import net.ipmdecisions.weather.util.vips.VIPSWeatherObservation;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
-import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.stream.Collectors;
 import net.ipmdecisions.weather.entity.LocationWeatherData;
 import net.ipmdecisions.weather.entity.WeatherData;
@@ -56,6 +54,32 @@ public class FinnishMeteorologicalInstituteAdapter {
             String obsAsString = obsAsStringWithPositionPrefix[1];
             ObjectMapper mapper = new ObjectMapper();
             List<VIPSWeatherObservation> observations = mapper.readValue(obsAsString, new TypeReference<List<VIPSWeatherObservation>>(){});
+            
+            // If global radiation has been requested, try to get it (not all stations
+            // measure it) and add to collection.
+            if(ipmDecisionsParameters.contains(5001))
+            {
+                FmiOpenDataAccess dA = new FmiOpenDataAccess();
+                FmiOpenDataRadiationParser rP = new FmiOpenDataRadiationParser();
+                // Radiation data max period is 7 days (168 hours)
+                Instant start7DayPeriod = timeStart;
+                Instant end7DayPeriod = start7DayPeriod.plus(7, ChronoUnit.DAYS);
+                while(start7DayPeriod.isBefore(timeEnd))
+                {
+                    String radiationDataFromFMIXML = dA.getRadiationData(weatherStationId.toString(), start7DayPeriod, end7DayPeriod);
+                    //System.out.println(radiationDataFromFMIXML);
+                    if(!radiationDataFromFMIXML.isBlank())
+                    {
+                        List<VIPSWeatherObservation> newObs = rP.getVIPSWeatherObservations(radiationDataFromFMIXML);
+                        if(newObs != null)
+                        {
+                            observations.addAll(newObs);
+                        }
+                    }
+                    start7DayPeriod = start7DayPeriod.plus(7, ChronoUnit.DAYS);
+                    end7DayPeriod = end7DayPeriod.plus(7, ChronoUnit.DAYS);
+                }
+            }
             
             Integer[] parameters = observations.stream()
                     .filter(obs->ipmDecisionsParameters.contains(Integer.valueOf(obs.getElementMeasurementTypeId())))
@@ -94,6 +118,13 @@ public class FinnishMeteorologicalInstituteAdapter {
                     ipmData.setValue(row.intValue(), col, obse.getValue());
             });
             weatherData.addLocationWeatherData(ipmData);
+            
+            // Set the QC - all is 1, as this comes from an official meteorological office
+            Integer[] QC = new Integer[weatherData.getWeatherParameters().length];
+            for(int i=0;i<QC.length;i++) {
+                QC[i] = 1;
+            }
+            weatherData.setQC(QC);
             return weatherData;
         }
         catch(IOException ex)
