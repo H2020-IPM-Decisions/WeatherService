@@ -27,6 +27,7 @@ import java.time.Instant;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -81,6 +82,12 @@ public class FinnishMeteorologicalInstituteAdapter {
                 }
             }
             
+            observations = observations.stream()
+                    .filter(obs->ipmDecisionsParameters.contains(Integer.valueOf(obs.getElementMeasurementTypeId())))
+                    .collect(Collectors.toList());
+            
+            return this.getWeatherDataFromVIPSWeatherObservations(observations, Double.valueOf(latLongStr[1]), Double.valueOf(latLongStr[0]));
+            /*
             Integer[] parameters = observations.stream()
                     .filter(obs->ipmDecisionsParameters.contains(Integer.valueOf(obs.getElementMeasurementTypeId())))
                     .map(obs->Integer.valueOf(obs.getElementMeasurementTypeId()))
@@ -126,12 +133,70 @@ public class FinnishMeteorologicalInstituteAdapter {
             }
             weatherData.setQC(QC);
             return weatherData;
+        */
         }
         catch(IOException ex)
         {
             ex.printStackTrace();
             return null;
         }
+    }
+    
+    public WeatherData getWeatherDataFromVIPSWeatherObservations(List<VIPSWeatherObservation> observations, Double longitude, Double latitude)
+    {
+        Integer[] parameters = observations.stream()
+                    .map(obs->Integer.valueOf(obs.getElementMeasurementTypeId()))
+                    .collect(Collectors.toSet())
+                    .toArray(Integer[]::new);
+                    
+            Map<Integer,Integer> paramCol = new HashMap<>();
+            for(int i=0;i<parameters.length;i++)
+            {
+                paramCol.put(parameters[i], i);
+            }
+        Collections.sort(observations);
+        Instant timeStart = observations.get(0).getTimeMeasured().toInstant();
+        Instant timeEnd = observations.get(observations.size()-1).getTimeMeasured().toInstant();
+        // Convert to IPM Decisions format
+        Integer interval = 3600; // Hourly data
+        Long rows = 1 + timeStart.until(timeEnd, ChronoUnit.SECONDS) / interval;
+        LocationWeatherData ipmData = new LocationWeatherData(
+                longitude,
+                latitude,
+                0.0,
+                rows.intValue(),
+                parameters.length
+        );
+        WeatherData weatherData = new WeatherData();
+        weatherData.setInterval(interval);
+        weatherData.setTimeStart(timeStart);
+        weatherData.setTimeEnd(timeEnd);
+        weatherData.setWeatherParameters(parameters);
+
+        observations.stream()
+
+            .forEach(obse -> {
+                Long row = timeStart.until(obse.getTimeMeasured().toInstant(), ChronoUnit.SECONDS) / interval;
+                Integer col = paramCol.get(Integer.valueOf(obse.getElementMeasurementTypeId()));
+                ipmData.setValue(row.intValue(), col, obse.getValue());
+        });
+        weatherData.addLocationWeatherData(ipmData);
+
+        // Set the QC - all is 1, as this comes from an official meteorological office
+        Integer[] QC = new Integer[weatherData.getWeatherParameters().length];
+        for(int i=0;i<QC.length;i++) {
+            QC[i] = 1;
+        }
+        weatherData.setQC(QC);
+        return weatherData;
+    }
+
+    public WeatherData getWeatherForecasts(Double longitude, Double latitude, Double altitude) {
+        FmiOpenDataAccess dA = new FmiOpenDataAccess();
+        FmiOpenDataForecastParser fP = new FmiOpenDataForecastParser();
+        String forecastXML = dA.getForecastData(longitude, latitude);
+        List<VIPSWeatherObservation> forecastObs = fP.getVIPSWeatherObservations(forecastXML);
+        return this.getWeatherDataFromVIPSWeatherObservations(forecastObs, longitude, latitude);
     }
 
 }

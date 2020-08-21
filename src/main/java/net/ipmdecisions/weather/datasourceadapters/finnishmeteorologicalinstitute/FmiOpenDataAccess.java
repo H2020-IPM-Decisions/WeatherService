@@ -23,6 +23,9 @@ import java.io.*;
 import java.net.*;
 import java.text.MessageFormat;
 import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Scanner;
 import javax.xml.parsers.DocumentBuilder;
@@ -267,5 +270,35 @@ public class FmiOpenDataAccess {
         
         return response;
     }
+
+    /**
+     * 36 hour forecast data for given position
+     * @param longitude
+     * @param latitude
+     * @return 
+     */
+    public String getForecastData(Double longitude, Double latitude)
+    {
+        try
+        {
+            String URLTemplate = "http://opendata.fmi.fi/wfs?storedquery_id=fmi::forecast::hirlam::surface::point::multipointcoverage&latlon={0},{1}&request=getFeature&starttime={2}&parameters=Temperature,Humidity,WindSpeedMS,DewPoint,Precipitation1h,radiationglobal";
+            // Get today at midnight, GMT time zone
+            LocalDateTime todayAtMidnight = LocalDateTime.now().withHour(0).withMinute(0).withSecond(0);
+            ZoneId UTCId = ZoneId.of("UTC");
+            ZonedDateTime UTCTodayAtMidnight = ZonedDateTime.of(todayAtMidnight, UTCId);
+            
+            return new Scanner(new URL(MessageFormat.format(URLTemplate, 
+                        latitude, longitude,
+                        UTCTodayAtMidnight.format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ssX"))
+                )).openStream(), "UTF-8").useDelimiter("\\A").next();
+
+        } catch(IOException  ex)
+        {
+            ex.printStackTrace();
+        }
+        return null;
+    }
+
+   
     
 }

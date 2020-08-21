@@ -96,6 +96,40 @@ public class WeatherAdapterService {
     }
     
     /**
+     * Get 9 day weather forecasts from <a href="https://www.met.no/en" target="new">The Norwegian Meteorological Institute</a>'s 
+     * <a href="https://api.met.no/weatherapi/locationforecast/1.9/documentation" target="new">Locationforecast API</a> 
+     * @param longitude WGS84 Decimal degrees
+     * @param latitude WGS84 Decimal degrees
+     * @param altitude Meters above sea level. This is used for correction of 
+     * temperatures (outside of Norway, where the local topological model is used)
+     * @pathExample /rest/weatheradapter/yr/?longitude=14.3711&latitude=67.2828&altitude=70
+     * @return the weather forecast formatted in the IPM Decision platform's weather data format
+     */
+    @GET
+    @POST
+    @Path("fmi/forecasts/")
+    @GZIP
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getFMIForecasts(
+                    @QueryParam("longitude") Double longitude,
+                    @QueryParam("latitude") Double latitude,
+                    @QueryParam("altitude") Double altitude
+    )
+    {
+        if(longitude == null || latitude == null)
+        {
+            return Response.status(Response.Status.BAD_REQUEST).entity("Missing longitude and/or latitude. Please correct this.").build();
+        }
+        if(altitude == null)
+        {
+            altitude = 0.0;
+        }
+        
+        WeatherData theData = new FinnishMeteorologicalInstituteAdapter().getWeatherForecasts(longitude, latitude, altitude);
+        return Response.ok().entity(theData).build();
+    }
+    
+    /**
      * Get weather observations in the IPM Decision's weather data format from the Finnish Meteorological Institute https://en.ilmatieteenlaitos.fi/
      * Access is made through the Institute's open data API: https://en.ilmatieteenlaitos.fi/open-data
      * 
