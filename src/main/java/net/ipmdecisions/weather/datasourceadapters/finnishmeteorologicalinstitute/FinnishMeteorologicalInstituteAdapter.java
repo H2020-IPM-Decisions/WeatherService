@@ -191,7 +191,13 @@ public class FinnishMeteorologicalInstituteAdapter {
         return weatherData;
     }
 
-    public WeatherData getWeatherForecasts(Double longitude, Double latitude, Double altitude) {
+    /**
+     * Get 36 hour forecasts from FMI
+     * @param longitude
+     * @param latitude
+     * @return 
+     */
+    public WeatherData getWeatherForecasts(Double longitude, Double latitude) {
         FmiOpenDataAccess dA = new FmiOpenDataAccess();
         FmiOpenDataForecastParser fP = new FmiOpenDataForecastParser();
         String forecastXML = dA.getForecastData(longitude, latitude);

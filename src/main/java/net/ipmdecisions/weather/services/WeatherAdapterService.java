@@ -96,13 +96,12 @@ public class WeatherAdapterService {
     }
     
     /**
-     * Get 9 day weather forecasts from <a href="https://www.met.no/en" target="new">The Norwegian Meteorological Institute</a>'s 
-     * <a href="https://api.met.no/weatherapi/locationforecast/1.9/documentation" target="new">Locationforecast API</a> 
+     * Get 36 hour forecasts from FMI (The Finnish Meteorological Institute),
+     * using their OpenData services at https://en.ilmatieteenlaitos.fi/open-data 
      * @param longitude WGS84 Decimal degrees
      * @param latitude WGS84 Decimal degrees
-     * @param altitude Meters above sea level. This is used for correction of 
-     * temperatures (outside of Norway, where the local topological model is used)
-     * @pathExample /rest/weatheradapter/yr/?longitude=14.3711&latitude=67.2828&altitude=70
+
+     * @pathExample /rest/weatheradapter/fmi/forecasts?latitude=67.2828&longitude=14.3711
      * @return the weather forecast formatted in the IPM Decision platform's weather data format
      */
     @GET
@@ -112,20 +111,15 @@ public class WeatherAdapterService {
     @Produces(MediaType.APPLICATION_JSON)
     public Response getFMIForecasts(
                     @QueryParam("longitude") Double longitude,
-                    @QueryParam("latitude") Double latitude,
-                    @QueryParam("altitude") Double altitude
+                    @QueryParam("latitude") Double latitude
     )
     {
         if(longitude == null || latitude == null)
         {
             return Response.status(Response.Status.BAD_REQUEST).entity("Missing longitude and/or latitude. Please correct this.").build();
         }
-        if(altitude == null)
-        {
-            altitude = 0.0;
-        }
         
-        WeatherData theData = new FinnishMeteorologicalInstituteAdapter().getWeatherForecasts(longitude, latitude, altitude);
+        WeatherData theData = new FinnishMeteorologicalInstituteAdapter().getWeatherForecasts(longitude, latitude);
         return Response.ok().entity(theData).build();
     }
     
