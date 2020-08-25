@@ -1,0 +1,490 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wfs:FeatureCollection
+    timeStamp="2020-08-25T07:42:45Z"
+    numberMatched="1"
+    numberReturned="1"
+    xmlns:wfs="http://www.opengis.net/wfs/2.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:xlink="http://www.w3.org/1999/xlink"
+    xmlns:om="http://www.opengis.net/om/2.0"
+    xmlns:omso="http://inspire.ec.europa.eu/schemas/omso/3.0"
+    xmlns:ompr="http://inspire.ec.europa.eu/schemas/ompr/3.0"
+    xmlns:gml="http://www.opengis.net/gml/3.2"
+    xmlns:gmd="http://www.isotc211.org/2005/gmd"
+    xmlns:gco="http://www.isotc211.org/2005/gco"
+    xmlns:swe="http://www.opengis.net/swe/2.0"
+    xmlns:gmlcov="http://www.opengis.net/gmlcov/1.0"
+    xmlns:sam="http://www.opengis.net/sampling/2.0"
+    xmlns:sams="http://www.opengis.net/samplingSpatial/2.0"
+    xmlns:target="http://xml.fmi.fi/namespace/om/atmosphericfeatures/1.0"
+    xsi:schemaLocation="http://www.opengis.net/wfs/2.0 http://schemas.opengis.net/wfs/2.0/wfs.xsd
+    http://www.opengis.net/gmlcov/1.0 http://schemas.opengis.net/gmlcov/1.0/gmlcovAll.xsd
+    http://www.opengis.net/sampling/2.0 http://schemas.opengis.net/sampling/2.0/samplingFeature.xsd
+    http://www.opengis.net/samplingSpatial/2.0 http://schemas.opengis.net/samplingSpatial/2.0/spatialSamplingFeature.xsd
+    http://www.opengis.net/swe/2.0 http://schemas.opengis.net/sweCommon/2.0/swe.xsd
+    http://inspire.ec.europa.eu/schemas/omso/3.0 http://inspire.ec.europa.eu/schemas/omso/3.0/SpecialisedObservations.xsd
+    http://inspire.ec.europa.eu/schemas/ompr/3.0 http://inspire.ec.europa.eu/schemas/ompr/3.0/Processes.xsd
+    http://xml.fmi.fi/namespace/om/atmosphericfeatures/1.0 http://xml.fmi.fi/schema/om/atmosphericfeatures/1.0/atmosphericfeatures.xsd">
+
+    <wfs:member>
+        <omso:GridSeriesObservation gml:id="WFS-AezcvefaUb7mbb4XUSSL18hQ83qJTowuYWbbpdOs2_llx4efR060aeWzDtdOufXlmw48rp1w36d3R0629dnTTw36d3THv7ZeWHPlhaWLLn07qmnbltSfwqGbhjUY2PlzrUi0Kcd06aMmrhnZd2Spp25bUn8Kh060yxHBm07sk7Lh5ZefSth2ackhmZ8u_Tk51nM2DRi3ZMnRry.e._lkv7.2Xl35aemHFsyxNLZl7ZdlTzwy1MzZvx4dmWtTNpvxpK7r0zOGttw.Imnn0w7seWlauhAa23Tz56d2epl8dKxp2Gcytu_Jl2VmaNPLZh2srhh5Ydta1TLt4ZeWHp15Za0JHXbpyaenmtavp3ZKfDLlyTadaETL3ob9O7pW9Q5Zcenhp6YemnfuY6K9qWHJpw9NO_dH2b8WHZBx4.u3rsw9NO_dW9yw5NOHpp37s.zfiw7G5z6b.WXJx65eXm_pyV5hZtul06zb.WXHh59HTrRp5bMO10659eWbDjyunXDfp3dHTrb12dNPDfp3dMe_tl5Yc.VodNO3LT6ZeE_ITQ6aduW1v3ZaxqtSGA--">
+	                 <om:phenomenonTime>
+                <gml:TimePeriod gml:id="time-interval-1-1">
+                    <gml:beginPosition>2020-08-19T03:00:00Z</gml:beginPosition>
+                    <gml:endPosition>2020-08-26T19:00:00Z</gml:endPosition>
+                </gml:TimePeriod>
+            </om:phenomenonTime>
+            <om:resultTime>
+                <gml:TimeInstant gml:id="time-1-1">
+                    <gml:timePosition>2020-08-25T03:58:31Z</gml:timePosition>
+                </gml:TimeInstant>
+            </om:resultTime>
+
+	    <om:procedure xlink:href="http://xml.fmi.fi/inspire/process/hirlam"/>
+            <om:parameter>
+                <om:NamedValue>
+                    <om:name xlink:href="http://xml.fmi.fi/inspire/process/hirlam"/>
+                    <om:value>
+                        <gml:TimeInstant gml:id="analysis-time-1-1">
+                            <gml:timePosition>2020-08-25T00:00:00Z</gml:timePosition>
+                        </gml:TimeInstant>
+                    </om:value>
+                </om:NamedValue>
+            </om:parameter>
+            <om:observedProperty  xlink:href="http://opendata.fmi.fi/meta?observableProperty=forecast&amp;param=Temperature,Humidity,WindSpeedMS,DewPoint,Precipitation1h,RadiationGlobalAccumulation,radiationglobal&amp;language=eng"/>
+	                <om:featureOfInterest>
+                <sams:SF_SpatialSamplingFeature gml:id="enn-s-1-1-">
+          <sam:sampledFeature>
+		<target:LocationCollection gml:id="sampled-target-1-1">
+		    <target:member>
+		    <target:Location gml:id="forloc-geoid-3041722-pos">
+		        <gml:identifier codeSpace="http://xml.fmi.fi/namespace/stationcode/geoid">3041722</gml:identifier>
+			<gml:name codeSpace="http://xml.fmi.fi/namespace/locationcode/name">Möckelö</gml:name>
+			<gml:name codeSpace="http://xml.fmi.fi/namespace/locationcode/geoid">3041722</gml:name>
+			<target:representativePoint xlink:href="#point-3041722"/>
+			<target:country codeSpace="http://xml.fmi.fi/namespace/location/country">Finland</target:country>
+			<target:timezone>Europe/Mariehamn</target:timezone>
+			<target:region codeSpace="http://xml.fmi.fi/namespace/location/region">Jomala</target:region>	   			
+		    </target:Location></target:member>
+		</target:LocationCollection>
+ 	   </sam:sampledFeature>
+                <sams:shape>
+                    <gml:MultiPoint gml:id="sf-1-1-">
+                        <gml:pointMembers>	
+                           <gml:Point gml:id="point-3041722" srsName="http://www.opengis.net/def/crs/EPSG/0/4258" srsDimension="2">
+                               <gml:name>Möckelö</gml:name>
+                               <gml:pos>60.10000 19.90000 </gml:pos>
+                           </gml:Point>
+                        </gml:pointMembers>
+                    </gml:MultiPoint>
+                </sams:shape>
+            </sams:SF_SpatialSamplingFeature>
+        </om:featureOfInterest>
+              <om:result>
+        <gmlcov:MultiPointCoverage gml:id="mpcv-1-1">
+          <gml:domainSet>
+            <gmlcov:SimpleMultiPoint gml:id="mp-1-1" srsName="http://xml.fmi.fi/gml/crs/compoundCRS.php?crs=4258&amp;time=unixtime" srsDimension="3">
+              <gmlcov:positions>
+                60.10000 19.90000  1597806000
+                60.10000 19.90000  1597809600
+                60.10000 19.90000  1597813200
+                60.10000 19.90000  1597816800
+                60.10000 19.90000  1597820400
+                60.10000 19.90000  1597824000
+                60.10000 19.90000  1597827600
+                60.10000 19.90000  1597831200
+                60.10000 19.90000  1597834800
+                60.10000 19.90000  1597838400
+                60.10000 19.90000  1597842000
+                60.10000 19.90000  1597845600
+                60.10000 19.90000  1597849200
+                60.10000 19.90000  1597852800
+                60.10000 19.90000  1597856400
+                60.10000 19.90000  1597860000
+                60.10000 19.90000  1597863600
+                60.10000 19.90000  1597867200
+                60.10000 19.90000  1597870800
+                60.10000 19.90000  1597874400
+                60.10000 19.90000  1597878000
+                60.10000 19.90000  1597881600
+                60.10000 19.90000  1597885200
+                60.10000 19.90000  1597888800
+                60.10000 19.90000  1597892400
+                60.10000 19.90000  1597896000
+                60.10000 19.90000  1597899600
+                60.10000 19.90000  1597903200
+                60.10000 19.90000  1597906800
+                60.10000 19.90000  1597910400
+                60.10000 19.90000  1597914000
+                60.10000 19.90000  1597917600
+                60.10000 19.90000  1597921200
+                60.10000 19.90000  1597924800
+                60.10000 19.90000  1597928400
+                60.10000 19.90000  1597932000
+                60.10000 19.90000  1597935600
+                60.10000 19.90000  1597939200
+                60.10000 19.90000  1597942800
+                60.10000 19.90000  1597946400
+                60.10000 19.90000  1597950000
+                60.10000 19.90000  1597953600
+                60.10000 19.90000  1597957200
+                60.10000 19.90000  1597960800
+                60.10000 19.90000  1597964400
+                60.10000 19.90000  1597968000
+                60.10000 19.90000  1597971600
+                60.10000 19.90000  1597975200
+                60.10000 19.90000  1597978800
+                60.10000 19.90000  1597982400
+                60.10000 19.90000  1597986000
+                60.10000 19.90000  1597989600
+                60.10000 19.90000  1597993200
+                60.10000 19.90000  1597996800
+                60.10000 19.90000  1598000400
+                60.10000 19.90000  1598004000
+                60.10000 19.90000  1598007600
+                60.10000 19.90000  1598011200
+                60.10000 19.90000  1598014800
+                60.10000 19.90000  1598018400
+                60.10000 19.90000  1598022000
+                60.10000 19.90000  1598025600
+                60.10000 19.90000  1598029200
+                60.10000 19.90000  1598032800
+                60.10000 19.90000  1598036400
+                60.10000 19.90000  1598040000
+                60.10000 19.90000  1598043600
+                60.10000 19.90000  1598047200
+                60.10000 19.90000  1598050800
+                60.10000 19.90000  1598054400
+                60.10000 19.90000  1598058000
+                60.10000 19.90000  1598061600
+                60.10000 19.90000  1598065200
+                60.10000 19.90000  1598068800
+                60.10000 19.90000  1598072400
+                60.10000 19.90000  1598076000
+                60.10000 19.90000  1598079600
+                60.10000 19.90000  1598083200
+                60.10000 19.90000  1598086800
+                60.10000 19.90000  1598090400
+                60.10000 19.90000  1598094000
+                60.10000 19.90000  1598097600
+                60.10000 19.90000  1598101200
+                60.10000 19.90000  1598104800
+                60.10000 19.90000  1598108400
+                60.10000 19.90000  1598112000
+                60.10000 19.90000  1598115600
+                60.10000 19.90000  1598119200
+                60.10000 19.90000  1598122800
+                60.10000 19.90000  1598126400
+                60.10000 19.90000  1598130000
+                60.10000 19.90000  1598133600
+                60.10000 19.90000  1598137200
+                60.10000 19.90000  1598140800
+                60.10000 19.90000  1598144400
+                60.10000 19.90000  1598148000
+                60.10000 19.90000  1598151600
+                60.10000 19.90000  1598155200
+                60.10000 19.90000  1598158800
+                60.10000 19.90000  1598162400
+                60.10000 19.90000  1598166000
+                60.10000 19.90000  1598169600
+                60.10000 19.90000  1598173200
+                60.10000 19.90000  1598176800
+                60.10000 19.90000  1598180400
+                60.10000 19.90000  1598184000
+                60.10000 19.90000  1598187600
+                60.10000 19.90000  1598191200
+                60.10000 19.90000  1598194800
+                60.10000 19.90000  1598198400
+                60.10000 19.90000  1598202000
+                60.10000 19.90000  1598205600
+                60.10000 19.90000  1598209200
+                60.10000 19.90000  1598212800
+                60.10000 19.90000  1598216400
+                60.10000 19.90000  1598220000
+                60.10000 19.90000  1598223600
+                60.10000 19.90000  1598227200
+                60.10000 19.90000  1598230800
+                60.10000 19.90000  1598234400
+                60.10000 19.90000  1598238000
+                60.10000 19.90000  1598241600
+                60.10000 19.90000  1598245200
+                60.10000 19.90000  1598248800
+                60.10000 19.90000  1598252400
+                60.10000 19.90000  1598256000
+                60.10000 19.90000  1598259600
+                60.10000 19.90000  1598263200
+                60.10000 19.90000  1598266800
+                60.10000 19.90000  1598270400
+                60.10000 19.90000  1598274000
+                60.10000 19.90000  1598277600
+                60.10000 19.90000  1598281200
+                60.10000 19.90000  1598284800
+                60.10000 19.90000  1598288400
+                60.10000 19.90000  1598292000
+                60.10000 19.90000  1598295600
+                60.10000 19.90000  1598299200
+                60.10000 19.90000  1598302800
+                60.10000 19.90000  1598306400
+                60.10000 19.90000  1598310000
+                60.10000 19.90000  1598313600
+                60.10000 19.90000  1598317200
+                60.10000 19.90000  1598320800
+                60.10000 19.90000  1598324400
+                60.10000 19.90000  1598328000
+                60.10000 19.90000  1598331600
+                60.10000 19.90000  1598335200
+                60.10000 19.90000  1598338800
+                60.10000 19.90000  1598342400
+                60.10000 19.90000  1598346000
+                60.10000 19.90000  1598349600
+                60.10000 19.90000  1598353200
+                60.10000 19.90000  1598356800
+                60.10000 19.90000  1598360400
+                60.10000 19.90000  1598364000
+                60.10000 19.90000  1598367600
+                60.10000 19.90000  1598371200
+                60.10000 19.90000  1598374800
+                60.10000 19.90000  1598378400
+                60.10000 19.90000  1598382000
+                60.10000 19.90000  1598385600
+                60.10000 19.90000  1598389200
+                60.10000 19.90000  1598392800
+                60.10000 19.90000  1598396400
+                60.10000 19.90000  1598400000
+                60.10000 19.90000  1598403600
+                60.10000 19.90000  1598407200
+                60.10000 19.90000  1598410800
+                60.10000 19.90000  1598414400
+                60.10000 19.90000  1598418000
+                60.10000 19.90000  1598421600
+                60.10000 19.90000  1598425200
+                60.10000 19.90000  1598428800
+                60.10000 19.90000  1598432400
+                60.10000 19.90000  1598436000
+                60.10000 19.90000  1598439600
+                60.10000 19.90000  1598443200
+                60.10000 19.90000  1598446800
+                60.10000 19.90000  1598450400
+                60.10000 19.90000  1598454000
+                60.10000 19.90000  1598457600
+                60.10000 19.90000  1598461200
+                60.10000 19.90000  1598464800
+                60.10000 19.90000  1598468400
+                </gmlcov:positions>
+            </gmlcov:SimpleMultiPoint>
+          </gml:domainSet>
+          <gml:rangeSet>
+            <gml:DataBlock>
+              <gml:rangeParameters/>
+              <gml:doubleOrNilReasonTupleList>
+                NaN NaN NaN NaN NaN NaN NaN 
+                NaN NaN NaN NaN NaN NaN NaN 
+                NaN NaN NaN NaN NaN NaN NaN 
+                NaN NaN NaN NaN NaN NaN NaN 
+                NaN NaN NaN NaN NaN NaN NaN 
+                NaN NaN NaN NaN NaN NaN NaN 
+                NaN NaN NaN NaN NaN NaN NaN 
+                NaN NaN NaN NaN NaN NaN NaN 
+                NaN NaN NaN NaN NaN NaN NaN 
+                NaN NaN NaN NaN NaN NaN NaN 
+                NaN NaN NaN NaN NaN NaN NaN 
+                NaN NaN NaN NaN NaN NaN NaN 
+                NaN NaN NaN NaN NaN NaN NaN 
+                NaN NaN NaN NaN NaN NaN NaN 
+                NaN NaN NaN NaN NaN NaN NaN 
+                NaN NaN NaN NaN NaN NaN NaN 
+                NaN NaN NaN NaN NaN NaN NaN 
+                NaN NaN NaN NaN NaN NaN NaN 
+                NaN NaN NaN NaN NaN NaN NaN 
+                NaN NaN NaN NaN NaN NaN NaN 
+                NaN NaN NaN NaN NaN NaN NaN 
+                NaN NaN NaN NaN NaN NaN NaN 
+                NaN NaN NaN NaN NaN NaN NaN 
+                NaN NaN NaN NaN NaN NaN NaN 
+                NaN NaN NaN NaN NaN NaN NaN 
+                NaN NaN NaN NaN NaN NaN NaN 
+                NaN NaN NaN NaN NaN NaN NaN 
+                NaN NaN NaN NaN NaN NaN NaN 
+                NaN NaN NaN NaN NaN NaN NaN 
+                NaN NaN NaN NaN NaN NaN NaN 
+                NaN NaN NaN NaN NaN NaN NaN 
+                NaN NaN NaN NaN NaN NaN NaN 
+                NaN NaN NaN NaN NaN NaN NaN 
+                NaN NaN NaN NaN NaN NaN NaN 
+                NaN NaN NaN NaN NaN NaN NaN 
+                NaN NaN NaN NaN NaN NaN NaN 
+                NaN NaN NaN NaN NaN NaN NaN 
+                NaN NaN NaN NaN NaN NaN NaN 
+                NaN NaN NaN NaN NaN NaN NaN 
+                NaN NaN NaN NaN NaN NaN NaN 
+                NaN NaN NaN NaN NaN NaN NaN 
+                NaN NaN NaN NaN NaN NaN NaN 
+                NaN NaN NaN NaN NaN NaN NaN 
+                NaN NaN NaN NaN NaN NaN NaN 
+                NaN NaN NaN NaN NaN NaN NaN 
+                NaN NaN NaN NaN NaN NaN NaN 
+                NaN NaN NaN NaN NaN NaN NaN 
+                NaN NaN NaN NaN NaN NaN NaN 
+                NaN NaN NaN NaN NaN NaN NaN 
+                NaN NaN NaN NaN NaN NaN NaN 
+                NaN NaN NaN NaN NaN NaN NaN 
+                NaN NaN NaN NaN NaN NaN NaN 
+                NaN NaN NaN NaN NaN NaN NaN 
+                NaN NaN NaN NaN NaN NaN NaN 
+                NaN NaN NaN NaN NaN NaN NaN 
+                NaN NaN NaN NaN NaN NaN NaN 
+                NaN NaN NaN NaN NaN NaN NaN 
+                NaN NaN NaN NaN NaN NaN NaN 
+                NaN NaN NaN NaN NaN NaN NaN 
+                NaN NaN NaN NaN NaN NaN NaN 
+                NaN NaN NaN NaN NaN NaN NaN 
+                NaN NaN NaN NaN NaN NaN NaN 
+                NaN NaN NaN NaN NaN NaN NaN 
+                NaN NaN NaN NaN NaN NaN NaN 
+                NaN NaN NaN NaN NaN NaN NaN 
+                NaN NaN NaN NaN NaN NaN NaN 
+                NaN NaN NaN NaN NaN NaN NaN 
+                NaN NaN NaN NaN NaN NaN NaN 
+                NaN NaN NaN NaN NaN NaN NaN 
+                NaN NaN NaN NaN NaN NaN NaN 
+                NaN NaN NaN NaN NaN NaN NaN 
+                NaN NaN NaN NaN NaN NaN NaN 
+                NaN NaN NaN NaN NaN NaN NaN 
+                NaN NaN NaN NaN NaN NaN NaN 
+                NaN NaN NaN NaN NaN NaN NaN 
+                NaN NaN NaN NaN NaN NaN NaN 
+                NaN NaN NaN NaN NaN NaN NaN 
+                NaN NaN NaN NaN NaN NaN NaN 
+                NaN NaN NaN NaN NaN NaN NaN 
+                NaN NaN NaN NaN NaN NaN NaN 
+                NaN NaN NaN NaN NaN NaN NaN 
+                NaN NaN NaN NaN NaN NaN NaN 
+                NaN NaN NaN NaN NaN NaN NaN 
+                NaN NaN NaN NaN NaN NaN NaN 
+                NaN NaN NaN NaN NaN NaN NaN 
+                NaN NaN NaN NaN NaN NaN NaN 
+                NaN NaN NaN NaN NaN NaN NaN 
+                NaN NaN NaN NaN NaN NaN NaN 
+                NaN NaN NaN NaN NaN NaN NaN 
+                NaN NaN NaN NaN NaN NaN NaN 
+                NaN NaN NaN NaN NaN NaN NaN 
+                NaN NaN NaN NaN NaN NaN NaN 
+                NaN NaN NaN NaN NaN NaN NaN 
+                NaN NaN NaN NaN NaN NaN NaN 
+                NaN NaN NaN NaN NaN NaN NaN 
+                NaN NaN NaN NaN NaN NaN NaN 
+                NaN NaN NaN NaN NaN NaN NaN 
+                NaN NaN NaN NaN NaN NaN NaN 
+                NaN NaN NaN NaN NaN NaN NaN 
+                NaN NaN NaN NaN NaN NaN NaN 
+                NaN NaN NaN NaN NaN NaN NaN 
+                NaN NaN NaN NaN NaN NaN NaN 
+                NaN NaN NaN NaN NaN NaN NaN 
+                NaN NaN NaN NaN NaN NaN NaN 
+                NaN NaN NaN NaN NaN NaN NaN 
+                NaN NaN NaN NaN NaN NaN NaN 
+                NaN NaN NaN NaN NaN NaN NaN 
+                NaN NaN NaN NaN NaN NaN NaN 
+                NaN NaN NaN NaN NaN NaN NaN 
+                NaN NaN NaN NaN NaN NaN NaN 
+                NaN NaN NaN NaN NaN NaN NaN 
+                NaN NaN NaN NaN NaN NaN NaN 
+                NaN NaN NaN NaN NaN NaN NaN 
+                NaN NaN NaN NaN NaN NaN NaN 
+                NaN NaN NaN NaN NaN NaN NaN 
+                NaN NaN NaN NaN NaN NaN NaN 
+                NaN NaN NaN NaN NaN NaN NaN 
+                NaN NaN NaN NaN NaN NaN NaN 
+                NaN NaN NaN NaN NaN NaN NaN 
+                NaN NaN NaN NaN NaN NaN NaN 
+                NaN NaN NaN NaN NaN NaN NaN 
+                NaN NaN NaN NaN NaN NaN NaN 
+                NaN NaN NaN NaN NaN NaN NaN 
+                NaN NaN NaN NaN NaN NaN NaN 
+                NaN NaN NaN NaN NaN NaN NaN 
+                NaN NaN NaN NaN NaN NaN NaN 
+                NaN NaN NaN NaN NaN NaN NaN 
+                NaN NaN NaN NaN NaN NaN NaN 
+                NaN NaN NaN NaN NaN NaN NaN 
+                NaN NaN NaN NaN NaN NaN NaN 
+                NaN NaN NaN NaN NaN NaN NaN 
+                NaN NaN NaN NaN NaN NaN NaN 
+                NaN NaN NaN NaN NaN NaN NaN 
+                NaN NaN NaN NaN NaN NaN NaN 
+                NaN NaN NaN NaN NaN NaN NaN 
+                NaN NaN NaN NaN NaN NaN NaN 
+                NaN NaN NaN NaN NaN NaN NaN 
+                NaN NaN NaN NaN NaN NaN NaN 
+                NaN NaN NaN NaN NaN NaN NaN 
+                NaN NaN NaN NaN NaN NaN NaN 
+                NaN NaN NaN NaN NaN NaN NaN 
+                14.53 80.31 1.83 9.95 NaN 0.0 NaN 
+                14.84 80.25 1.83 10.23 0.0 0.0 0.0 
+                14.73 80.41 1.22 10.17 0.0 0.0 0.0 
+                14.29 80.64 0.37 9.81 0.0 0.0 0.0 
+                13.97 80.1 0.25 9.36 0.0 23719.55 6.59 
+                14.65 77.69 0.39 9.39 0.0 349915.59 90.61 
+                15.08 83.15 1.84 11.2 0.2 1149670.5 222.15 
+                14.94 87.17 1.9 12.05 0.2 2418992.75 352.59 
+                15.54 84.48 1.04 11.98 0.0 3966947.5 429.99 
+                16.28 78.65 1.8 11.21 0.0 5396926.5 397.22 
+                16.74 67.37 2.64 8.47 0.1 7123345.5 479.56 
+                18.02 42.58 3.57 0.56 0.0 9432366.0 641.39 
+                18.14 38.67 4.07 -1.17 0.0 11751666.0 644.25 
+                18.05 40.11 3.76 -0.55 0.0 13897668.0 596.11 
+                17.98 41.67 3.39 0.12 0.0 15690974.0 498.14 
+                17.6 49.42 4.56 3.08 0.0 16651311.0 266.76 
+                17.41 53.0 5.36 4.29 0.0 17333428.0 189.48 
+                16.37 66.79 6.88 7.94 0.4 17567798.0 65.1 
+                16.69 65.1 6.88 7.73 0.1 17613720.0 12.76 
+                17.22 69.13 7.0 9.45 0.0 17615856.0 0.59 
+                17.27 61.46 4.77 7.1 0.0 17616654.0 0.22 
+                16.63 56.59 3.4 4.86 0.0 17616782.0 0.04 
+                16.28 58.99 3.69 5.36 0.0 17616782.0 0.0 
+                16.37 59.97 4.38 5.78 0.0 17616782.0 0.0 
+                15.98 64.66 4.79 6.93 0.0 17617684.0 0.25 
+                15.47 68.26 4.96 7.53 0.0 17613762.0 0.66 
+                14.88 73.08 3.73 8.36 0.0 17612330.0 0.0 
+                14.42 78.16 3.16 9.28 0.0 17610012.0 0.0 
+                14.02 82.03 2.59 9.89 0.0 17644222.0 9.5 
+                14.67 80.69 2.37 10.18 0.0 17981114.0 93.58 
+                15.78 75.37 1.96 9.85 0.0 18778254.0 221.43 
+                16.79 67.48 1.62 8.55 0.0 20037946.0 349.91 
+                17.33 64.97 2.63 8.29 0.0 21725122.0 468.66 
+                17.45 64.27 3.66 8.18 0.0 23744352.0 560.9 
+                17.7 61.76 3.72 7.6 0.0 25985408.0 622.51 
+                18.08 55.28 3.29 5.73 0.0 28260952.0 632.09 
+                18.47 45.43 2.84 2.22 0.0 30578670.0 643.81 
+                18.31 42.53 2.72 0.8 0.0 32325738.0 485.3 
+                18.11 41.7 2.57 0.24 0.0 33440070.0 309.54 
+                18.01 40.88 1.59 -0.23 0.0 34347568.0 252.08 
+                17.75 42.95 0.44 0.49 0.0 34867128.0 144.32 
+                17.27 48.78 2.97 2.53 0.0 35067528.0 55.67 
+                16.73 54.97 3.92 4.38 0.0 35123492.0 15.55 
+                16.38 58.06 3.72 5.14 0.0 35117260.0 1.42 
+                </gml:doubleOrNilReasonTupleList>
+            </gml:DataBlock>
+          </gml:rangeSet>
+          <gml:coverageFunction>
+            <gml:CoverageMappingRule>
+              <gml:ruleDefinition>Linear</gml:ruleDefinition>
+            </gml:CoverageMappingRule>
+          </gml:coverageFunction>
+          <gmlcov:rangeType>
+            <swe:DataRecord>
+              <swe:field name="Temperature"  xlink:href="http://opendata.fmi.fi/meta?observableProperty=forecast&amp;param=Temperature&amp;language=eng"/>
+              <swe:field name="Humidity"  xlink:href="http://opendata.fmi.fi/meta?observableProperty=forecast&amp;param=Humidity&amp;language=eng"/>
+              <swe:field name="WindSpeedMS"  xlink:href="http://opendata.fmi.fi/meta?observableProperty=forecast&amp;param=WindSpeedMS&amp;language=eng"/>
+              <swe:field name="DewPoint"  xlink:href="http://opendata.fmi.fi/meta?observableProperty=forecast&amp;param=DewPoint&amp;language=eng"/>
+              <swe:field name="Precipitation1h"  xlink:href="http://opendata.fmi.fi/meta?observableProperty=forecast&amp;param=Precipitation1h&amp;language=eng"/>
+              <swe:field name="RadiationGlobalAccumulation"  xlink:href="http://opendata.fmi.fi/meta?observableProperty=forecast&amp;param=RadiationGlobalAccumulation&amp;language=eng"/>
+              <swe:field name="radiationglobal"  xlink:href="http://opendata.fmi.fi/meta?observableProperty=forecast&amp;param=radiationglobal&amp;language=eng"/>
+              </swe:DataRecord>
+          </gmlcov:rangeType>
+        </gmlcov:MultiPointCoverage>
+      </om:result>
+
+        </omso:GridSeriesObservation>
+    </wfs:member>
+  
+</wfs:FeatureCollection>

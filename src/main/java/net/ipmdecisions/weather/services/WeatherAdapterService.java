@@ -22,7 +22,6 @@ package net.ipmdecisions.weather.services;
 import java.time.Instant;
 import java.time.ZonedDateTime;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 import javax.ws.rs.GET;

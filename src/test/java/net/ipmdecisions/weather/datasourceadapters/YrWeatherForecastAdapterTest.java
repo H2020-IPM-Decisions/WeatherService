@@ -18,7 +18,6 @@
  */
 package net.ipmdecisions.weather.datasourceadapters;
 
-import net.ipmdecisions.weather.entity.LocationWeatherData;
 import net.ipmdecisions.weather.entity.WeatherData;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.AfterAll;

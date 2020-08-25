@@ -34,7 +34,7 @@ public class FmiOpenDataParser {
     public FmiOpenDataParser() {}
     
     public String getAsJSON_prototype(String fmiDataAsXML, String temporalFactor) {
-        
+        //System.out.println(fmiDataAsXML);
         //DateTimeFunctions myDateTime = new DateTimeFunctions();
         
         //System.out.println("PARSE START: " + myDateTime.getNowStandardWithMilliseconds());
@@ -91,7 +91,7 @@ public class FmiOpenDataParser {
         observationCount = groupTokens.length;
         for (String groupToken: groupTokens) {
             variableTokens = groupToken.split("  ");
-            gmlCovPositionsAsList.add(dateTime.getUnixTimeAsISO(Long.parseLong(variableTokens[1])));
+            gmlCovPositionsAsList.add(dateTime.getUnixTimeAsISO(Long.parseLong(variableTokens[1].strip())));
         }
         
         //Variable values
@@ -130,7 +130,13 @@ public class FmiOpenDataParser {
             gmlDateTime = gmlDateTime.replace(" ", "T");
             gmlDateTime += "+00:00";
             for (String variableValue: variableTokens) {
+                if(variableValue.isBlank())
+                {
+                    continue;
+                }
+                //System.out.println("variableValue=|" + variableValue+"|");
                 variableKey = keyIterator.next().toString();
+                //System.out.println("variableKey=" + variableKey + ", variableValue=" + variableValue);
                 if (variableKey.equals("t2m") || variableKey.equals("rh") || variableKey.equals("r_1h") || variableKey.equals("ws_10min")) {
                     switch (variableKey) {
                         case "t2m": variableKey = "1002";
