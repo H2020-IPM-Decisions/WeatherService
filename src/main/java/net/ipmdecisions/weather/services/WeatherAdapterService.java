@@ -19,19 +19,32 @@
 
 package net.ipmdecisions.weather.services;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.time.Instant;
 import java.time.ZonedDateTime;
+import java.time.LocalDate;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
+import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
+import javax.ws.rs.HeaderParam;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
+import javax.ws.rs.core.SecurityContext;
+import net.ipmdecisions.weather.datasourceadapters.MeteobotAPIAdapter;
 import net.ipmdecisions.weather.datasourceadapters.ParseWeatherDataException;
 import net.ipmdecisions.weather.datasourceadapters.YrWeatherForecastAdapter;
 import net.ipmdecisions.weather.datasourceadapters.finnishmeteorologicalinstitute.FinnishMeteorologicalInstituteAdapter;
@@ -163,13 +176,67 @@ public class WeatherAdapterService {
             return Response.status(Status.BAD_REQUEST).entity("This service only provides hourly data").build();
         }
 
-            WeatherData theData = new FinnishMeteorologicalInstituteAdapter().getHourlyData(weatherStationId, timeStartInstant, timeEndInstant, ipmDecisionsParameters, ignoreErrorsB);
-            
-            return Response.ok().entity(theData).build();       
-//            return Response.serverError().entity(ex.getMessage()).build();
+        WeatherData theData = new FinnishMeteorologicalInstituteAdapter().getHourlyData(weatherStationId, timeStartInstant, timeEndInstant, ipmDecisionsParameters, ignoreErrorsB);
 
-
+        return Response.ok().entity(theData).build();       
     }
     
+    @POST
+    @Path("meteobot/")
+    @GZIP
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getMeteobotObservations(
+            @FormParam("weatherStationId") Integer weatherStationId,
+            @FormParam("timeStart") String timeStart,
+            @FormParam("timeEnd") String timeEnd,
+            @FormParam("interval") Integer logInterval,
+            @FormParam("parameters") String parameters,
+            @FormParam("ignoreErrors") String ignoreErrors,
+            @FormParam("credentials") String credentials
+    )
+    {
+        // We only accept requests for hourly data
+        if(!logInterval.equals(3600))
+        {
+            return Response.status(Status.BAD_REQUEST).entity("This service only provides hourly data").build();
+        }
+        try
+        {
+            JsonNode json = new ObjectMapper().readTree(credentials);
+            String userName = json.get("userName").asText();
+            String password = json.get("password").asText();
+
+            List<Integer> ipmDecisionsParameters = Arrays.asList(parameters.split(",")).stream()
+                        .map(paramstr->Integer.parseInt(paramstr.strip())).collect(Collectors.toList());
+            // Date parsing
+            LocalDate startDate = LocalDate.parse(timeStart);
+            LocalDate endDate = LocalDate.parse(timeEnd);
+
+            Boolean ignoreErrorsB = ignoreErrors != null ? ignoreErrors.equals("true") : false;
+
+            WeatherData theData = new MeteobotAPIAdapter().getWeatherData(weatherStationId,userName,password,startDate, endDate);
+            return Response.ok().entity(theData).build();
+        }
+        catch(JsonProcessingException | ParseWeatherDataException ex)
+        {
+            return Response.serverError().entity(ex).build();
+        }
+    }
     
+    @POST
+    @Path("testauth/")
+    //public Response testAuth(@HeaderParam("Authorization") String authString)
+    public Response testAuth(@Context SecurityContext sc, @Context HttpHeaders headers )
+    {
+        System.out.println("---START");
+        MultivaluedMap<String, String> headers1 = headers.getRequestHeaders();
+        for(String h:headers1.keySet())
+        {
+            System.out.println("Headername=" + h);
+        }
+        System.out.println("---END");
+        //System.out.println(authString);
+        //return Response.ok().entity(authString).build();
+        return Response.ok().entity("JUHU").build();
+    }
 }

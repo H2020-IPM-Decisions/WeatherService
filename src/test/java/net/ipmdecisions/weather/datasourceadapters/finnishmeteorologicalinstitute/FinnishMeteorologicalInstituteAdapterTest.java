@@ -26,6 +26,7 @@ import java.util.List;
 import net.ipmdecisions.weather.entity.WeatherData;
 import net.ipmdecisions.weather.util.FileUtils;
 import net.ipmdecisions.weather.util.vips.VIPSWeatherObservation;
+import net.ipmdecisions.weather.util.vips.WeatherUtils;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -38,8 +39,9 @@ import static org.junit.jupiter.api.Assertions.*;
  * @author treinar
  */
 public class FinnishMeteorologicalInstituteAdapterTest {
-    
+    private final WeatherUtils weatherUtils;
     public FinnishMeteorologicalInstituteAdapterTest() {
+        this.weatherUtils = new WeatherUtils();
     }
     
     @BeforeAll
@@ -72,7 +74,7 @@ public class FinnishMeteorologicalInstituteAdapterTest {
         Double longitude = 12.1;
         Double latitude = 61.8;
         FinnishMeteorologicalInstituteAdapter instance = new FinnishMeteorologicalInstituteAdapter();
-        WeatherData result = instance.getWeatherDataFromVIPSWeatherObservations(observations, longitude, latitude);
+        WeatherData result = this.weatherUtils.getWeatherDataFromVIPSWeatherObservations(observations, longitude, latitude,1);
         assertNotNull(result);
         
     }

@@ -1,0 +1,39 @@
+{
+	"info": {
+		"_postman_id": "3febfc92-66df-4e6f-9626-609621038503",
+		"name": "IPM Decisions Weather API tests",
+		"description": "This is the test suite for the IPM Decisions Weather API",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"id": "7fda8a8f-8e48-442a-a018-a1287652d6ce",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"id": "8593204e-bf22-4e39-bd22-585cddc01c32",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"id": "c06ae525-5298-416f-9f97-80e708141c92",
+			"key": "base_url",
+			"value": "localhost:8080/VIPSWeatherService"
+		}
+	],
+	"protocolProfileBehavior": {}
+}

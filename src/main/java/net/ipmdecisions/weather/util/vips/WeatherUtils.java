@@ -19,14 +19,20 @@
 
 package net.ipmdecisions.weather.util.vips;
 
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TimeZone;
+import java.util.stream.Collectors;
+import net.ipmdecisions.weather.entity.LocationWeatherData;
+import net.ipmdecisions.weather.entity.WeatherData;
 
 
 /**
@@ -35,11 +41,53 @@ import java.util.TimeZone;
  */
 public class WeatherUtils {
     
+    private final boolean DEBUG = false;
+    
     public final static int AGGREGATION_TYPE_AVERAGE = 1;
     public final static int AGGREGATION_TYPE_SUM = 2;
     public final static int AGGREGATION_TYPE_MINIMUM = 3;
     public final static int AGGREGATION_TYPE_MAXIMUM = 4;
     public final static int AGGREGATION_TYPE_SUM_GLOBAL_RADIATION = 5;
+    
+    private final Map<String, Integer> VIPSToIPM = Map.of(
+            "TM",1002, // TM
+            "RR", 2001, // RR
+            "UM", 3002, // UM
+            "Q0", 5001, // Q0
+            "BT",3101, // BT
+            "FF2", 4002,
+            "FM2", 4003,
+            "DP", 1901 // Dew point
+            
+    );
+    
+    private final Map<Integer, String> IPMToVIPS = Map.of(
+            1002,"TM", // TM
+            2001, "RR", // RR
+            3002, "UM", // UM
+            5001,"Q0", // Q0
+            3101, "BT",
+            4002, "FF2",
+            4003, "FM2",
+            1901, "DP" // Dew Point
+    );
+    
+    public Integer getIPMParameterId(String VIPSParameterId)
+    {
+        if(DEBUG)
+        {
+            if(this.VIPSToIPM.get(VIPSParameterId) == null)
+            {
+                System.out.println("Could not find IPM parameter for VIPS parameter " + VIPSParameterId);
+            }
+        }
+        return this.VIPSToIPM.get(VIPSParameterId);
+    }
+    
+    public String getVIPSParameterId(Integer IPMParameterId)
+    {
+        return this.IPMToVIPS.get(IPMParameterId);
+    }
 
     
     /**
@@ -172,5 +220,64 @@ public class WeatherUtils {
             maximum = maximum == null ? value : Math.max(maximum, value);
         }
         return maximum;
+    }
+    
+    /**
+     * 
+     * @param observations
+     * @param longitude
+     * @param latitude
+     * @return 
+     */
+    public WeatherData getWeatherDataFromVIPSWeatherObservations(List<VIPSWeatherObservation> observations, Double longitude, Double latitude, Integer defaultQC)
+    {
+        // TODO: Ensure that both VIPS named parameters and IPM parameter codes are mapped
+        // Some adapters have included the IPM parameter codes already
+        Integer[] parameters = observations.stream()
+                    .filter(obs->this.getIPMParameterId(obs.getElementMeasurementTypeId())!=null)
+                    .map(obs->this.getIPMParameterId(obs.getElementMeasurementTypeId()))
+                    .collect(Collectors.toSet())
+                    .toArray(Integer[]::new);
+                    
+        Map<Integer,Integer> paramCol = new HashMap<>();
+        for(int i=0;i<parameters.length;i++)
+        {
+            paramCol.put(parameters[i], i);
+        }
+        Collections.sort(observations);
+        Instant timeStart = observations.get(0).getTimeMeasured().toInstant();
+        Instant timeEnd = observations.get(observations.size()-1).getTimeMeasured().toInstant();
+        // Convert to IPM Decisions format
+        Integer interval = 3600; // Hourly data
+        Long rows = 1 + timeStart.until(timeEnd, ChronoUnit.SECONDS) / interval;
+        LocationWeatherData ipmData = new LocationWeatherData(
+                longitude,
+                latitude,
+                0.0,
+                rows.intValue(),
+                parameters.length
+        );
+        WeatherData weatherData = new WeatherData();
+        weatherData.setInterval(interval);
+        weatherData.setTimeStart(timeStart);
+        weatherData.setTimeEnd(timeEnd);
+        weatherData.setWeatherParameters(parameters);
+
+        observations.stream()
+            .filter(obs->this.getIPMParameterId(obs.getElementMeasurementTypeId())!=null)
+            .forEach(obse -> {
+                Long row = timeStart.until(obse.getTimeMeasured().toInstant(), ChronoUnit.SECONDS) / interval;
+                Integer col = paramCol.get(this.getIPMParameterId(obse.getElementMeasurementTypeId()));
+                ipmData.setValue(row.intValue(), col, obse.getValue());
+        });
+        weatherData.addLocationWeatherData(ipmData);
+
+        // Set the QC to defaultQC from the method's client
+        Integer[] QC = new Integer[weatherData.getWeatherParameters().length];
+        for(int i=0;i<QC.length;i++) {
+            QC[i] = defaultQC;
+        }
+        weatherData.setQC(QC);
+        return weatherData;
     }
 }

@@ -78,22 +78,22 @@ public class FmiOpenDataForecastParser {
                     String paramName = e.getAttribute("name");
                     switch(paramName){
                         case "Temperature":
-                            o.setElementMeasurementTypeId("1002");
+                            o.setElementMeasurementTypeId("TM");
                             break;
                         case "Humidity":
-                            o.setElementMeasurementTypeId("3002");
+                            o.setElementMeasurementTypeId("UM");
                             break;
                         case "WindSpeedMS":
-                            o.setElementMeasurementTypeId("4002");
+                            o.setElementMeasurementTypeId("FF2");
                             break;
                         case "DewPoint":
-                            o.setElementMeasurementTypeId("1901");
+                            o.setElementMeasurementTypeId("DP");
                             break;
                         case "Precipitation1h":
-                            o.setElementMeasurementTypeId("2001");
+                            o.setElementMeasurementTypeId("RR");
                             break;
                         case "radiationglobal":
-                            o.setElementMeasurementTypeId("5001");
+                            o.setElementMeasurementTypeId("Q0");
                             break;
                         default:
                             continue;

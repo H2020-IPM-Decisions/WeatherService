@@ -34,12 +34,20 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import net.ipmdecisions.weather.entity.LocationWeatherData;
 import net.ipmdecisions.weather.entity.WeatherData;
+import net.ipmdecisions.weather.util.vips.WeatherUtils;
 
 /**
  * @copyright 2020 <a href="http://www.nibio.no/">NIBIO</a>
  * @author Tor-Einar Skog <tor-einar.skog@nibio.no>
  */
 public class FinnishMeteorologicalInstituteAdapter {
+    
+    private final WeatherUtils weatherUtils;
+    
+    public FinnishMeteorologicalInstituteAdapter()
+    {
+        this.weatherUtils = new WeatherUtils();
+    }
 
     public WeatherData getHourlyData(Integer weatherStationId, Instant timeStart, Instant timeEnd, List<Integer> ipmDecisionsParameters, Boolean ignoreErrors)  {
         try
@@ -86,7 +94,7 @@ public class FinnishMeteorologicalInstituteAdapter {
                     .filter(obs->ipmDecisionsParameters.contains(Integer.valueOf(obs.getElementMeasurementTypeId())))
                     .collect(Collectors.toList());
             
-            return this.getWeatherDataFromVIPSWeatherObservations(observations, Double.valueOf(latLongStr[1]), Double.valueOf(latLongStr[0]));
+            return this.weatherUtils.getWeatherDataFromVIPSWeatherObservations(observations, Double.valueOf(latLongStr[1]), Double.valueOf(latLongStr[0]), 1);
             /*
             Integer[] parameters = observations.stream()
                     .filter(obs->ipmDecisionsParameters.contains(Integer.valueOf(obs.getElementMeasurementTypeId())))
@@ -142,55 +150,6 @@ public class FinnishMeteorologicalInstituteAdapter {
         }
     }
     
-    public WeatherData getWeatherDataFromVIPSWeatherObservations(List<VIPSWeatherObservation> observations, Double longitude, Double latitude)
-    {
-        Integer[] parameters = observations.stream()
-                    .map(obs->Integer.valueOf(obs.getElementMeasurementTypeId()))
-                    .collect(Collectors.toSet())
-                    .toArray(Integer[]::new);
-                    
-            Map<Integer,Integer> paramCol = new HashMap<>();
-            for(int i=0;i<parameters.length;i++)
-            {
-                paramCol.put(parameters[i], i);
-            }
-        Collections.sort(observations);
-        Instant timeStart = observations.get(0).getTimeMeasured().toInstant();
-        Instant timeEnd = observations.get(observations.size()-1).getTimeMeasured().toInstant();
-        // Convert to IPM Decisions format
-        Integer interval = 3600; // Hourly data
-        Long rows = 1 + timeStart.until(timeEnd, ChronoUnit.SECONDS) / interval;
-        LocationWeatherData ipmData = new LocationWeatherData(
-                longitude,
-                latitude,
-                0.0,
-                rows.intValue(),
-                parameters.length
-        );
-        WeatherData weatherData = new WeatherData();
-        weatherData.setInterval(interval);
-        weatherData.setTimeStart(timeStart);
-        weatherData.setTimeEnd(timeEnd);
-        weatherData.setWeatherParameters(parameters);
-
-        observations.stream()
-
-            .forEach(obse -> {
-                Long row = timeStart.until(obse.getTimeMeasured().toInstant(), ChronoUnit.SECONDS) / interval;
-                Integer col = paramCol.get(Integer.valueOf(obse.getElementMeasurementTypeId()));
-                ipmData.setValue(row.intValue(), col, obse.getValue());
-        });
-        weatherData.addLocationWeatherData(ipmData);
-
-        // Set the QC - all is 1, as this comes from an official meteorological office
-        Integer[] QC = new Integer[weatherData.getWeatherParameters().length];
-        for(int i=0;i<QC.length;i++) {
-            QC[i] = 1;
-        }
-        weatherData.setQC(QC);
-        return weatherData;
-    }
-
     /**
      * Get 36 hour forecasts from FMI
      * @param longitude
@@ -202,7 +161,7 @@ public class FinnishMeteorologicalInstituteAdapter {
         FmiOpenDataForecastParser fP = new FmiOpenDataForecastParser();
         String forecastXML = dA.getForecastData(longitude, latitude);
         List<VIPSWeatherObservation> forecastObs = fP.getVIPSWeatherObservations(forecastXML);
-        return this.getWeatherDataFromVIPSWeatherObservations(forecastObs, longitude, latitude);
+        return this.weatherUtils.getWeatherDataFromVIPSWeatherObservations(forecastObs, longitude, latitude,1);
     }
 
 }

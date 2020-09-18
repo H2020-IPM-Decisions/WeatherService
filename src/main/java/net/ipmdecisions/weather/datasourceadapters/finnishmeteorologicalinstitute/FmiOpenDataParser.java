@@ -139,13 +139,13 @@ public class FmiOpenDataParser {
                 //System.out.println("variableKey=" + variableKey + ", variableValue=" + variableValue);
                 if (variableKey.equals("t2m") || variableKey.equals("rh") || variableKey.equals("r_1h") || variableKey.equals("ws_10min")) {
                     switch (variableKey) {
-                        case "t2m": variableKey = "1002";
+                        case "t2m": variableKey = "TM";
                                     break;
-                        case "rh": variableKey = "3002";
+                        case "rh": variableKey = "UM";
                                     break;
-                        case "r_1h": variableKey = "2001";
+                        case "r_1h": variableKey = "RR";
                                     break;
-                        case "ws_10min": variableKey = "4003";
+                        case "ws_10min": variableKey = "FF2";
                                     break;
                     }
                     dataPod = "{\"timeMeasured\":\"" + gmlDateTime + "\", \"elementMeasurementTypeId\":\"" + variableKey + "\", \"logIntervalId\":1, \"value\":" + variableValue + "}, ";

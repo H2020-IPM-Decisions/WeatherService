@@ -91,7 +91,7 @@ public class FmiOpenDataRadiationParser {
                     continue;
                 }
                 VIPSWeatherObservation o = new VIPSWeatherObservation();
-                o.setElementMeasurementTypeId("5001");
+                o.setElementMeasurementTypeId("Q0");
                 o.setLogIntervalId(VIPSWeatherObservation.LOG_INTERVAL_ID_1M);
                 //System.out.println("||" + positionsAndTimeStamps[i].trim());
                 o.setTimeMeasured(Date.from(Instant.ofEpochSecond(Long.valueOf(positionsAndTimeStamps[i].trim().split("\\s+")[2]))));
