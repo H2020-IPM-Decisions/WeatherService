@@ -43,6 +43,7 @@ import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.SecurityContext;
+import net.ipmdecisions.weather.datasourceadapters.DavisFruitwebAdapter;
 import net.ipmdecisions.weather.datasourceadapters.MeteobotAPIAdapter;
 import net.ipmdecisions.weather.datasourceadapters.MetosAPIAdapter;
 import net.ipmdecisions.weather.datasourceadapters.ParseWeatherDataException;
@@ -260,6 +261,50 @@ public class WeatherAdapterService {
             return Response.ok().entity(theData).build();
         }
         catch(ParseWeatherDataException | GeneralSecurityException | IOException ex)
+        {
+            return Response.serverError().entity(ex).build();
+        }
+    }
+    
+    @POST
+    @Path("davisfruitweb/")
+    @GZIP
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getDavisFruitwebObservations(
+            @FormParam("weatherStationId") String weatherStationId,
+            @FormParam("timeStart") String timeStart,
+            @FormParam("timeEnd") String timeEnd,
+            @FormParam("interval") Integer logInterval,
+            @FormParam("parameters") String parameters,
+            @FormParam("ignoreErrors") String ignoreErrors,
+            @FormParam("credentials") String credentials
+    )
+    {
+        // We only accept requests for hourly data
+        if(!logInterval.equals(3600))
+        {
+            return Response.status(Status.BAD_REQUEST).entity("This service only provides hourly data").build();
+        }
+        try
+        {
+            JsonNode json = new ObjectMapper().readTree(credentials);
+            String userName = json.get("userName").asText();
+            String password = json.get("password").asText();
+
+            List<Integer> ipmDecisionsParameters = Arrays.asList(parameters.split(",")).stream()
+                        .map(paramstr->Integer.parseInt(paramstr.strip())).collect(Collectors.toList());
+            // Date parsing
+            LocalDate startDate = LocalDate.parse(timeStart);
+            LocalDate endDate = LocalDate.parse(timeEnd);
+
+            Boolean ignoreErrorsB = ignoreErrors != null ? ignoreErrors.equals("true") : false;
+
+            
+            
+            WeatherData theData = new DavisFruitwebAdapter().getWeatherData(weatherStationId, password, startDate, endDate);
+            return Response.ok().entity(theData).build();
+        }
+        catch(ParseWeatherDataException | IOException ex)
         {
             return Response.serverError().entity(ex).build();
         }
