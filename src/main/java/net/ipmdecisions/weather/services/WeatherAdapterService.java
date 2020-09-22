@@ -22,17 +22,16 @@ package net.ipmdecisions.weather.services;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.io.IOException;
+import java.security.GeneralSecurityException;
 import java.time.Instant;
 import java.time.ZonedDateTime;
 import java.time.LocalDate;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
-import javax.ws.rs.HeaderParam;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
@@ -45,6 +44,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.SecurityContext;
 import net.ipmdecisions.weather.datasourceadapters.MeteobotAPIAdapter;
+import net.ipmdecisions.weather.datasourceadapters.MetosAPIAdapter;
 import net.ipmdecisions.weather.datasourceadapters.ParseWeatherDataException;
 import net.ipmdecisions.weather.datasourceadapters.YrWeatherForecastAdapter;
 import net.ipmdecisions.weather.datasourceadapters.finnishmeteorologicalinstitute.FinnishMeteorologicalInstituteAdapter;
@@ -218,6 +218,48 @@ public class WeatherAdapterService {
             return Response.ok().entity(theData).build();
         }
         catch(JsonProcessingException | ParseWeatherDataException ex)
+        {
+            return Response.serverError().entity(ex).build();
+        }
+    }
+    
+    @POST
+    @Path("metos/")
+    @GZIP
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getMetosObservations(
+            @FormParam("weatherStationId") String weatherStationId,
+            @FormParam("timeStart") String timeStart,
+            @FormParam("timeEnd") String timeEnd,
+            @FormParam("interval") Integer logInterval,
+            @FormParam("parameters") String parameters,
+            @FormParam("ignoreErrors") String ignoreErrors,
+            @FormParam("credentials") String credentials
+    )
+    {
+        // We only accept requests for hourly data
+        if(!logInterval.equals(3600))
+        {
+            return Response.status(Status.BAD_REQUEST).entity("This service only provides hourly data").build();
+        }
+        try
+        {
+            JsonNode json = new ObjectMapper().readTree(credentials);
+            String publicKey = json.get("userName").asText();
+            String privateKey = json.get("password").asText();
+
+            List<Integer> ipmDecisionsParameters = Arrays.asList(parameters.split(",")).stream()
+                        .map(paramstr->Integer.parseInt(paramstr.strip())).collect(Collectors.toList());
+            // Date parsing
+            LocalDate startDate = LocalDate.parse(timeStart);
+            LocalDate endDate = LocalDate.parse(timeEnd);
+
+            Boolean ignoreErrorsB = ignoreErrors != null ? ignoreErrors.equals("true") : false;
+
+            WeatherData theData = new MetosAPIAdapter().getWeatherData(weatherStationId,publicKey,privateKey,startDate, endDate);
+            return Response.ok().entity(theData).build();
+        }
+        catch(ParseWeatherDataException | GeneralSecurityException | IOException ex)
         {
             return Response.serverError().entity(ex).build();
         }

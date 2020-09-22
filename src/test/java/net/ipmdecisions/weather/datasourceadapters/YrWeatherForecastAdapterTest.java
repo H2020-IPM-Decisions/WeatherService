@@ -54,7 +54,7 @@ public class YrWeatherForecastAdapterTest {
     /**
      * Test of getWeatherForecasts method, of class YrWeatherForecastAdapter.
      */
-    @Test
+    //@Test
     public void testGetWeatherForecasts() throws Exception {
         System.out.println("getWeatherForecasts");
         Double longitude = 14.3711;
