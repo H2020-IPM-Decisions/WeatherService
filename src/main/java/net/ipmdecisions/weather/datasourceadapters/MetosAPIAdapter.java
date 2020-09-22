@@ -21,12 +21,8 @@ package net.ipmdecisions.weather.datasourceadapters;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.security.GeneralSecurityException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
@@ -35,13 +31,9 @@ import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
-import java.util.Optional;
 import java.util.TimeZone;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 import net.ipmdecisions.weather.entity.WeatherData;
@@ -49,43 +41,23 @@ import net.ipmdecisions.weather.util.vips.VIPSWeatherObservation;
 import net.ipmdecisions.weather.util.vips.WeatherElements;
 import net.ipmdecisions.weather.util.vips.WeatherUtils;
 import org.apache.commons.codec.binary.Hex;
-import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpHeaders;
-import org.apache.http.HttpHost;
 import org.apache.http.HttpResponse;
-import org.apache.http.NameValuePair;
-import org.apache.http.auth.AuthenticationException;
-import org.apache.http.auth.UsernamePasswordCredentials;
-import org.apache.http.client.AuthCache;
-import org.apache.http.client.CookieStore;
-import org.apache.http.client.CredentialsProvider;
 import org.apache.http.client.HttpClient;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.client.methods.RequestBuilder;
-import org.apache.http.client.protocol.HttpClientContext;
 import org.apache.http.client.utils.DateUtils;
-import org.apache.http.client.utils.URLEncodedUtils;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
 import org.apache.http.conn.ssl.TrustStrategy;
-import org.apache.http.impl.auth.BasicScheme;
-import org.apache.http.impl.client.BasicAuthCache;
-import org.apache.http.impl.client.BasicCookieStore;
-import org.apache.http.impl.client.BasicCredentialsProvider;
-import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
-import org.apache.http.impl.cookie.BasicClientCookie;
-import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.ssl.SSLContextBuilder;
 import org.apache.http.util.EntityUtils;
 
 /**
  * 
  * Gets data from the Pessl METOS fieldclimate API.
- * Read about the API here: 
+ * Read about the API here: https://api.fieldclimate.com/v1/docs/
  * 
  * @copyright 2017 <a href="http://www.nibio.no/">NIBIO</a>
  * @author Tor-Einar Skog <tor-einar.skog@nibio.no>
@@ -221,7 +193,7 @@ public class MetosAPIAdapter {
 
             HttpResponse response = client.execute(request);
             HttpEntity entity = response.getEntity();
-            System.out.println(response.getStatusLine());
+            //System.out.println(response.getStatusLine());
 
             //EntityUtils.consume(entity);
             String responseString = EntityUtils.toString(entity, "UTF-8");
@@ -267,7 +239,7 @@ public class MetosAPIAdapter {
 
             String method = "GET";
             String path = "/station/" + stationId;
-            System.out.println("path=" + path);
+            //System.out.println("path=" + path);
             // Creating date in appropriate format (RFC 1123) that is accepted by http header; apache http client library is used
             String date = DateUtils.formatDate(new Date(System.currentTimeMillis()));
 
@@ -284,11 +256,11 @@ public class MetosAPIAdapter {
 
             HttpResponse response = client.execute(request);
             HttpEntity entity = response.getEntity();
-            System.out.println("TZ:" + response.getStatusLine());
+            //System.out.println("TZ:" + response.getStatusLine());
 
             //EntityUtils.consume(entity);
             String responseString = EntityUtils.toString(entity, "UTF-8");
-            System.out.println(responseString);
+            //System.out.println(responseString);
             ObjectMapper oMapper = new ObjectMapper();
             JsonNode jNode = oMapper.readTree(responseString);
             return jNode;
