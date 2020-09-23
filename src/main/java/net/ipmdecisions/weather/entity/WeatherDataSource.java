@@ -32,7 +32,7 @@ import java.time.LocalDate;
  * @author Tor-Einar Skog <tor-einar.skog@nibio.no>
  */
 public class WeatherDataSource {
-    private String name, description, public_URL,endpoint, needs_data_control, access_type;
+    private String name, description, public_URL,endpoint, authentication_required, needs_data_control, access_type;
     private Temporal temporal;
     private Parameters parameters; 
     private Spatial spatial;
@@ -480,5 +480,25 @@ public class WeatherDataSource {
      */
     public void setOrganization(Organization organization) {
         this.organization = organization;
+    }
+
+    /**
+     * <p>
+     * The default value is "false". If "true", this implies http POST and sending 
+     * parameters x-www-form-urlencoded, adding parameter 
+     * <code>credentials={"username":"XXX", "password":"XXX"}</code>
+     * </p>
+     * @return the authentication_required
+     */
+    @DocumentationExample("false")
+    public String getAuthentication_required() {
+        return authentication_required != null ? authentication_required : "false";
+    }
+
+    /**
+     * @param authentication_required the authentication_required to set
+     */
+    public void setAuthentication_required(String authentication_required) {
+        this.authentication_required = authentication_required;
     }
 }

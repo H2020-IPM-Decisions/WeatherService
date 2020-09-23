@@ -28,8 +28,11 @@ import java.time.Instant;
 import java.time.ZonedDateTime;
 import java.time.LocalDate;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
+import javax.ws.rs.Consumes;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -50,6 +53,7 @@ import net.ipmdecisions.weather.datasourceadapters.ParseWeatherDataException;
 import net.ipmdecisions.weather.datasourceadapters.YrWeatherForecastAdapter;
 import net.ipmdecisions.weather.datasourceadapters.finnishmeteorologicalinstitute.FinnishMeteorologicalInstituteAdapter;
 import net.ipmdecisions.weather.entity.WeatherData;
+import net.ipmdecisions.weather.util.WeatherDataUtil;
 import org.jboss.resteasy.annotations.GZIP;
 
 /**
@@ -65,6 +69,9 @@ import org.jboss.resteasy.annotations.GZIP;
  */
 @Path("rest/weatheradapter")
 public class WeatherAdapterService {
+    
+    private WeatherDataUtil weatherDataUtil;
+    
     /**
      * Get 9 day weather forecasts from <a href="https://www.met.no/en" target="new">The Norwegian Meteorological Institute</a>'s 
      * <a href="https://api.met.no/weatherapi/locationforecast/1.9/documentation" target="new">Locationforecast API</a> 
@@ -182,9 +189,34 @@ public class WeatherAdapterService {
         return Response.ok().entity(theData).build();       
     }
     
+    /**
+     * Get weather observations in the IPM Decision's weather data format from the the network of MeteoBot stations 
+     * [https://meteobot.com/en/]
+     * 
+     * This is a network of privately owned weather stations, which all require 
+     * authentication to access.
+     * 
+     * @param weatherStationId The weather station id 
+     * @param timeStart Start of weather data period (ISO-8601 Timestamp, e.g. 2020-06-12T00:00:00+03:00)
+     * @param timeEnd End of weather data period (ISO-8601 Timestamp, e.g. 2020-07-03T00:00:00+03:00)
+     * @param logInterval The measuring interval in seconds. Please note that the only allowed interval in this version is 3600 (hourly)
+     * @param parameters Comma separated list of the requested weather parameters, given by <a href="/rest/parameter" target="new">their codes</a>
+     * @param ignoreErrors Set to "true" if you want the service to return weather data regardless of there being errors in the service
+     * @param credentials json object with "userName" and "password" properties set
+     * @requestExample application/x-www-form-urlencoded
+     *   weatherStationId:536
+     *   interval:3600
+     *   ignoreErrors:true
+     *   timeStart:2020-06-12
+     *   timeEnd:2020-07-03
+     *   parameters:1002,3002,2001
+     *   credentials:{"userName":"XXXXX","password":"XXXX"}
+     * @return 
+     */
     @POST
     @Path("meteobot/")
     @GZIP
+    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Produces(MediaType.APPLICATION_JSON)
     public Response getMeteobotObservations(
             @FormParam("weatherStationId") Integer weatherStationId,
@@ -207,8 +239,8 @@ public class WeatherAdapterService {
             String userName = json.get("userName").asText();
             String password = json.get("password").asText();
 
-            List<Integer> ipmDecisionsParameters = Arrays.asList(parameters.split(",")).stream()
-                        .map(paramstr->Integer.parseInt(paramstr.strip())).collect(Collectors.toList());
+            Set<Integer> ipmDecisionsParameters = new HashSet(Arrays.asList(parameters.split(",")).stream()
+                        .map(paramstr->Integer.parseInt(paramstr.strip())).collect(Collectors.toList()));
             // Date parsing
             LocalDate startDate = LocalDate.parse(timeStart);
             LocalDate endDate = LocalDate.parse(timeEnd);
@@ -216,7 +248,7 @@ public class WeatherAdapterService {
             Boolean ignoreErrorsB = ignoreErrors != null ? ignoreErrors.equals("true") : false;
 
             WeatherData theData = new MeteobotAPIAdapter().getWeatherData(weatherStationId,userName,password,startDate, endDate);
-            return Response.ok().entity(theData).build();
+            return Response.ok().entity(this.getWeatherDataUtil().filterParameters(theData, ipmDecisionsParameters)).build();
         }
         catch(JsonProcessingException | ParseWeatherDataException ex)
         {
@@ -224,9 +256,34 @@ public class WeatherAdapterService {
         }
     }
     
+    /**
+     * Get weather observations in the IPM Decision's weather data format from the the network of Pessl Instruments Metos stations 
+     * [https://metos.at/]
+     * 
+     * This is a network of privately owned weather stations, which all require 
+     * authentication to access.
+     * 
+     * @param weatherStationId The weather station id 
+     * @param timeStart Start of weather data period (ISO-8601 Timestamp, e.g. 2020-06-12T00:00:00+03:00)
+     * @param timeEnd End of weather data period (ISO-8601 Timestamp, e.g. 2020-07-03T00:00:00+03:00)
+     * @param logInterval The measuring interval in seconds. Please note that the only allowed interval in this version is 3600 (hourly)
+     * @param parameters Comma separated list of the requested weather parameters, given by <a href="/rest/parameter" target="new">their codes</a>
+     * @param ignoreErrors Set to "true" if you want the service to return weather data regardless of there being errors in the service
+     * @param credentials json object with "userName" and "password" properties set
+     * @requestExample application/x-www-form-urlencoded
+     *   weatherStationId:536
+     *   interval:3600
+     *   ignoreErrors:true
+     *   timeStart:2020-06-12
+     *   timeEnd:2020-07-03
+     *   parameters:1002,3002,2001
+     *   credentials:{"userName":"XXXXX","password":"XXXX"}
+     * @return 
+     */
     @POST
     @Path("metos/")
     @GZIP
+    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Produces(MediaType.APPLICATION_JSON)
     public Response getMetosObservations(
             @FormParam("weatherStationId") String weatherStationId,
@@ -249,8 +306,8 @@ public class WeatherAdapterService {
             String publicKey = json.get("userName").asText();
             String privateKey = json.get("password").asText();
 
-            List<Integer> ipmDecisionsParameters = Arrays.asList(parameters.split(",")).stream()
-                        .map(paramstr->Integer.parseInt(paramstr.strip())).collect(Collectors.toList());
+            Set<Integer> ipmDecisionsParameters = new HashSet(Arrays.asList(parameters.split(",")).stream()
+                        .map(paramstr->Integer.parseInt(paramstr.strip())).collect(Collectors.toList()));
             // Date parsing
             LocalDate startDate = LocalDate.parse(timeStart);
             LocalDate endDate = LocalDate.parse(timeEnd);
@@ -258,7 +315,7 @@ public class WeatherAdapterService {
             Boolean ignoreErrorsB = ignoreErrors != null ? ignoreErrors.equals("true") : false;
 
             WeatherData theData = new MetosAPIAdapter().getWeatherData(weatherStationId,publicKey,privateKey,startDate, endDate);
-            return Response.ok().entity(theData).build();
+            return Response.ok().entity(this.getWeatherDataUtil().filterParameters(theData, ipmDecisionsParameters)).build();
         }
         catch(ParseWeatherDataException | GeneralSecurityException | IOException ex)
         {
@@ -266,9 +323,34 @@ public class WeatherAdapterService {
         }
     }
     
+    /**
+     * Get weather observations in the IPM Decision's weather data format from the the network of Fruitweb attached stations 
+     * [https://www.fruitweb.info/en/]
+     * 
+     * This is a network of privately owned weather stations, which all require 
+     * authentication to access.
+     * 
+     * @param weatherStationId The weather station id 
+     * @param timeStart Start of weather data period (ISO-8601 Timestamp, e.g. 2020-06-12T00:00:00+03:00)
+     * @param timeEnd End of weather data period (ISO-8601 Timestamp, e.g. 2020-07-03T00:00:00+03:00)
+     * @param logInterval The measuring interval in seconds. Please note that the only allowed interval in this version is 3600 (hourly)
+     * @param parameters Comma separated list of the requested weather parameters, given by <a href="/rest/parameter" target="new">their codes</a>
+     * @param ignoreErrors Set to "true" if you want the service to return weather data regardless of there being errors in the service
+     * @param credentials json object with "userName" and "password" properties set
+     * @requestExample application/x-www-form-urlencoded
+     *   weatherStationId:536
+     *   interval:3600
+     *   ignoreErrors:true
+     *   timeStart:2020-06-12
+     *   timeEnd:2020-07-03
+     *   parameters:1002,3002,2001
+     *   credentials:{"userName":"XXXXX","password":"XXXX"}
+     * @return 
+     */
     @POST
     @Path("davisfruitweb/")
     @GZIP
+    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Produces(MediaType.APPLICATION_JSON)
     public Response getDavisFruitwebObservations(
             @FormParam("weatherStationId") String weatherStationId,
@@ -291,8 +373,8 @@ public class WeatherAdapterService {
             String userName = json.get("userName").asText();
             String password = json.get("password").asText();
 
-            List<Integer> ipmDecisionsParameters = Arrays.asList(parameters.split(",")).stream()
-                        .map(paramstr->Integer.parseInt(paramstr.strip())).collect(Collectors.toList());
+            Set<Integer> ipmDecisionsParameters = new HashSet(Arrays.asList(parameters.split(",")).stream()
+                        .map(paramstr->Integer.parseInt(paramstr.strip())).collect(Collectors.toList()));
             // Date parsing
             LocalDate startDate = LocalDate.parse(timeStart);
             LocalDate endDate = LocalDate.parse(timeEnd);
@@ -302,7 +384,7 @@ public class WeatherAdapterService {
             
             
             WeatherData theData = new DavisFruitwebAdapter().getWeatherData(weatherStationId, password, startDate, endDate);
-            return Response.ok().entity(theData).build();
+            return Response.ok().entity(this.getWeatherDataUtil().filterParameters(theData, ipmDecisionsParameters)).build();
         }
         catch(ParseWeatherDataException | IOException ex)
         {
@@ -310,20 +392,12 @@ public class WeatherAdapterService {
         }
     }
     
-    @POST
-    @Path("testauth/")
-    //public Response testAuth(@HeaderParam("Authorization") String authString)
-    public Response testAuth(@Context SecurityContext sc, @Context HttpHeaders headers )
+    private WeatherDataUtil getWeatherDataUtil()
     {
-        System.out.println("---START");
-        MultivaluedMap<String, String> headers1 = headers.getRequestHeaders();
-        for(String h:headers1.keySet())
+        if(this.weatherDataUtil == null)
         {
-            System.out.println("Headername=" + h);
+            this.weatherDataUtil = new WeatherDataUtil();
         }
-        System.out.println("---END");
-        //System.out.println(authString);
-        //return Response.ok().entity(authString).build();
-        return Response.ok().entity("JUHU").build();
+        return this.weatherDataUtil;
     }
 }

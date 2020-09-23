@@ -41,7 +41,7 @@ public class LocationWeatherData {
     private Double altitude;
     @JsonSchemaTitle("Weather data per location")
     @JsonPropertyDescription("The data. In rows, ordered chronologically. Columns ordered as given in weatherParameters.")
-    private final Double[][] data;
+    private Double[][] data;
     
     public LocationWeatherData(Double longitude, Double latitude, Double altitude, int rows, int columns){
         this.longitude = longitude;
@@ -71,6 +71,11 @@ public class LocationWeatherData {
     public Double[][] getData()
     {
         return this.data;
+    }
+    
+    public void setData(Double[][] data)
+    {
+        this.data = data;
     }
     
     public void setValue(Integer row, Integer column, Double value)
