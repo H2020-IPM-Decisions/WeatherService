@@ -27,6 +27,8 @@ import java.security.GeneralSecurityException;
 import java.time.Instant;
 import java.time.ZonedDateTime;
 import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.format.DateTimeParseException;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
@@ -55,6 +57,8 @@ import net.ipmdecisions.weather.datasourceadapters.finnishmeteorologicalinstitut
 import net.ipmdecisions.weather.entity.WeatherData;
 import net.ipmdecisions.weather.util.WeatherDataUtil;
 import org.jboss.resteasy.annotations.GZIP;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 /**
  * Some weather data sources may agree to deliver their weather data in the 
@@ -172,9 +176,24 @@ public class WeatherAdapterService {
     {
         List<Integer> ipmDecisionsParameters = Arrays.asList(parameters.split(",")).stream()
                     .map(paramstr->Integer.parseInt(paramstr.strip())).collect(Collectors.toList());
+        
+        
+        Instant timeStartInstant;
+        Instant timeEndInstant;
+        
         // Date parsing
-        Instant timeStartInstant = ZonedDateTime.parse(timeStart).toInstant();
-        Instant timeEndInstant = ZonedDateTime.parse(timeEnd).toInstant();
+        // Is it a ISO-8601 timestamp or date?
+        try
+        {
+            timeStartInstant = ZonedDateTime.parse(timeStart).toInstant();
+            timeEndInstant = ZonedDateTime.parse(timeEnd).toInstant();
+        }
+        catch(DateTimeParseException ex)
+        {
+            DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+            timeStartInstant = LocalDate.parse(timeStart, dtf).atStartOfDay(ZoneId.of("Europe/Helsinki")).toInstant();//.atZone().toInstant();
+            timeEndInstant = LocalDate.parse(timeEnd, dtf).atStartOfDay(ZoneId.of("Europe/Helsinki")).toInstant();//.atZone(ZoneId.of("Europe/Helsinki")).toInstant();     
+        }
         
         Boolean ignoreErrorsB = ignoreErrors != null ? ignoreErrors.equals("true") : false;
         

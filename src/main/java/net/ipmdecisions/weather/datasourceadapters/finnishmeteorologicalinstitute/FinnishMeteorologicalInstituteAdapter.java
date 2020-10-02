@@ -91,7 +91,7 @@ public class FinnishMeteorologicalInstituteAdapter {
             }
             
             observations = observations.stream()
-                    .filter(obs->ipmDecisionsParameters.contains(Integer.valueOf(obs.getElementMeasurementTypeId())))
+                    .filter(obs->ipmDecisionsParameters.contains(this.weatherUtils.getIPMParameterId(obs.getElementMeasurementTypeId())))
                     .collect(Collectors.toList());
             
             return this.weatherUtils.getWeatherDataFromVIPSWeatherObservations(observations, Double.valueOf(latLongStr[1]), Double.valueOf(latLongStr[0]), 1);

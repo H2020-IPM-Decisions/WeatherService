@@ -159,6 +159,7 @@ public class DavisFruitwebAdapter {
             Date timestamp = null;
             for(String[] lineData: data)
             {
+                //System.out.println(String.join(",",lineData));
                 // Skip lines that are not exactly :00 or :30
                 if(
                         !lineData[1].split(":")[1].equals("00")
@@ -194,31 +195,43 @@ public class DavisFruitwebAdapter {
 
                 for(Integer i=2;i<data30.length;i++)
                 {
-                    Double aggregateValue = null;
-                    Double value00 = Double.valueOf(data00[i].replaceAll(",","."));
-                    Double value30 = Double.valueOf(data30[i].replaceAll(",","."));
+                    
                     Integer elementMeasurementTypeIndex = elementOrdering.get(i);
                     // This means there is an element type we don't collect
                     if(elementMeasurementTypeIndex == null)
                     {
                         continue;
                     }
-                    //System.out.println("element " + i + "=" + MetosDataParser.elementMeasurementTypes[elementMeasurementTypeIndex][1]);
-                    if(DavisFruitwebAdapter.ELEMENT_MEASUREMENT_TYPES[elementMeasurementTypeIndex][2].equals("AVG"))
+                    Double aggregateValue = null;
+                    Double value00 = null;
+                    Double value30 = null;
+                    Boolean atLeastOneValueMissing = false;
+                    try{value00 = Double.valueOf(data00[i].replaceAll(",","."));}catch(NumberFormatException ex){atLeastOneValueMissing = Boolean.TRUE;}
+                    try{value30 = Double.valueOf(data30[i].replaceAll(",","."));}catch(NumberFormatException ex){atLeastOneValueMissing = Boolean.TRUE;}
+                    if(value00 == null && value30 == null)
                     {
-                        aggregateValue = (value00 + value30) / 2;
+                        aggregateValue = null;
                     }
                     else
                     {
-                        aggregateValue = (value00 + value30);
+                        value00 = value00 == null ? 0.0 : value00;
+                        value30 = value30 == null ? 0.0 : value30;
+                        //System.out.println("element " + i + "=" + MetosDataParser.elementMeasurementTypes[elementMeasurementTypeIndex][1]);
+                        if(DavisFruitwebAdapter.ELEMENT_MEASUREMENT_TYPES[elementMeasurementTypeIndex][2].equals("AVG"))
+                        {
+                            aggregateValue = (value00 + value30) / (atLeastOneValueMissing ? 1 : 2);
+                        }
+                        else
+                        {
+                            aggregateValue = (value00 + value30);
+                        }
                     }
-
-                        VIPSWeatherObservation obs = new VIPSWeatherObservation();
-                        obs.setTimeMeasured(timestamp);
-                        obs.setLogIntervalId(VIPSWeatherObservation.LOG_INTERVAL_ID_1H);
-                        obs.setElementMeasurementTypeId(DavisFruitwebAdapter.ELEMENT_MEASUREMENT_TYPES[elementMeasurementTypeIndex][1]);
-                        obs.setValue(aggregateValue);
-                        retVal.add(obs);
+                    VIPSWeatherObservation obs = new VIPSWeatherObservation();
+                    obs.setTimeMeasured(timestamp);
+                    obs.setLogIntervalId(VIPSWeatherObservation.LOG_INTERVAL_ID_1H);
+                    obs.setElementMeasurementTypeId(DavisFruitwebAdapter.ELEMENT_MEASUREMENT_TYPES[elementMeasurementTypeIndex][1]);
+                    obs.setValue(aggregateValue);
+                    retVal.add(obs);
                 }
             }
         }

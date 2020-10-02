@@ -135,7 +135,7 @@ public class WeatherDataSourceService {
             // We do a brute force search for the string "Sphere" in the geoJSON string
             // to bypass any issues in deserialization of that custom type, which is 
             // short for creating a polygon that covers the entire globe
-            if(dataSourceGeoJsonStr.contains("\"Sphere\""))
+            if(dataSourceGeoJsonStr != null && dataSourceGeoJsonStr.contains("\"Sphere\""))
             {
                 return true;
             }

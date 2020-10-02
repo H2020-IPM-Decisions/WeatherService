@@ -46,7 +46,7 @@ public class VIPSWeatherObservation implements Comparable{
     private String elementMeasurementTypeId;
     private Integer logIntervalId;
     private Date timeMeasured;
-    private double value;
+    private Double value;
    
     /** Creates a new instance of WeatherObservation */
     public VIPSWeatherObservation() {
@@ -134,7 +134,7 @@ public class VIPSWeatherObservation implements Comparable{
     /**
      * @return the value
      */
-    public double getValue() {
+    public Double getValue() {
         return value;
     }
 

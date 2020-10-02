@@ -31,6 +31,16 @@ import com.webcohesion.enunciate.metadata.DocumentationExample;
  * @author Tor-Einar Skog <tor-einar.skog@nibio.no>
  */
 public class QC {
+    
+    public final static Integer NO_QC = 0;
+    public final static Integer OK_FROM_EXTERNAL = 1;
+    public final static Integer OK_FROM_IPM_DECISIONS = 2;
+    public final static Integer FAILED_NAN = 4;
+    public final static Integer FAILED_INTERVAL_TEST = 8;
+    public final static Integer FAILED_LOGIC_TEST = 16;
+    public final static Integer FAILED_STEP_TEST = 32;
+    public final static Integer FAILED_FREEZE_TEST = 64;
+    
     private Integer id;
     private String name, description;
 

@@ -263,6 +263,12 @@ public class WeatherUtils {
         weatherData.setTimeEnd(timeEnd);
         weatherData.setWeatherParameters(parameters);
 
+        // Set the QC to defaultQC from the method's client
+        Integer[] QCPerParam = new Integer[weatherData.getWeatherParameters().length];
+        for(int i=0;i<QCPerParam.length;i++) {
+            QCPerParam[i] = defaultQC;
+        }
+        
         observations.stream()
             .filter(obs->this.getIPMParameterId(obs.getElementMeasurementTypeId())!=null)
             .forEach(obse -> {
@@ -272,12 +278,8 @@ public class WeatherUtils {
         });
         weatherData.addLocationWeatherData(ipmData);
 
-        // Set the QC to defaultQC from the method's client
-        Integer[] QC = new Integer[weatherData.getWeatherParameters().length];
-        for(int i=0;i<QC.length;i++) {
-            QC[i] = defaultQC;
-        }
-        weatherData.setQC(QC);
+        
+        weatherData.setQC(QCPerParam);
         return weatherData;
     }
 }
