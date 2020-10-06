@@ -12,5 +12,6 @@
 		<docs>
 			<download file="LICENSE" name="GNU Affero GPL v3" description="The license governing this API" showLink="true"/>
 		</docs>
+		<swagger basePath="/api/wx/" docsSubdir="swagger" />
 	</modules>
 </enunciate>
