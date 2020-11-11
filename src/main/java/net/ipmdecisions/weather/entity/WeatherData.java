@@ -33,7 +33,9 @@ import javax.validation.constraints.Positive;
 import javax.validation.constraints.Size;
 
 /**
- * We are using this tool to serialize to Json Schema: https://github.com/mbknor/mbknor-jackson-jsonSchema
+ * NOTE: We do not use the meta data here to generate the schema. The schema
+ * is a hard coded Json file at the root of the jar file. To get the schema for WeatherData,
+ * use SchemaProvider.getWeatherDataSchema()
  * 
  * @copyright 2020 <a href="http://www.nibio.no/">NIBIO</a>
  * @author Tor-Einar Skog <tor-einar.skog@nibio.no>
@@ -62,7 +64,7 @@ public class WeatherData {
     @NotNull
     @Size(min=1)
     @JsonSchemaTitle("Weather parameters")
-    @JsonPropertyDescription("The weather parameters. For reference, see https://ipmdecisions.nibio.no/weather/rest/parameter/list")
+    @JsonPropertyDescription("The weather parameters. For reference, see https://ipmdecisions.nibio.no/api/wx/rest/parameter")
     private Integer[] weatherParameters;
     @Size(min=1)
     @JsonSchemaTitle("QC")

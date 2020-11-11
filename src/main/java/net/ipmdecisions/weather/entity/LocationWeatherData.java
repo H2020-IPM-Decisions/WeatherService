@@ -23,7 +23,13 @@ import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import com.kjetland.jackson.jsonSchema.annotations.JsonSchemaTitle;
 import javax.validation.constraints.NotNull;
 
+
+
 /**
+ * NOTE: We do not use the meta data here to generate the schema. The schema
+ * is a hard coded Json file at the root of the jar file. To get the schema for WeatherData,
+ * use SchemaProvider.getWeatherDataSchema()
+ * 
  * @copyright 2020 <a href="http://www.nibio.no/">NIBIO</a>
  * @author Tor-Einar Skog <tor-einar.skog@nibio.no>
  */

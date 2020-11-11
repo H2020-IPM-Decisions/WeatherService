@@ -19,8 +19,11 @@
 
 package net.ipmdecisions.weather.services;
 
+import com.fasterxml.jackson.core.JsonFactory;
+import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.MappingJsonFactory;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.github.fge.jsonschema.core.exceptions.ProcessingException;
@@ -45,9 +48,11 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import net.ipmdecisions.weather.entity.LocationWeatherData;
 import net.ipmdecisions.weather.entity.QC;
 import net.ipmdecisions.weather.entity.WeatherData;
 import net.ipmdecisions.weather.entity.WeatherParameter;
+import net.ipmdecisions.weather.util.SchemaProvider;
 import net.ipmdecisions.weather.util.SchemaUtils;
 import org.jboss.resteasy.annotations.GZIP;
 import org.jboss.resteasy.spi.HttpRequest;
@@ -111,9 +116,16 @@ public class MetaDataService {
     @Produces("application/json;charset=UTF-8")
     public Response getWeatherDataSchema()
     {
-        JsonNode schema = schemaGen.generateJsonSchema(WeatherData.class);
-        return Response.ok().entity(schema).build();
+        try
+        {
+            return Response.ok().entity(SchemaProvider.getWeatherDataSchema()).build();
+        }
+        catch(IOException ex) {
+            return Response.serverError().entity(ex.getMessage()).build();
+        }
     }
+    
+    
     
     /**
      * Validates the posted weather data against the <a href="https://json-schema.org/" target="new">Json schema</a>
@@ -130,7 +142,8 @@ public class MetaDataService {
     {
         try
         {
-            JsonNode schema = schemaGen.generateJsonSchema(WeatherData.class);
+            
+            JsonNode schema = SchemaProvider.getWeatherDataSchema();
             SchemaUtils sUtils = new SchemaUtils();
             // If we don't create a string from the schema, it will always pass with a well formed but non conforming JSON document
             // Don't ask me why!!!
