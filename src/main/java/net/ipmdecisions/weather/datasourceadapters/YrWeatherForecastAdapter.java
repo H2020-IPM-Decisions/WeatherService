@@ -28,6 +28,7 @@ import java.text.MessageFormat;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -56,8 +57,7 @@ public class YrWeatherForecastAdapter {
     Integer[] QC = {1,1,1,1};
     
 
-    //private final static String YR_API_URL = "https://api.met.no/weatherapi/locationforecastlts/1.3/?lat={0};lon={1};msl={2}";
-    private final static String YR_API_URL = "https://api.met.no/weatherapi/locationforecast/1.9/?lat={0};lon={1};msl={2}";
+    private final static String YR_API_URL = "https://api.met.no/weatherapi/locationforecast/1.9/?lat=%f;lon=%f;msl=%d";
     
 
     
@@ -66,10 +66,11 @@ public class YrWeatherForecastAdapter {
         URL yrURL;
         LocationWeatherData yrValues;
         try {
-            yrURL = new URL(MessageFormat.format(YrWeatherForecastAdapter.YR_API_URL, 
+            yrURL = new URL(String.format(Locale.US,
+                    YrWeatherForecastAdapter.YR_API_URL,
                     latitude,
                     longitude,
-                    String.valueOf(altitude.intValue())) // Need to do this in order to avoid formatting the int 2000 to "2,000"
+                    altitude.intValue()) // Need to do this in order to avoid formatting the int 2000 to "2,000"
             );
             
             // Find earliest and latest forecast time stamp
