@@ -22,6 +22,7 @@ package net.ipmdecisions.weather.entity;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import com.kjetland.jackson.jsonSchema.annotations.JsonSchemaTitle;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 
 
 
@@ -34,6 +35,7 @@ import javax.validation.constraints.NotNull;
  * @author Tor-Einar Skog <tor-einar.skog@nibio.no>
  */
 public class LocationWeatherData {
+
     @NotNull
     @JsonSchemaTitle("Longitude (WGS84)")
     @JsonPropertyDescription("The longitude of the location. Decimal degrees (WGS84)")
@@ -45,6 +47,10 @@ public class LocationWeatherData {
     @JsonSchemaTitle("Altitude (Meters)")
     @JsonPropertyDescription("The altitude of the location. Measured in meters")
     private Double altitude;
+    @Size(min=1)
+    @JsonSchemaTitle("QC")
+    @JsonPropertyDescription("Quality control results for each weather parameter. Bitmapped against list of tests. For reference, see (TODO)")
+    private Integer[] QC;
     @JsonSchemaTitle("Weather data per location")
     @JsonPropertyDescription("The data. In rows, ordered chronologically. Columns ordered as given in weatherParameters.")
     private Double[][] data;
@@ -165,5 +171,19 @@ public class LocationWeatherData {
      */
     public void setAltitude(Double altitude) {
         this.altitude = altitude;
+    }
+    
+    /**
+     * @return the QC
+     */
+    public Integer[] getQC() {
+        return QC;
+    }
+
+    /**
+     * @param QC the QC to set
+     */
+    public void setQC(Integer[] QC) {
+        this.QC = QC;
     }
 }

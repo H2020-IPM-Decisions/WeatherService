@@ -149,10 +149,10 @@ public class YrWeatherForecastAdapter {
             yrValues.setLongitude(longitude);
             yrValues.setLatitude(latitude);
             yrValues.setAltitude(altitude);
+            yrValues.setQC(QC);
             WeatherData retVal = new WeatherData();
             retVal.setInterval(3600);
             retVal.setWeatherParameters(this.parameters);
-            retVal.setQC(QC);
             retVal.setTimeStart(timeStart);
             retVal.setTimeEnd(timeEnd);
             retVal.addLocationWeatherData(yrValues);

@@ -52,6 +52,8 @@ public class WeatherDataUtil {
             }
         }
         
+        Integer[] filteredQC = new Integer[paramIndexesToKeep.size()];
+        
         source.getLocationWeatherData().forEach(lwd -> {
             Double[][] filteredData = new Double[lwd.getLength()][paramsToKeep.size()];
             for(int i=0;i<lwd.getLength();i++)
@@ -62,15 +64,16 @@ public class WeatherDataUtil {
                 }
             }
             lwd.setData(filteredData);
+            for(int i=0; i<paramIndexesToKeep.size();i++)
+            {
+                filteredQC[i] = lwd.getQC()[paramIndexesToKeep.get(i)];
+            }
+            lwd.setQC(filteredQC);
         });
         
-        Integer[] filteredQC = new Integer[paramIndexesToKeep.size()];
+        
 
-        for(int i=0; i<paramIndexesToKeep.size();i++)
-        {
-            filteredQC[i] = source.getQC()[paramIndexesToKeep.get(i)];
-        }
-        source.setQC(filteredQC);
+        
         source.setWeatherParameters(paramsToKeep.toArray(new Integer[paramsToKeep.size()]));
         
         return source;

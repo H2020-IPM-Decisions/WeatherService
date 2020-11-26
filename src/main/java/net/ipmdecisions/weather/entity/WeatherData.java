@@ -66,10 +66,7 @@ public class WeatherData {
     @JsonSchemaTitle("Weather parameters")
     @JsonPropertyDescription("The weather parameters. For reference, see https://ipmdecisions.nibio.no/api/wx/rest/parameter")
     private Integer[] weatherParameters;
-    @Size(min=1)
-    @JsonSchemaTitle("QC")
-    @JsonPropertyDescription("Quality control results for each weather parameter. Bitmapped against list of tests. For reference, see (TODO)")
-    private Integer[] QC;
+    
     @JsonSchemaTitle("Weather data")
     @JsonPropertyDescription("The weather data per location.")
     private List<LocationWeatherData> locationWeatherData;
@@ -154,17 +151,4 @@ public class WeatherData {
         this.locationWeatherData.add(locationWeatherData);
     }
 
-    /**
-     * @return the QC
-     */
-    public Integer[] getQC() {
-        return QC;
-    }
-
-    /**
-     * @param QC the QC to set
-     */
-    public void setQC(Integer[] QC) {
-        this.QC = QC;
-    }
 }

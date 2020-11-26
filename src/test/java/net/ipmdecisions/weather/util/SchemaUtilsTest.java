@@ -20,7 +20,10 @@ package net.ipmdecisions.weather.util;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import java.io.BufferedInputStream;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
 import java.net.URL;
+import java.util.stream.Collectors;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -57,24 +60,26 @@ public class SchemaUtilsTest {
      * Test of isJsonValid method, of class SchemaUtils.
      */
     @Test
-    
     public void testIsJsonValid_URL_JsonNode() throws Exception {
         System.out.println("isJsonValid");
-        URL schemaURL = new URL("https://ipmdecisions.nibio.no/api/wx/rest/schema/weatherdata");
+        
+        // Get schema as string
+        BufferedInputStream schemaInputStream = new BufferedInputStream(this.getClass().getResourceAsStream("/weatherDataSchema.json"));
+        String schema = new BufferedReader(new InputStreamReader(schemaInputStream)).lines().collect(Collectors.joining("\n"));
         
         // Try first with assumed correct data
         BufferedInputStream inputStream = new BufferedInputStream(this.getClass().getResourceAsStream("/yr_weatherdata_correct.json"));
         SchemaUtils instance = new SchemaUtils();
         JsonNode jsonNode = instance.getJsonFromInputStream(inputStream);
         Boolean expResult = true;
-        Boolean result = instance.isJsonValid(schemaURL, jsonNode);
+        Boolean result = instance.isJsonValid(schema, jsonNode);
         assertEquals(expResult, result);
         
         // Then with non conforming data
         inputStream = new BufferedInputStream(this.getClass().getResourceAsStream("/yr_weatherdata_wrong.json"));
         jsonNode = instance.getJsonFromInputStream(inputStream);
         expResult = false;
-        result = instance.isJsonValid(schemaURL, jsonNode);
+        result = instance.isJsonValid(schema, jsonNode);
         assertEquals(expResult, result);
         
     }

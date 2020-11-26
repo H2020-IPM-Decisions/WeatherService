@@ -49,20 +49,6 @@
       ],
       "description": "The weather data per location.",
       "title": "Weather data"
-    },
-    "qc": {
-      "oneOf": [
-        {
-          "type": "null",
-          "title": "Not included"
-        },
-        {
-          "type": "array",
-          "items": {
-            "type": "integer"
-          }
-        }
-      ]
     }
   },
   "required": [
@@ -98,6 +84,20 @@
           ],
           "description": "The altitude of the location. Measured in meters",
           "title": "Altitude (Meters)"
+        },
+        "qc": {
+          "oneOf": [
+            {
+              "type": "null",
+              "title": "Not included"
+            },
+            {
+              "type": "array",
+              "items": {
+                "type": "integer"
+              }
+            }
+          ]
         },
         "data": {
           "oneOf": [

@@ -275,11 +275,12 @@ public class WeatherUtils {
                 Long row = timeStart.until(obse.getTimeMeasured().toInstant(), ChronoUnit.SECONDS) / interval;
                 Integer col = paramCol.get(this.getIPMParameterId(obse.getElementMeasurementTypeId()));
                 ipmData.setValue(row.intValue(), col, obse.getValue());
+                ipmData.setQC(QCPerParam);
         });
         weatherData.addLocationWeatherData(ipmData);
 
         
-        weatherData.setQC(QCPerParam);
+        
         return weatherData;
     }
 }
