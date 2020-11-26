@@ -141,7 +141,7 @@ public class VIPSWeatherObservation implements Comparable{
     /**
      * @param value the value to set
      */
-    public final void setValue(double value) {
+    public final void setValue(Double value) {
         this.value = value;
     }
     
