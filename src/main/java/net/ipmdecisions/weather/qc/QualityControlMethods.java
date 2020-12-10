@@ -1,7 +1,9 @@
 package net.ipmdecisions.weather.qc;
 
+import static java.lang.Math.abs;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import org.json.JSONObject;
 import org.json.JSONArray;
@@ -11,6 +13,9 @@ import org.json.JSONArray;
  * @author 03080928
  */
 public class QualityControlMethods {
+    
+    private final static Integer STEP_TEST_1002_TRESHOLD = 10;
+    private final static Integer STEP_TEST_3002_TRESHOLD = 50;
     
     public QualityControlMethods() {
         
@@ -26,7 +31,10 @@ public class QualityControlMethods {
         JSONArray data;
        
         JSONArray weatherParameters = weatherDataObject.getWeatherParameters();
+        
         int interval = weatherDataObject.getInterval();
+        String timeStart = weatherDataObject.getTimeStart();
+        String timeEnd = weatherDataObject.getTimeEnd();
         
         double  longitude;
         double  latitude;
@@ -40,7 +48,7 @@ public class QualityControlMethods {
             latitude = locationWeatherDataObject.getDouble("latitude");
             altitude = locationWeatherDataObject.getInt("altitude");
             data = locationWeatherDataObject.getJSONArray("data");
-            qcResult = getParameterTypeBasedQC(data, interval, weatherParameters, longitude, latitude, altitude);
+            qcResult = getParameterTypeBasedQC(data, interval, timeStart, timeEnd, weatherParameters, longitude, latitude, altitude);
             locationWeatherDataObject.put("qc", qcResult);
             inboundWeatherDataAsJsonObject.getJSONArray("locationWeatherData").put(i, locationWeatherDataObject);
         }
@@ -49,7 +57,9 @@ public class QualityControlMethods {
         
     }
     
-    private JSONArray getParameterTypeBasedQC(JSONArray data, int interval, JSONArray weatherParameters, double longitude, double latitude, int altitude) {
+    private JSONArray getParameterTypeBasedQC(JSONArray data, int interval, String timeStart, String timeEnd, JSONArray weatherParameters, double longitude, double latitude, int altitude) {
+        
+        List weatherParameterValuesAsList;
         
         JSONArray qcResult = new JSONArray();
         
@@ -58,11 +68,13 @@ public class QualityControlMethods {
         for (int index=0; index<weatherParameters.length(); index++) {
             switch (weatherParameters.getInt(index)) {
                 case 1002:
-                    testResult = getFreezeTestResult(data, index);
+                    weatherParameterValuesAsList = getValuesAsList(data, index);
+                    testResult = getFreezeTestResult(weatherParameterValuesAsList, index) + getStepTestResult(weatherParameterValuesAsList, index, 1002);
                     qcResult.put(getFinalTestResult(testResult));
                     break;
                 case 3002:
-                    testResult = getFreezeTestResult(data, index);
+                    weatherParameterValuesAsList = getValuesAsList(data, index);
+                    testResult = getFreezeTestResult(weatherParameterValuesAsList, index) + getStepTestResult(weatherParameterValuesAsList, index, 3002);
                     qcResult.put(getFinalTestResult(testResult));
                     break;
                 default:
@@ -71,6 +83,73 @@ public class QualityControlMethods {
         }
         
         return qcResult;
+    }
+    
+    private int getIntervalTestResult(JSONArray data, int index, int weatherParameter, int interval, String timeStart, String timeEnd, double longitude, double latitude, int altitude) {
+        return 0;
+    }
+    
+    private int getLogicalTestResult(JSONArray data, int index, int weatherParameter, int interval, String timeStart, String timeEnd, double longitude, double latitude, int altitude) {
+        return 0;
+    }
+    
+    private int getFreezeTestResult(List weatherParameterValuesAsList, int index) {
+        HashSet unique = new HashSet(weatherParameterValuesAsList);
+        if (unique.size() == 1 && weatherParameterValuesAsList.size() > 1) {
+            return 64;
+        } else {
+            return 0;
+        }
+    }
+    
+    private int getStepTestResult(List weatherParameterValuesAsList, int index, int weatherParameter) {
+        
+        int returnValue = 0;
+        
+        switch (weatherParameter) {
+            case 1002:
+                returnValue = getParameterSpecificStepTestResult(weatherParameterValuesAsList, this.STEP_TEST_1002_TRESHOLD);
+                break;
+            case 3002:
+                returnValue = getParameterSpecificStepTestResult(weatherParameterValuesAsList, this.STEP_TEST_3002_TRESHOLD);
+                break;
+            default:
+        }
+        
+        return returnValue;
+        
+    }
+    
+    private int getParameterSpecificStepTestResult(List valuesAsList, int parameterSpecificThreshold) {
+        
+        if (valuesAsList.size() == 1) {
+            return 0;
+        }
+        
+        boolean testSuccess = true;
+        
+        Iterator<Double> iterator = valuesAsList.iterator();
+        double parameterValue_current;
+        double parameterValue_next;
+        
+        while (iterator.hasNext()) {
+            parameterValue_current = iterator.next();
+            if (iterator.hasNext()) {
+                parameterValue_next = iterator.next();
+            } else {
+                parameterValue_next = parameterValue_current;
+            }
+            if (abs(parameterValue_next-parameterValue_current) > parameterSpecificThreshold) {
+                testSuccess = false;
+            }
+        }
+        
+        if (testSuccess) {
+            return 0;
+        } else {
+            return 32;
+        }
+        
     }
     
     private int getFinalTestResult(int testResult) {
@@ -91,20 +170,6 @@ public class QualityControlMethods {
             valuesAsList.add(variableValue);
         }
         return valuesAsList;
-    }
-    
-    private int getFreezeTestResult(JSONArray data, int index) {
-        List valuesAsList = getValuesAsList(data, index);
-        HashSet unique = new HashSet(valuesAsList);
-        if (unique.size() == 1) {
-            return 64;
-        } else {
-            return 0;
-        }
-    }
-    
-    private void getQC_1002(JSONArray data, int index, int interval, double longitude, double latitude, int altitude) {
-        
     }
     
 }
