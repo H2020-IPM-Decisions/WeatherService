@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
+import java.net.URLConnection;
 import java.text.MessageFormat;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
@@ -57,7 +58,7 @@ public class YrWeatherForecastAdapter {
     Integer[] QC = {1,1,1,1};
     
 
-    private final static String YR_API_URL = "https://api.met.no/weatherapi/locationforecast/1.9/?lat=%f;lon=%f;msl=%d";
+    private final static String YR_API_URL = "https://api.met.no/weatherapi/locationforecast/2.0/classic?lat=%f&lon=%f&altitude=%d";
     
 
     
@@ -72,18 +73,20 @@ public class YrWeatherForecastAdapter {
                     longitude,
                     altitude.intValue()) // Need to do this in order to avoid formatting the int 2000 to "2,000"
             );
-            
+            URLConnection connection = yrURL.openConnection();
+            // LocationForecast >= 2.0 requires a unique User-Agent
+            connection.setRequestProperty("User-Agent", "net.ipmdecisions.weatherapi/ALPHA-01 IPMDecisions@adas.co.uk");
+            connection.connect();
             // Find earliest and latest forecast time stamp
             
             
             //System.out.println("yrURL=" + yrURL.toString());
-            //System.out.println(getStringFromInputStream(yrURL.openStream()));
             
             
             // Parse with DOM parser
             DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
             DocumentBuilder db = dbf.newDocumentBuilder();
-            Document doc = db.parse(yrURL.openStream());
+            Document doc = db.parse(connection.getInputStream());
             NodeList nodes = doc.getElementsByTagName("time");
             Map<Long, String> RRMap = new HashMap<>();
             Instant timeStart = Instant.parse(nodes.item(0).getAttributes().getNamedItem("from").getNodeValue());
