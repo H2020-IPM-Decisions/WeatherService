@@ -59,8 +59,8 @@ public class QualityControlMethods {
                     inboundWeatherDataAsJsonObject.getJSONArray("locationWeatherData").put(i, locationWeatherDataObject);
                 break;
             
-                // Step test -> OK
-                // Freeze test -> Needs input data for parameter specific thresholds
+                // Step test -> Needs input data for parameter specific thresholds
+                // Freeze test -> OK
                 case "NONRT":
                     qcResult = getNonRtQC(data, interval, timeStart, timeEnd, weatherParameters, longitude, latitude, altitude);
                     locationWeatherDataObject.put("qc", qcResult);
@@ -88,15 +88,33 @@ public class QualityControlMethods {
         for (int index=0; index<weatherParameters.length(); index++) {
             weatherParameter = weatherParameters.getInt(index);
             weatherParameterValuesAsList = getValuesAsList(data, index);
-            testResult = getIntervalTestResult(weatherParameterValuesAsList, weatherParameter);
+            //testResult = getIntervalTestResult(weatherParameterValuesAsList, weatherParameter);
+            testResult = getPrequalificationTestResult(weatherParameterValuesAsList, weatherParameter);
             qcResult.put(getFinalTestResult(testResult));
         }
         
         return qcResult;
     }
     
-    private int getPrequalificationTestResult() {
-        return 0;
+    private int getPrequalificationTestResult(List weatherParameterValuesAsList, int weatherParameter) {
+        
+        int qcResult = 2;
+        
+        Iterator iterator = weatherParameterValuesAsList.iterator();
+        
+        Object parameterValue;
+        String parameterClassName;
+        
+        while (iterator.hasNext()) {
+            parameterValue = iterator.next();
+            parameterClassName = parameterValue.getClass().getName();
+            if (parameterClassName.equals("java.lang.String")) {
+                return 4;
+            }
+        }
+        
+        return qcResult;
+        
     }
     
     private int getIntervalTestResult(List weatherParameterValuesAsList, int weatherParameter) {
@@ -113,16 +131,11 @@ public class QualityControlMethods {
         
         while (iterator.hasNext()) {
             parameterValue = (double) iterator.next();
-            System.out.println("PARAMETER VALUE: " + parameterValue);
-            System.out.println("UPPER: " + upperLimit);
-            System.out.println("LOWER: " + lowerLimit);
             if (parameterValue >= upperLimit || parameterValue <= lowerLimit) {
-                System.out.println("FAIL");
                 return 8;
             }
         }
         
-        System.out.println("SUCCESS");
         return qcResult;
         
     }
@@ -212,10 +225,10 @@ public class QualityControlMethods {
     private List getValuesAsList(JSONArray data, int index) {
         List valuesAsList = new ArrayList();
         JSONArray dataItem;
-        double variableValue;
+        Object variableValue;
         for (int i=0; i<data.length(); i++) {
             dataItem = data.getJSONArray(i);
-            variableValue = dataItem.getDouble(index);
+            variableValue = dataItem.get(index);
             valuesAsList.add(variableValue);
         }
         return valuesAsList;
