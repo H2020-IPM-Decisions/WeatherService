@@ -88,8 +88,10 @@ public class QualityControlMethods {
         for (int index=0; index<weatherParameters.length(); index++) {
             weatherParameter = weatherParameters.getInt(index);
             weatherParameterValuesAsList = getValuesAsList(data, index);
-            //testResult = getIntervalTestResult(weatherParameterValuesAsList, weatherParameter);
             testResult = getPrequalificationTestResult(weatherParameterValuesAsList, weatherParameter);
+            if (testResult == 2) {
+                testResult += getIntervalTestResult(weatherParameterValuesAsList, weatherParameter);
+            }
             qcResult.put(getFinalTestResult(testResult));
         }
         
@@ -107,8 +109,7 @@ public class QualityControlMethods {
         
         while (iterator.hasNext()) {
             parameterValue = iterator.next();
-            parameterClassName = parameterValue.getClass().getName();
-            if (parameterClassName.equals("java.lang.String")) {
+            if (parameterValue instanceof String) {
                 return 4;
             }
         }
@@ -130,7 +131,7 @@ public class QualityControlMethods {
         Iterator iterator = weatherParameterValuesAsList.iterator();
         
         while (iterator.hasNext()) {
-            parameterValue = (double) iterator.next();
+            parameterValue = ((Number)iterator.next()).doubleValue();
             if (parameterValue >= upperLimit || parameterValue <= lowerLimit) {
                 return 8;
             }
