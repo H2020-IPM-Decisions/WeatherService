@@ -1,0 +1,86 @@
+[
+    {
+        "parameter":"Air temperature",
+        "id_array":["1001","1002","1003","1004"],
+        "lower_limit":-55,
+        "upper_limit":50
+    },
+    {
+        "parameter":"Temperature in canopy",
+        "id_array":["1021","1022","1023","1024"],
+        "lower_limit":-40,
+        "upper_limit":50
+    },
+    {
+        "parameter":"Soil temperature -5 cm",
+        "id_array":["1101","1102"],
+        "lower_limit":-30,
+        "upper_limit":40
+    },
+    {
+        "parameter":"Soil temperature -10 cm",
+        "id_array":["1111","1112"],
+        "lower_limit":-20,
+        "upper_limit":40
+    },
+    {
+        "parameter":"Soil temperature -20 cm",
+        "id_array":["1121","1122"],
+        "lower_limit":-15,
+        "upper_limit":30
+    },
+    {
+        "parameter":"Soil temperature -30 cm",
+        "id_array":["1131","1132"],
+        "lower_limit":-15,
+        "upper_limit":30
+    },
+    {
+        "parameter":"Soil temperature -40 cm",
+        "id_array":["1141","1142"],
+        "lower_limit":-10,
+        "upper_limit":25
+    },
+    {
+        "parameter":"Soil temperature -50 cm",
+        "id_array":["1101","1102"],
+        "lower_limit":-10,
+        "upper_limit":25
+    },
+    {
+        "parameter":"Precipitation",
+        "id_array":["2001"],
+        "lower_limit":-0.5,
+        "upper_limit":100
+    },
+    {
+        "parameter":"Relative humidty",
+        "id_array":["3001","3002","3003","3004","3021","3022","3023","3024"],
+        "lower_limit":0,
+        "upper_limit":103
+    },
+    {
+        "parameter":"Leaf wetness",
+        "id_array":["3101","3102","3103"],
+        "lower_limit":0,
+        "upper_limit":60
+    },
+    {
+        "parameter":"Wind speed",
+        "id_array":["4002","4003","4004","4005","4012","4013","4014","4015"],
+        "lower_limit":0,
+        "upper_limit":75
+    },
+    {
+        "parameter":"Wind direction",
+        "id_array":["4001","4011"],
+        "lower_limit":0,
+        "upper_limit":360
+    },
+    {
+        "parameter":"Solar radiation",
+        "id_array":["5001"],
+        "lower_limit":-25,
+        "upper_limit":1500
+    }
+]

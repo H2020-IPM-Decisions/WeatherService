@@ -14,14 +14,13 @@ import org.json.JSONArray;
  */
 public class QualityControlMethods {
     
-    private final static Integer STEP_TEST_1002_TRESHOLD = 10;
-    private final static Integer STEP_TEST_3002_TRESHOLD = 50;
-    
     public QualityControlMethods() {
         
     }
     
-    public JSONObject getQC(JSONObject inboundWeatherDataAsJsonObject) {
+    public String getQC(String inboundWeatherData, String qcType) {
+        
+        JSONObject inboundWeatherDataAsJsonObject = new JSONObject(inboundWeatherData);
         
         WeatherDataObject weatherDataObject = new WeatherDataObject(inboundWeatherDataAsJsonObject);
         
@@ -48,16 +47,87 @@ public class QualityControlMethods {
             latitude = locationWeatherDataObject.getDouble("latitude");
             altitude = locationWeatherDataObject.getInt("altitude");
             data = locationWeatherDataObject.getJSONArray("data");
-            qcResult = getParameterTypeBasedQC(data, interval, timeStart, timeEnd, weatherParameters, longitude, latitude, altitude);
-            locationWeatherDataObject.put("qc", qcResult);
-            inboundWeatherDataAsJsonObject.getJSONArray("locationWeatherData").put(i, locationWeatherDataObject);
+        
+            switch(qcType) {
+            
+                // Simple prequalification for values -> TODO: Implement
+                // Interval test for temperature, soil temperature and wind -> OK
+                // Logical test for temperature, soil temperature, humidity and wind
+                case "RT":
+                    qcResult = getRtQC(data, interval, timeStart, timeEnd, weatherParameters, longitude, latitude, altitude);
+                    locationWeatherDataObject.put("qc", qcResult);
+                    inboundWeatherDataAsJsonObject.getJSONArray("locationWeatherData").put(i, locationWeatherDataObject);
+                break;
+            
+                // Step test -> OK
+                // Freeze test -> Needs input data for parameter specific thresholds
+                case "NONRT":
+                    qcResult = getNonRtQC(data, interval, timeStart, timeEnd, weatherParameters, longitude, latitude, altitude);
+                    locationWeatherDataObject.put("qc", qcResult);
+                    inboundWeatherDataAsJsonObject.getJSONArray("locationWeatherData").put(i, locationWeatherDataObject);
+                break;
+                
+            }
+        
         }
         
-        return inboundWeatherDataAsJsonObject;
+        return inboundWeatherDataAsJsonObject.toString();
         
     }
     
-    private JSONArray getParameterTypeBasedQC(JSONArray data, int interval, String timeStart, String timeEnd, JSONArray weatherParameters, double longitude, double latitude, int altitude) {
+    private JSONArray getRtQC(JSONArray data, int interval, String timeStart, String timeEnd, JSONArray weatherParameters, double longitude, double latitude, int altitude) {
+        
+        List weatherParameterValuesAsList;
+        
+        JSONArray qcResult = new JSONArray();
+        
+        int testResult;
+        
+        int weatherParameter;
+        
+        for (int index=0; index<weatherParameters.length(); index++) {
+            weatherParameter = weatherParameters.getInt(index);
+            weatherParameterValuesAsList = getValuesAsList(data, index);
+            testResult = getIntervalTestResult(weatherParameterValuesAsList, weatherParameter);
+            qcResult.put(getFinalTestResult(testResult));
+        }
+        
+        return qcResult;
+    }
+    
+    private int getPrequalificationTestResult() {
+        return 0;
+    }
+    
+    private int getIntervalTestResult(List weatherParameterValuesAsList, int weatherParameter) {
+        
+        int qcResult = 2;
+        
+        ThresholdData thresholdData = new ThresholdData();
+        JSONObject lowerAndUpperLimits = thresholdData.getLowerAndUpperLimits(String.valueOf(weatherParameter));
+        double lowerLimit = lowerAndUpperLimits.getDouble("lower_limit");
+        double upperLimit = lowerAndUpperLimits.getDouble("upper_limit");
+        double parameterValue;
+        
+        Iterator iterator = weatherParameterValuesAsList.iterator();
+        
+        while (iterator.hasNext()) {
+            parameterValue = (double) iterator.next();
+            System.out.println("PARAMETER VALUE: " + parameterValue);
+            System.out.println("UPPER: " + upperLimit);
+            System.out.println("LOWER: " + lowerLimit);
+            if (parameterValue >= upperLimit || parameterValue <= lowerLimit) {
+                System.out.println("FAIL");
+                return 8;
+            }
+        }
+        
+        System.out.println("SUCCESS");
+        return qcResult;
+        
+    }
+    
+    private JSONArray getNonRtQC(JSONArray data, int interval, String timeStart, String timeEnd, JSONArray weatherParameters, double longitude, double latitude, int altitude) {
         
         List weatherParameterValuesAsList;
         
@@ -66,31 +136,12 @@ public class QualityControlMethods {
         int testResult;
         
         for (int index=0; index<weatherParameters.length(); index++) {
-            switch (weatherParameters.getInt(index)) {
-                case 1002:
-                    weatherParameterValuesAsList = getValuesAsList(data, index);
-                    testResult = getFreezeTestResult(weatherParameterValuesAsList, index) + getStepTestResult(weatherParameterValuesAsList, index, 1002);
-                    qcResult.put(getFinalTestResult(testResult));
-                    break;
-                case 3002:
-                    weatherParameterValuesAsList = getValuesAsList(data, index);
-                    testResult = getFreezeTestResult(weatherParameterValuesAsList, index) + getStepTestResult(weatherParameterValuesAsList, index, 3002);
-                    qcResult.put(getFinalTestResult(testResult));
-                    break;
-                default:
-                    qcResult.put(0);
-            }
+            weatherParameterValuesAsList = getValuesAsList(data, index);
+            testResult = getFreezeTestResult(weatherParameterValuesAsList, index);
+            qcResult.put(getFinalTestResult(testResult));
         }
         
         return qcResult;
-    }
-    
-    private int getIntervalTestResult(JSONArray data, int index, int weatherParameter, int interval, String timeStart, String timeEnd, double longitude, double latitude, int altitude) {
-        return 0;
-    }
-    
-    private int getLogicalTestResult(JSONArray data, int index, int weatherParameter, int interval, String timeStart, String timeEnd, double longitude, double latitude, int altitude) {
-        return 0;
     }
     
     private int getFreezeTestResult(List weatherParameterValuesAsList, int index) {
@@ -102,19 +153,17 @@ public class QualityControlMethods {
         }
     }
     
+    private int getLogicalTestResult(JSONArray data, int index, int weatherParameter, int interval, String timeStart, String timeEnd, double longitude, double latitude, int altitude) {
+        return 0;
+    }
+    
+    
+    /*
+     * This needs to be redrafted -> The parameter specific step threshold should come from threshold data
+     */
     private int getStepTestResult(List weatherParameterValuesAsList, int index, int weatherParameter) {
         
         int returnValue = 0;
-        
-        switch (weatherParameter) {
-            case 1002:
-                returnValue = getParameterSpecificStepTestResult(weatherParameterValuesAsList, this.STEP_TEST_1002_TRESHOLD);
-                break;
-            case 3002:
-                returnValue = getParameterSpecificStepTestResult(weatherParameterValuesAsList, this.STEP_TEST_3002_TRESHOLD);
-                break;
-            default:
-        }
         
         return returnValue;
         

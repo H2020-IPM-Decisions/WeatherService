@@ -56,6 +56,7 @@ public class YrWeatherForecastAdapterTest {
      */
     //@Test
     public void testGetWeatherForecasts() throws Exception {
+        /*
         System.out.println("getWeatherForecasts");
         Double longitude = 14.3711;
         Double latitude = 67.2828;
@@ -64,6 +65,7 @@ public class YrWeatherForecastAdapterTest {
         WeatherData result = instance.getWeatherForecasts(longitude, latitude, altitude);
         assertNotNull(result);
         //System.out.println(result.toString());
+        */
     }
     
 }
