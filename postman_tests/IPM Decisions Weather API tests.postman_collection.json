@@ -15,7 +15,6 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "800d9f1a-4440-4af5-9b20-d0cc21b93a15",
 								"exec": [
 									"pm.test(\"Status code is 200\", function () {",
 									"    pm.response.to.have.status(200);",
@@ -51,7 +50,6 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "095102c5-e1b9-45fe-a393-efa6213ae361",
 								"exec": [
 									"pm.test(\"Status code is 200\", function () {",
 									"    pm.response.to.have.status(200);",
@@ -98,7 +96,6 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "ce561eab-1d29-4ea9-9f5d-c52194f2a30b",
 								"exec": [
 									"pm.test(\"Status code is 200\", function () {",
 									"    pm.response.to.have.status(200);",
@@ -136,7 +133,6 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "631472a0-c25a-426e-b658-2777726846ae",
 								"exec": [
 									"pm.test(\"Status code is 200\", function () {",
 									"    pm.response.to.have.status(200);",
@@ -178,8 +174,7 @@
 					},
 					"response": []
 				}
-			],
-			"protocolProfileBehavior": {}
+			]
 		},
 		{
 			"name": "WeatherAdapterService",
@@ -190,7 +185,6 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "c9c356bb-f399-474c-9149-d3b653b335d6",
 								"exec": [
 									"pm.test(\"Status code is 200\", function () {",
 									"    pm.response.to.have.status(200);",
@@ -229,12 +223,12 @@
 								},
 								{
 									"key": "timeStart",
-									"value": "2020-06-12",
+									"value": "2021-02-01",
 									"type": "text"
 								},
 								{
 									"key": "timeEnd",
-									"value": "2020-07-03",
+									"value": "2021-03-01",
 									"type": "text"
 								},
 								{
@@ -277,12 +271,12 @@
 								},
 								{
 									"key": "timeStart",
-									"value": "2020-06-12",
+									"value": "2021-02-01",
 									"disabled": true
 								},
 								{
 									"key": "timeEnd",
-									"value": "2020-07-03",
+									"value": "2021-03-01",
 									"disabled": true
 								},
 								{
@@ -292,7 +286,7 @@
 								},
 								{
 									"key": "credentials",
-									"value": "{\"username\":\"3138313530303239\",\"password\":\"Y3Nw_48aNe4y1Z0Wj\"}",
+									"value": "{\"username\":\"536\",\"password\":\"GF90esoleo\"}",
 									"disabled": true
 								}
 							]
@@ -306,7 +300,6 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "3c9f822c-e869-4d72-8c8c-10b95704c638",
 								"exec": [
 									"pm.test(\"Status code is 200\", function () {",
 									"    pm.response.to.have.status(200);",
@@ -422,7 +415,6 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "6aa0d75f-4e27-462b-a675-8ef151d61b8a",
 								"exec": [
 									"pm.test(\"Status code is 200\", function () {",
 									"    pm.response.to.have.status(200);",
@@ -538,7 +530,6 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "ef5d4b4d-9cf9-4833-8ebd-8c26deb66dfe",
 								"exec": [
 									"pm.test(\"Status code is 200\", function () {",
 									"    pm.response.to.have.status(200);",
@@ -608,7 +599,6 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "aac3c189-b91b-4531-a09e-6cdbce9d9f67",
 								"exec": [
 									"pm.test(\"Status code is 200\", function () {",
 									"    pm.response.to.have.status(200);",
@@ -669,7 +659,6 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "2c900e0f-f9e7-425d-863e-23f6bffb676d",
 								"exec": [
 									"pm.test(\"Status code is 200\", function () {",
 									"    pm.response.to.have.status(200);",
@@ -720,8 +709,7 @@
 					},
 					"response": []
 				}
-			],
-			"protocolProfileBehavior": {}
+			]
 		},
 		{
 			"name": "WeatherDataSourceService",
@@ -732,7 +720,6 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "dce6daea-5d68-4bae-bb42-5d02643050d7",
 								"exec": [
 									"pm.test(\"Status code is 200\", function () {",
 									"    pm.response.to.have.status(200);",
@@ -777,7 +764,6 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "1e0d7fd0-47bd-4597-b230-90321318f414",
 								"exec": [
 									"pm.test(\"Status code is 200\", function () {",
 									"    pm.response.to.have.status(200);",
@@ -835,7 +821,6 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "1a1c7e61-054f-471c-95d4-e1377c37d697",
 								"exec": [
 									"pm.test(\"Status code is 200\", function () {",
 									"    pm.response.to.have.status(200);",
@@ -884,15 +869,13 @@
 					},
 					"response": []
 				}
-			],
-			"protocolProfileBehavior": {}
+			]
 		}
 	],
 	"event": [
 		{
 			"listen": "prerequest",
 			"script": {
-				"id": "7fda8a8f-8e48-442a-a018-a1287652d6ce",
 				"type": "text/javascript",
 				"exec": [
 					""
@@ -902,7 +885,6 @@
 		{
 			"listen": "test",
 			"script": {
-				"id": "8593204e-bf22-4e39-bd22-585cddc01c32",
 				"type": "text/javascript",
 				"exec": [
 					""
@@ -912,10 +894,8 @@
 	],
 	"variable": [
 		{
-			"id": "eee98f1d-1c49-4ee5-a7c6-84324c253525",
 			"key": "base_url",
 			"value": "localhost:8080/VIPSWeatherService"
 		}
-	],
-	"protocolProfileBehavior": {}
+	]
 }
