@@ -219,6 +219,7 @@ Here's an example of a web service definition made with RestEasy/JAX-WS
 
 ## Register your service in our database
 Making the service available in the platform is done by providing IPM Decisions with the required metadata. You can see an example of the metadata below.
+
 ``` json
 {
     "name": "Landbruksmeteorologisk tjeneste",
