@@ -759,6 +759,48 @@
 					"response": []
 				},
 				{
+					"name": "Check all platform weather data sources endpoints",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"All endpoints exist\", function(){",
+									"    var dataSourceList = pm.response.json();",
+									"    for(var i=0;i<dataSourceList.length;i++)",
+									"    {",
+									"        var endpoint = dataSourceList[i].endpoint;",
+									"        pm.sendRequest(endpoint, function (err, response2) {",
+									"            pm.expect(response2.code).to.not.equal(404);",
+									"        });",
+									"    }",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{wx_url}}/rest/weatherdatasource",
+							"host": [
+								"{{wx_url}}"
+							],
+							"path": [
+								"rest",
+								"weatherdatasource"
+							]
+						}
+					},
+					"response": []
+				},
+				{
 					"name": "Get weather data sources for simple point",
 					"event": [
 						{
