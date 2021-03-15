@@ -3,7 +3,9 @@
         "parameter":"Air temperature",
         "id_array":["1001","1002","1003","1004"],
         "lower_limit":-55,
-        "upper_limit":50
+        "upper_limit":50,
+        "step_test_threshold": 7.5,
+        "step_test_threshold_type": "absolute"
     },
     {
         "parameter":"Temperature in canopy",
@@ -21,31 +23,41 @@
         "parameter":"Soil temperature -10 cm",
         "id_array":["1111","1112"],
         "lower_limit":-20,
-        "upper_limit":40
+        "upper_limit":40,
+        "step_test_threshold": 2,
+        "step_test_threshold_type": "absolute"
     },
     {
         "parameter":"Soil temperature -20 cm",
         "id_array":["1121","1122"],
         "lower_limit":-15,
-        "upper_limit":30
+        "upper_limit":30,
+        "step_test_threshold": 2,
+        "step_test_threshold_type": "absolute"
     },
     {
         "parameter":"Soil temperature -30 cm",
         "id_array":["1131","1132"],
         "lower_limit":-15,
-        "upper_limit":30
+        "upper_limit":30,
+        "step_test_threshold": 2,
+        "step_test_threshold_type": "absolute"
     },
     {
         "parameter":"Soil temperature -40 cm",
         "id_array":["1141","1142"],
         "lower_limit":-10,
-        "upper_limit":25
+        "upper_limit":25,
+        "step_test_threshold": 2,
+        "step_test_threshold_type": "absolute"
     },
     {
         "parameter":"Soil temperature -50 cm",
         "id_array":["1101","1102"],
         "lower_limit":-10,
-        "upper_limit":25
+        "upper_limit":25,
+        "step_test_threshold": 2,
+        "step_test_threshold_type": "absolute"
     },
     {
         "parameter":"Precipitation",
@@ -57,7 +69,9 @@
         "parameter":"Relative humidty",
         "id_array":["3001","3002","3003","3004","3021","3022","3023","3024"],
         "lower_limit":0,
-        "upper_limit":103
+        "upper_limit":103,
+        "step_test_threshold": 30,
+        "step_test_threshold_type": "presentage"
     },
     {
         "parameter":"Leaf wetness",
@@ -69,7 +83,9 @@
         "parameter":"Wind speed",
         "id_array":["4002","4003","4004","4005","4012","4013","4014","4015"],
         "lower_limit":0,
-        "upper_limit":75
+        "upper_limit":75,
+        "step_test_threshold": 13,
+        "step_test_threshold_type": "absolute"
     },
     {
         "parameter":"Wind direction",

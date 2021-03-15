@@ -26,6 +26,12 @@ public class ThresholdData {
           
     }
     
+    public JSONObject getThresholdDataObject(String parameterID) {
+        
+        return findFromJSONArray(getThresholdData(), parameterID);
+          
+    }
+    
     private JSONObject findFromJSONArray(JSONArray thresholdData, String searchString) {
         
         JSONObject thresholdDataItem;

@@ -50,7 +50,7 @@ public class QualityControlMethods {
         
             switch(qcType) {
             
-                // Simple prequalification for values -> TODO: Implement
+                // Simple prequalification for values -> OK
                 // Interval test for temperature, soil temperature and wind -> OK
                 // Logical test for temperature, soil temperature, humidity and wind
                 case "RT":
@@ -149,9 +149,13 @@ public class QualityControlMethods {
         
         int testResult;
         
+        int weatherParameter;
+        
         for (int index=0; index<weatherParameters.length(); index++) {
             weatherParameterValuesAsList = getValuesAsList(data, index);
-            testResult = getFreezeTestResult(weatherParameterValuesAsList, index);
+            weatherParameter = weatherParameters.getInt(index);
+            //testResult = getFreezeTestResult(weatherParameterValuesAsList, index);
+            testResult = getStepTestResult(weatherParameterValuesAsList,weatherParameter);
             qcResult.put(getFinalTestResult(testResult));
         }
         
@@ -173,14 +177,77 @@ public class QualityControlMethods {
     
     
     /*
-     * This needs to be redrafted -> The parameter specific step threshold should come from threshold data
+     * 
      */
-    private int getStepTestResult(List weatherParameterValuesAsList, int index, int weatherParameter) {
+    private int getStepTestResult(List weatherParameterValuesAsList, int weatherParameter) {
+        
+        System.out.println("Weather parameter int: " + weatherParameter);
+        System.out.println("Weather parameter String: " + String.valueOf(weatherParameter));
         
         int returnValue = 0;
         
+        ThresholdData thresholdData = new ThresholdData();
+        JSONObject thresholdDataObject = thresholdData.getThresholdDataObject(String.valueOf(weatherParameter));
+        
+        String stepTestType;
+        double thresholdValue;
+        
+        System.out.println("THRESHOLD OBJECT" + thresholdDataObject.toString());
+        System.out.println("STEP TEST: " + thresholdDataObject.has("step_test_threshold"));
+        
+        if (thresholdDataObject.has("step_test_threshold")) {
+            thresholdValue = thresholdDataObject.getDouble("step_test_threshold");
+            returnValue =  getStepTestRun(weatherParameterValuesAsList, thresholdValue, thresholdDataObject.getString("step_test_threshold_type"));
+        } else {
+            returnValue = 0;
+        }
+        
         return returnValue;
         
+    }
+    
+    private int getStepTestRun(List weatherParameterValuesAsList, double thresholdValue, String thresholdType) {
+        
+        System.out.println("TYPE: " + thresholdType);
+        System.out.println("VALUE: " + thresholdValue);
+        
+        Iterator iterator = weatherParameterValuesAsList.iterator();
+        
+        String weatherParameterValueAsString;
+        double weatherParameterValue;
+        double previousWeatherParameterValue = 0.0;
+        double testValue_max;
+        double testValue_min;
+        int counter = 0;
+        
+        if (weatherParameterValuesAsList.size() == 1) {
+            return 0;
+        } else {
+            while (iterator.hasNext()) {
+                weatherParameterValueAsString = iterator.next().toString();
+                weatherParameterValue = Double.parseDouble(weatherParameterValueAsString);
+                counter ++;
+                if (counter > 1) {
+                    switch (thresholdType) {
+                        case "absolute":
+                            if (abs(previousWeatherParameterValue-weatherParameterValue) > thresholdValue) {
+                                return 32;
+                            }
+                            break;
+                        case "presentage":
+                            testValue_max = previousWeatherParameterValue + ((previousWeatherParameterValue/100) * thresholdValue);
+                            testValue_min = previousWeatherParameterValue - ((previousWeatherParameterValue/100) * thresholdValue);
+                            if (weatherParameterValue >= testValue_max || weatherParameterValue <= testValue_min) {
+                                return 32;
+                            }
+                            break;
+                    }
+                }
+                previousWeatherParameterValue = weatherParameterValue;
+            }
+        }
+        
+        return 2;
     }
     
     private int getParameterSpecificStepTestResult(List valuesAsList, int parameterSpecificThreshold) {
