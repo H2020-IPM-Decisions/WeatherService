@@ -94,7 +94,8 @@ public class WeatherAdapterService {
     public Response getYRForecasts(
                     @QueryParam("longitude") Double longitude,
                     @QueryParam("latitude") Double latitude,
-                    @QueryParam("altitude") Double altitude
+                    @QueryParam("altitude") Double altitude,
+                    @QueryParam("parameters") String parameters
     )
     {
         if(longitude == null || latitude == null)
@@ -106,10 +107,17 @@ public class WeatherAdapterService {
             altitude = 0.0;
         }
         
+        Set<Integer> ipmDecisionsParameters = parameters != null ? Arrays.asList(parameters.split(",")).stream()
+                .map(paramstr->Integer.parseInt(paramstr.strip())).collect(Collectors.toSet())
+                : null;
+        
         try 
         {
             WeatherData theData = new YrWeatherForecastAdapter().getWeatherForecasts(longitude, latitude, altitude);
-            
+            if(ipmDecisionsParameters != null && ipmDecisionsParameters.size() > 0)
+            {
+            	theData = new WeatherDataUtil().filterParameters(theData, ipmDecisionsParameters);
+            }
             return Response.ok().entity(theData).build();
         } 
         catch (ParseWeatherDataException ex) 
@@ -135,7 +143,8 @@ public class WeatherAdapterService {
     @Produces(MediaType.APPLICATION_JSON)
     public Response getFMIForecasts(
                     @QueryParam("longitude") Double longitude,
-                    @QueryParam("latitude") Double latitude
+                    @QueryParam("latitude") Double latitude,
+                    @QueryParam("parameters") String parameters
     )
     {
         if(longitude == null || latitude == null)
@@ -143,7 +152,15 @@ public class WeatherAdapterService {
             return Response.status(Response.Status.BAD_REQUEST).entity("Missing longitude and/or latitude. Please correct this.").build();
         }
         
+        Set<Integer> ipmDecisionsParameters = parameters != null ? Arrays.asList(parameters.split(",")).stream()
+                .map(paramstr->Integer.parseInt(paramstr.strip())).collect(Collectors.toSet())
+                : null;
+        
         WeatherData theData = new FinnishMeteorologicalInstituteAdapter().getWeatherForecasts(longitude, latitude);
+        if(ipmDecisionsParameters != null && ipmDecisionsParameters.size() > 0)
+        {
+        	theData = new WeatherDataUtil().filterParameters(theData, ipmDecisionsParameters);
+        }
         return Response.ok().entity(theData).build();
     }
     
