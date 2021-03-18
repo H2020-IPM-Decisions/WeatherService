@@ -71,7 +71,7 @@
         "lower_limit":0,
         "upper_limit":103,
         "step_test_threshold": 30,
-        "step_test_threshold_type": "presentage"
+        "step_test_threshold_type": "relative"
     },
     {
         "parameter":"Leaf wetness",

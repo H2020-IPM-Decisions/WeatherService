@@ -4,7 +4,7 @@ import org.json.JSONObject;
 import org.json.JSONArray;
 
 /**
- *
+ * Weather data JSON -> Object
  * @author 03080928
  */
 public class WeatherDataObject {

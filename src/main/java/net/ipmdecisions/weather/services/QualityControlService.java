@@ -10,19 +10,26 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import org.json.JSONObject;
+import org.jboss.resteasy.annotations.GZIP;
 
 import net.ipmdecisions.weather.qc.QualityControlMethods;
 import net.ipmdecisions.weather.qc.ThresholdData;
 
 
 /**
- *
- * @author 03080928
+ * Quality control endpoints for both real time and non-real time weather data.
+ * 
+ * @copyright 2020 <a href="http://www.nibio.no/">NIBIO</a>
+ * @author Markku Koistinen <markku.koistinen@luke.fi>
  */
-
 @Path("rest/weatherdata/qualitycontrol")
 public class QualityControlService {
     
+    /**
+     * Get API heart beat
+     * @pathExample /rest/weatherdata/qualitycontrol/heartbeat
+     * @return JSON Object with the message Heartbeat received
+     */
     @GET
     @Path("heartbeat")
     @Produces(MediaType.APPLICATION_JSON)
@@ -30,19 +37,12 @@ public class QualityControlService {
         return Response.ok().entity("{\"result\":\"Heartbeat received\"}").build();
     }
     
-    // PROTOTYPE IS DEPRECATED
-    /*
-    @POST
-    @Path("prototype")
-    @Consumes (MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response setQC(String weatherData) {
-        JSONObject inboundWeatherDataAsJsonObject = new JSONObject(weatherData);
-        QualityControlMethods qualityControlMethods = new QualityControlMethods();
-        return Response.ok().entity(qualityControlMethods.getQC(inboundWeatherDataAsJsonObject)).build();
-    }
-    */
-    
+    /**
+     * Get weather parameter specific threshold data object with applicable min, max, threshold value and threshold value type
+     * @param parameterid Weather parameter id
+     * @pathExample /rest/weatherdata/qualitycontrol/threshold?parameterid=1101
+     * @return JSON Object with parameter specific threshold data
+     */
     @GET
     @Path("threshold")
     @Produces(MediaType.APPLICATION_JSON)
@@ -50,37 +50,42 @@ public class QualityControlService {
                     @QueryParam("parameterid") String parameterId
     ) {
         ThresholdData thd = new ThresholdData();
-        return Response.ok().entity(thd.getLowerAndUpperLimits(parameterId).toString()).build();
+        return Response.ok().entity(thd.getThresholdDataObject(parameterId).toString()).build();
     }
     
-    /*
-     * QC for RT data
-     * Implements
-     * - Simple prequalification for values
-     * - Interval test for temperature, soil temperature and wind
-     * - Logical test for temperature, soil temperature, humidity and wind
+    /**
+     * Post real time weather data for quality control
+     * RT QC implements
+     * - Simple prequalification for values (value is numeric)
+     * - Interval test for temperature, soil temperature and wind (parameter values
+     * are tested against lower and upper physical limits)
+     * - Logical test for temperature, soil temperature, humidity and wind (TBD)
+     * @body Wather data in platform defined format
+     * @pathExample /rest/weatherdata/qualitycontrol/rt
+     * @return Quality controlled weather data. The end-point appends qc arrays 
+     * into location weather data objects.
     */
     @POST
     @Path("rt")
     @Consumes (MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response getQC_RT(String weatherData) {
-        //JSONObject inboundWeatherDataAsJsonObject = new JSONObject(weatherData);
         QualityControlMethods qualityControlMethods = new QualityControlMethods();
         return Response.ok().entity(qualityControlMethods.getQC(weatherData, "RT")).build();
     }
     
-    /*
-     * QC for NON-RT data
-     * - Step test
-     * - Freeze test
+    /**
+     * Post non-real time weather data for quality control
+     * NON-RT QC implaments
+     * - Step test (parameter values are tested against parameter specific threshold values,
+     * both absolute and relative when applicable)
+     * - Freeze test (parameter values are frozen)
     */
     @POST
     @Path("nonrt")
     @Consumes (MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response getQC_nonRT(String weatherData) {
-        //JSONObject inboundWeatherDataAsJsonObject = new JSONObject(weatherData);
         QualityControlMethods qualityControlMethods = new QualityControlMethods();
         return Response.ok().entity(qualityControlMethods.getQC(weatherData, "NONRT")).build();
     }
