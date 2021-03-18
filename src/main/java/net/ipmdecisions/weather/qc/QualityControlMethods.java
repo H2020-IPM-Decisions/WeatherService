@@ -14,6 +14,15 @@ import org.json.JSONArray;
  */
 public class QualityControlMethods {
     
+    public final static Integer NO_QC = 0;
+    public final static Integer OK_FROM_EXTERNAL = 1;
+    public final static Integer OK_FROM_IPM_DECISIONS = 2;
+    public final static Integer FAILED_NAN = 4;
+    public final static Integer FAILED_INTERVAL_TEST = 8;
+    public final static Integer FAILED_LOGIC_TEST = 16;
+    public final static Integer FAILED_STEP_TEST = 32;
+    public final static Integer FAILED_FREEZE_TEST = 64;
+    
     public QualityControlMethods() {
         
     }
@@ -135,13 +144,13 @@ public class QualityControlMethods {
             //Prequalification test to check the non-numerical values
             testResult = getPrequalificationTestResult(weatherParameterValuesAsList, weatherParameter);
             //Prequalification test passes returning 2
-            if (testResult == 2) {
+            if (testResult == this.OK_FROM_IPM_DECISIONS) {
                 //Interval test result
                 testResult += getIntervalTestResult(weatherParameterValuesAsList, weatherParameter);
             }
             //Put the final test result into qcResult
             //getFinalRestResult(int) returns 2 if the final result remains 0
-            qcResult.put(getFinalTestResult(testResult));
+            qcResult.put(testResult);
         }
         
         return qcResult;
@@ -160,8 +169,8 @@ public class QualityControlMethods {
      */
     private int getPrequalificationTestResult(List weatherParameterValuesAsList, int weatherParameter) {
         
-        //QC result return variable. Default is set as fail
-        int qcResult = 2;
+        //QC result return variable. Default is set as pass
+        int qcResult = this.OK_FROM_IPM_DECISIONS;
         
         //Weather parameter value List Iterator
         Iterator iterator = weatherParameterValuesAsList.iterator();
@@ -176,7 +185,7 @@ public class QualityControlMethods {
             parameterValue = iterator.next();
             //Parameter value object type. Only String is tested
             if (parameterValue instanceof String) {
-                return 4;
+                return this.FAILED_NAN;
             }
         }
         
@@ -199,8 +208,8 @@ public class QualityControlMethods {
      */
     private int getIntervalTestResult(List weatherParameterValuesAsList, int weatherParameter) {
         
-        //QC result return variable. Default is set as fail
-        int qcResult = 2;
+        //QC result return variable. Default is set as pass
+        int qcResult = this.OK_FROM_IPM_DECISIONS;
         
         //Threshold data Object
         ThresholdData thresholdData = new ThresholdData();
@@ -223,7 +232,7 @@ public class QualityControlMethods {
             //Interval test. Weather data parameter values higher than upper limit
             //or lower than lower limit causes abort with exit code 8 (QC pass false)
             if (parameterValue > upperLimit || parameterValue < lowerLimit) {
-                return 8;
+                return this.FAILED_INTERVAL_TEST;
             }
         }
         
@@ -272,7 +281,7 @@ public class QualityControlMethods {
             testResult += getStepTestResult(weatherParameterValuesAsList,weatherParameter);
             //Put the final test result into qcResult
             //getFinalRestResult(int) returns 2 if the final result remains 0
-            qcResult.put(getFinalTestResult(testResult));
+            qcResult.put(testResult);
         }
         
         return qcResult;
@@ -294,9 +303,11 @@ public class QualityControlMethods {
         //Weather data parameter values List into HashSet for dublicate check
         HashSet unique = new HashSet(weatherParameterValuesAsList);
         if (unique.size() == 1 && weatherParameterValuesAsList.size() > 1) {
-            return 64;
+            return this.FAILED_FREEZE_TEST;
+        } else if (weatherParameterValuesAsList.size() == 1) {
+            return this.NO_QC;
         } else {
-            return 2;
+            return this.OK_FROM_IPM_DECISIONS;
         }
     }
     
@@ -315,7 +326,7 @@ public class QualityControlMethods {
      * @return 0 as int
      */
     private int getLogicalTestResult(JSONArray data, int index, int weatherParameter, int interval, String timeStart, String timeEnd, double longitude, double latitude, int altitude) {
-        return 0;
+        return this.NO_QC;
     }
     
     
@@ -334,7 +345,7 @@ public class QualityControlMethods {
     private int getStepTestResult(List weatherParameterValuesAsList, int weatherParameter) {
         
         //Default QC response is set to pass with return value 2
-        int returnValue = 2;
+        int returnValue = this.OK_FROM_IPM_DECISIONS;
         
         //ThresholdData object
         ThresholdData thresholdData = new ThresholdData();
@@ -354,7 +365,7 @@ public class QualityControlMethods {
             //Threshold test. Threshold test type is retrieved from threshold data object from the key step_test_threshold_type
             returnValue =  getStepTestRun(weatherParameterValuesAsList, thresholdValue, thresholdDataObject.getString("step_test_threshold_type"));
         } else {
-            returnValue = 0;
+            returnValue = this.NO_QC;
         }
         
         return returnValue;
@@ -393,7 +404,7 @@ public class QualityControlMethods {
         // If there is only one weather data parameter value the step test cannor run
         //and returns 0 (no quality control performed)
         if (weatherParameterValuesAsList.size() == 1) {
-            return 0;
+            return this.NO_QC;
         //Step test
         } else {
             //Loop for weather data parameter values
@@ -409,7 +420,7 @@ public class QualityControlMethods {
                             //Step test for absolute type where the threshold is + or - n units
                             //Immediate abort if the test fails
                             if (abs(previousWeatherParameterValue-weatherParameterValue) > thresholdValue) {
-                                return 32;
+                                return this.FAILED_STEP_TEST;
                             }
                             break;
                         case "relative":
@@ -420,7 +431,7 @@ public class QualityControlMethods {
                             //Step test for relative type where the threshold is + or - n presentage
                             //Abort with return value 32 if the test fails
                             if (weatherParameterValue >= testValue_max || weatherParameterValue <= testValue_min) {
-                                return 32;
+                                return this.FAILED_STEP_TEST;
                             }
                             break;
                     }
@@ -430,12 +441,13 @@ public class QualityControlMethods {
             }
         }
         
-        return 2;
+        //Return OK if test passes and reaches this point
+        return this.OK_FROM_IPM_DECISIONS;
     }
     
     
     /**
-     * Deprecated
+     * @deprecated
      * Final test result correction from 0 to 2 in the case the test could be performed but
      * the test returned 0
      * @param testResult QC test result as int
@@ -446,7 +458,7 @@ public class QualityControlMethods {
      */
     private int getFinalTestResult(int testResult) {
         if (testResult == 0) {
-            return 2;
+            return this.OK_FROM_IPM_DECISIONS;
         } else {
             return testResult;
         }
