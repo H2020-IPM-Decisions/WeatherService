@@ -19,11 +19,8 @@
 
 package net.ipmdecisions.weather.services;
 
-import com.fasterxml.jackson.core.JsonFactory;
-import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.MappingJsonFactory;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.github.fge.jsonschema.core.exceptions.ProcessingException;
@@ -48,9 +45,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import net.ipmdecisions.weather.entity.LocationWeatherData;
 import net.ipmdecisions.weather.entity.QC;
-import net.ipmdecisions.weather.entity.WeatherData;
 import net.ipmdecisions.weather.entity.WeatherParameter;
 import net.ipmdecisions.weather.util.SchemaProvider;
 import net.ipmdecisions.weather.util.SchemaUtils;

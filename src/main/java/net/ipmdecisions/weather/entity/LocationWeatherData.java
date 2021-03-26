@@ -20,7 +20,11 @@
 package net.ipmdecisions.weather.entity;
 
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.kjetland.jackson.jsonSchema.annotations.JsonSchemaTitle;
+
+import net.ipmdecisions.weather.entity.serializers.LocationWeatherDataDeserializer;
+
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
@@ -34,6 +38,7 @@ import javax.validation.constraints.Size;
  * @copyright 2020 <a href="http://www.nibio.no/">NIBIO</a>
  * @author Tor-Einar Skog <tor-einar.skog@nibio.no>
  */
+@JsonDeserialize(using = LocationWeatherDataDeserializer.class)
 public class LocationWeatherData {
 
     @NotNull

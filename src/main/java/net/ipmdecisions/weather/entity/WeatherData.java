@@ -19,12 +19,18 @@
 
 package net.ipmdecisions.weather.entity;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.kjetland.jackson.jsonSchema.annotations.JsonSchemaDescription;
 import com.kjetland.jackson.jsonSchema.annotations.JsonSchemaExamples;
 import com.kjetland.jackson.jsonSchema.annotations.JsonSchemaInject;
 import com.kjetland.jackson.jsonSchema.annotations.JsonSchemaString;
 import com.kjetland.jackson.jsonSchema.annotations.JsonSchemaTitle;
+
+import net.ipmdecisions.weather.entity.serializers.CustomInstantDeserializer;
+import net.ipmdecisions.weather.entity.serializers.LocationWeatherDataDeserializer;
+
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
@@ -51,10 +57,12 @@ public class WeatherData {
     @NotNull
     @JsonSchemaTitle("Time start (yyyy-MM-dd'T'HH:mm:ssXXX)")
     @JsonPropertyDescription("The timestamp of the first weather observation. Format: \"yyyy-MM-dd'T'HH:mm:ssXXX\", e.g. 2020-04-09T18:00:00+02:00")
+    @JsonDeserialize(using = CustomInstantDeserializer.class)
     private Instant timeStart;
     @NotNull
     @JsonSchemaTitle("Time end (yyyy-MM-dd'T'HH:mm:ssXXX)")
     @JsonPropertyDescription("The timestamp of the last weather observation. Format: \"yyyy-MM-dd'T'HH:mm:ssXXX\", e.g. 2020-04-09T18:00:00+02:00")
+    @JsonDeserialize(using = CustomInstantDeserializer.class)
     private Instant timeEnd;
     @NotNull
     @Positive
