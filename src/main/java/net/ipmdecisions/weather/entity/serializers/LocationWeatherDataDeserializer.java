@@ -1,8 +1,6 @@
 package net.ipmdecisions.weather.entity.serializers;
 
 import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.JsonToken;
-import com.fasterxml.jackson.core.TreeNode;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -11,6 +9,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import net.ipmdecisions.weather.entity.LocationWeatherData;
 
 import java.io.IOException;
+
+/**
+ * (c) 2021 NIBIO
+ * @author Tor-Einar Skog <tor-einar.skog@nibio.no>
+ *
+ */
 public class LocationWeatherDataDeserializer extends JsonDeserializer<LocationWeatherData>{
 
 

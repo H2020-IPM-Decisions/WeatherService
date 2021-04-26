@@ -625,7 +625,7 @@
 							"urlencoded": []
 						},
 						"url": {
-							"raw": "{{wx_url}}/rest/weatheradapter/yr/?longitude=14.3711&latitude=67.2828&altitude=70",
+							"raw": "{{wx_url}}/rest/weatheradapter/yr/?longitude=14.3711&latitude=67.2828&altitude=70&parameters=1001, 3001",
 							"host": [
 								"{{wx_url}}"
 							],
@@ -647,6 +647,10 @@
 								{
 									"key": "altitude",
 									"value": "70"
+								},
+								{
+									"key": "parameters",
+									"value": "1001, 3001"
 								}
 							]
 						}
@@ -685,7 +689,7 @@
 							"urlencoded": []
 						},
 						"url": {
-							"raw": "{{wx_url}}/rest/weatheradapter/fmi/forecasts?longitude=14.3711&latitude=67.2828",
+							"raw": "{{wx_url}}/rest/weatheradapter/fmi/forecasts?latitude=67.2828&longitude=14.3711&parameters=2001",
 							"host": [
 								"{{wx_url}}"
 							],
@@ -697,12 +701,16 @@
 							],
 							"query": [
 								{
+									"key": "latitude",
+									"value": "67.2828"
+								},
+								{
 									"key": "longitude",
 									"value": "14.3711"
 								},
 								{
-									"key": "latitude",
-									"value": "67.2828"
+									"key": "parameters",
+									"value": "2001"
 								}
 							]
 						}
@@ -906,6 +914,80 @@
 								"rest",
 								"weatherdatasource",
 								"location"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "AmalgamationService",
+			"item": [
+				{
+					"name": "Amalgamate basic test",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{wx_url}}/rest/amalgamation/amalgamate/?endpointURL=https%3A%2F%2Fipmdecisions.nibio.no%2Fapi%2Fwx%2Frest%2Fweatheradapter%2Fyr%2F&endpointQueryStr=longitude%3D14.3711%26latitude%3D67.2828%26altitude%3D70%26parameters%3D1001%2C3001",
+							"host": [
+								"{{wx_url}}"
+							],
+							"path": [
+								"rest",
+								"amalgamation",
+								"amalgamate",
+								""
+							],
+							"query": [
+								{
+									"key": "longitude",
+									"value": "14.3711",
+									"disabled": true
+								},
+								{
+									"key": "latitude",
+									"value": "67.2828",
+									"disabled": true
+								},
+								{
+									"key": "altitude",
+									"value": "70",
+									"disabled": true
+								},
+								{
+									"key": "parameters",
+									"value": "1001, 3001",
+									"disabled": true
+								},
+								{
+									"key": "endpointURL",
+									"value": "https%3A%2F%2Fipmdecisions.nibio.no%2Fapi%2Fwx%2Frest%2Fweatheradapter%2Fyr%2F"
+								},
+								{
+									"key": "endpointQueryStr",
+									"value": "longitude%3D14.3711%26latitude%3D67.2828%26altitude%3D70%26parameters%3D1001%2C3001%2C3099",
+									"disabled": true
+								},
+								{
+									"key": "endpointQueryStr",
+									"value": "longitude%3D14.3711%26latitude%3D67.2828%26altitude%3D70%26parameters%3D1001%2C3001"
+								}
 							]
 						}
 					},
