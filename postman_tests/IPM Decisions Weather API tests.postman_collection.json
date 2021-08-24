@@ -416,15 +416,19 @@
 							"listen": "test",
 							"script": {
 								"exec": [
-									"pm.test(\"Status code is 200\", function () {",
-									"    pm.response.to.have.status(200);",
+									"pm.test(\"Status code is 200 or 204 (no data)\", function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([201,204]);",
 									"});",
-									"pm.test(\"Data is valid WeatherData\", function(){",
-									"    pm.sendRequest(pm.environment.get(\"wx_url\") + \"/rest/schema/weatherdata\",function(err,res){",
-									"        var schema = res.json();",
-									"        pm.expect(tv4.validate(pm.response.json(), schema)).to.be.true;",
+									"",
+									"if(pm.response.code == 200)",
+									"{",
+									"    pm.test(\"Data is valid WeatherData\", function(){",
+									"        pm.sendRequest(pm.environment.get(\"wx_url\") + \"/rest/schema/weatherdata\",function(err,res){",
+									"            var schema = res.json();",
+									"            pm.expect(tv4.validate(pm.response.json(), schema)).to.be.true;",
+									"        });",
 									"    });",
-									"});"
+									"}"
 								],
 								"type": "text/javascript"
 							}
@@ -625,7 +629,7 @@
 							"urlencoded": []
 						},
 						"url": {
-							"raw": "{{wx_url}}/rest/weatheradapter/yr/?longitude=14.3711&latitude=67.2828&altitude=70&parameters=1001, 3001",
+							"raw": "{{wx_url}}/rest/weatheradapter/yr/?longitude=10.961&latitude=50.109&parameters=1001, 3001",
 							"host": [
 								"{{wx_url}}"
 							],
@@ -638,15 +642,11 @@
 							"query": [
 								{
 									"key": "longitude",
-									"value": "14.3711"
+									"value": "10.961"
 								},
 								{
 									"key": "latitude",
-									"value": "67.2828"
-								},
-								{
-									"key": "altitude",
-									"value": "70"
+									"value": "50.109"
 								},
 								{
 									"key": "parameters",
@@ -761,6 +761,82 @@
 							"path": [
 								"rest",
 								"weatherdatasource"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get weather data source by id",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Met Norway Locationforecast can be found\", function(){",
+									"    var dataSource = pm.response.json();",
+									"    var locationForecastFound = false;",
+									"    if(dataSource.id == \"no.met.locationforecast\")",
+									"    {",
+									"        locationForecastFound = true;",
+									"    }",
+									"    pm.expect(locationForecastFound).to.be.true;",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{wx_url}}/rest/weatherdatasource/no.met.locationforecast",
+							"host": [
+								"{{wx_url}}"
+							],
+							"path": [
+								"rest",
+								"weatherdatasource",
+								"no.met.locationforecast"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get weather data source by non-existent id",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 404\", function () {",
+									"    pm.response.to.have.status(404);",
+									"});",
+									"",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{wx_url}}/rest/weatherdatasource/foo.bar",
+							"host": [
+								"{{wx_url}}"
+							],
+							"path": [
+								"rest",
+								"weatherdatasource",
+								"foo.bar"
 							]
 						}
 					},
@@ -944,7 +1020,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{wx_url}}/rest/amalgamation/amalgamate/?endpointURL=https%3A%2F%2Fipmdecisions.nibio.no%2Fapi%2Fwx%2Frest%2Fweatheradapter%2Fyr%2F&endpointQueryStr=longitude%3D14.3711%26latitude%3D67.2828%26altitude%3D70%26parameters%3D1001%2C3001",
+							"raw": "{{wx_url}}/rest/amalgamation/amalgamate/?endpointURL=https%3A%2F%2Fipmdecisions.nibio.no%2Fapi%2Fwx%2Frest%2Fweatheradapter%2Fyr%2F&endpointQueryStr=longitude%3D14.3711%26latitude%3D67.2828%26altitude%3D70%26parameters%3D1001%2C3001&latitude=67.2828&longitude=14.3711",
 							"host": [
 								"{{wx_url}}"
 							],
@@ -987,6 +1063,14 @@
 								{
 									"key": "endpointQueryStr",
 									"value": "longitude%3D14.3711%26latitude%3D67.2828%26altitude%3D70%26parameters%3D1001%2C3001"
+								},
+								{
+									"key": "latitude",
+									"value": "67.2828"
+								},
+								{
+									"key": "longitude",
+									"value": "14.3711"
 								}
 							]
 						}
