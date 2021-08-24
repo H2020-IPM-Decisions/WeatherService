@@ -351,7 +351,14 @@ public class WeatherAdapterService {
             Boolean ignoreErrorsB = ignoreErrors != null ? ignoreErrors.equals("true") : false;
 
             WeatherData theData = new MetosAPIAdapter().getWeatherData(weatherStationId,publicKey,privateKey,startDate, endDate);
-            return Response.ok().entity(this.getWeatherDataUtil().filterParameters(theData, ipmDecisionsParameters)).build();
+            if(theData != null)
+            {
+            	return Response.ok().entity(this.getWeatherDataUtil().filterParameters(theData, ipmDecisionsParameters)).build();
+            }
+            else
+            {
+            	return Response.status(Status.NO_CONTENT).build();
+            }
         }
         catch(ParseWeatherDataException | GeneralSecurityException | IOException ex)
         {

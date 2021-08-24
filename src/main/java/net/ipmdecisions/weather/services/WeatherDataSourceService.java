@@ -36,10 +36,13 @@ import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
+
 import net.ipmdecisions.weather.entity.WeatherDataSource;
 import net.ipmdecisions.weather.util.GISUtils;
 import org.locationtech.jts.geom.Geometry;
@@ -201,6 +204,31 @@ public class WeatherDataSourceService {
         features.add(new Feature(point,properties));
         GeoJSONWriter writer = new GeoJSONWriter();
         return this.listWeatherDataSourcesForLocation(tolerance, writer.write(features).toString());
+    }
+    
+    @GET
+    @Path("weatherdatasource/{id}")
+    @Produces("application/json")
+    @TypeHint(WeatherDataSource[].class)
+    public Response getWeatherDataSourceById(
+    		@PathParam("id") String id
+    		)
+    {
+    	try
+    	{
+	    	for(WeatherDataSource candidate:this.getAllWeatherDataSources())
+	    	{
+	    		if(candidate.getId().equals(id))
+	    		{
+	    			return Response.ok().entity(candidate).build();
+	    		}
+	    	}
+	    	return Response.status(Status.NOT_FOUND).build();
+    	}
+    	catch(IOException ex)
+    	{
+    		return Response.serverError().entity(ex.getMessage()).build();
+    	}
     }
     
     /**
