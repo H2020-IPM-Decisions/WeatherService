@@ -22,6 +22,9 @@ package net.ipmdecisions.weather.entity;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.kjetland.jackson.jsonSchema.annotations.JsonSchemaDescription;
 import com.kjetland.jackson.jsonSchema.annotations.JsonSchemaExamples;
@@ -82,6 +85,20 @@ public class WeatherData {
     @JsonPropertyDescription("The weather data per location.")
     private List<LocationWeatherData> locationWeatherData;
 
+    private static ObjectMapper objectMapper;
+    
+    public static WeatherData getInstanceFromString(String weatherDataAsString) throws JsonMappingException, JsonProcessingException
+    {
+    	if(WeatherData.objectMapper == null)
+    	{
+    		WeatherData.objectMapper = new ObjectMapper();
+    	}
+
+		return objectMapper.readValue(weatherDataAsString,
+				WeatherData.class);
+
+    }
+    
     /**
      * @return the timeStart
      */
@@ -202,5 +219,4 @@ public class WeatherData {
     	return null;
     }
     
-
 }

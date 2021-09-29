@@ -8,10 +8,9 @@ import javax.ws.rs.Consumes;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.Status;
-import org.json.JSONObject;
-import org.jboss.resteasy.annotations.GZIP;
+import com.fasterxml.jackson.core.JsonProcessingException;
 
+import net.ipmdecisions.weather.entity.WeatherData;
 import net.ipmdecisions.weather.qc.QualityControlMethods;
 import net.ipmdecisions.weather.qc.ThresholdData;
 
@@ -69,9 +68,16 @@ public class QualityControlService {
     @Path("rt")
     @Consumes (MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getQC_RT(String weatherData) {
-        QualityControlMethods qualityControlMethods = new QualityControlMethods();
-        return Response.ok().entity(qualityControlMethods.getQC(weatherData, "RT")).build();
+    public Response getQC_RT(String weatherDataStr) {
+    	try
+    	{
+	        QualityControlMethods qualityControlMethods = new QualityControlMethods();
+	        return Response.ok().entity(qualityControlMethods.getQC(WeatherData.getInstanceFromString(weatherDataStr), "RT")).build();
+    	}
+    	catch(JsonProcessingException ex)
+    	{
+    		return Response.serverError().entity(ex.getMessage()).build();
+    	}
     }
     
     /**
@@ -85,9 +91,16 @@ public class QualityControlService {
     @Path("nonrt")
     @Consumes (MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getQC_nonRT(String weatherData) {
-        QualityControlMethods qualityControlMethods = new QualityControlMethods();
-        return Response.ok().entity(qualityControlMethods.getQC(weatherData, "NONRT")).build();
+    public Response getQC_nonRT(String weatherDataStr) {
+    	try
+    	{
+	        QualityControlMethods qualityControlMethods = new QualityControlMethods();
+	        return Response.ok().entity(qualityControlMethods.getQC(WeatherData.getInstanceFromString(weatherDataStr), "NONRT")).build();
+    	}
+    	catch(JsonProcessingException ex)
+    	{
+    		return Response.serverError().entity(ex.getMessage()).build();
+    	}
     }
     
 }
