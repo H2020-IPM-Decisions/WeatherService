@@ -19,15 +19,24 @@
 
 package net.ipmdecisions.weather.entity;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.kjetland.jackson.jsonSchema.annotations.JsonSchemaDescription;
 import com.kjetland.jackson.jsonSchema.annotations.JsonSchemaExamples;
 import com.kjetland.jackson.jsonSchema.annotations.JsonSchemaInject;
 import com.kjetland.jackson.jsonSchema.annotations.JsonSchemaString;
 import com.kjetland.jackson.jsonSchema.annotations.JsonSchemaTitle;
+
+import net.ipmdecisions.weather.entity.serializers.CustomInstantDeserializer;
+import net.ipmdecisions.weather.entity.serializers.LocationWeatherDataDeserializer;
+
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
+
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
 import javax.validation.constraints.Size;
@@ -37,7 +46,7 @@ import javax.validation.constraints.Size;
  * is a hard coded Json file at the root of the jar file. To get the schema for WeatherData,
  * use SchemaProvider.getWeatherDataSchema()
  * 
- * @copyright 2020 <a href="http://www.nibio.no/">NIBIO</a>
+ * @copyright 2021 <a href="http://www.nibio.no/">NIBIO</a>
  * @author Tor-Einar Skog <tor-einar.skog@nibio.no>
  */
 @JsonSchemaInject(strings = {
@@ -51,10 +60,12 @@ public class WeatherData {
     @NotNull
     @JsonSchemaTitle("Time start (yyyy-MM-dd'T'HH:mm:ssXXX)")
     @JsonPropertyDescription("The timestamp of the first weather observation. Format: \"yyyy-MM-dd'T'HH:mm:ssXXX\", e.g. 2020-04-09T18:00:00+02:00")
+    @JsonDeserialize(using = CustomInstantDeserializer.class)
     private Instant timeStart;
     @NotNull
     @JsonSchemaTitle("Time end (yyyy-MM-dd'T'HH:mm:ssXXX)")
     @JsonPropertyDescription("The timestamp of the last weather observation. Format: \"yyyy-MM-dd'T'HH:mm:ssXXX\", e.g. 2020-04-09T18:00:00+02:00")
+    @JsonDeserialize(using = CustomInstantDeserializer.class)
     private Instant timeEnd;
     @NotNull
     @Positive
@@ -150,5 +161,46 @@ public class WeatherData {
         }
         this.locationWeatherData.add(locationWeatherData);
     }
+
+    @JsonIgnore
+    public List<LocationWeatherData> getDataForParameter(Integer parameterCode)
+    {
+    	Integer paramIndex = this.getParameterIndex(parameterCode);
+    	if(paramIndex == null)
+    	{ 
+    		return null;
+    	}
+    	return this.getLocationWeatherData().stream()
+			.map(l->{
+	    		LocationWeatherData n = new LocationWeatherData(
+					l.getLongitude(),
+					l.getLatitude(),
+					l.getAltitude(),
+					l.getData().length,
+					1 // Only one parameter
+				);
+	    		for(int i=0;i<n.getData().length;i++)
+	    		{
+	    			n.getData()[i][0] = l.getData()[i][paramIndex];
+	    		}
+	    		return n;
+			})
+			.collect(Collectors.toList());
+    	
+    }
+    
+    @JsonIgnore
+    public Integer getParameterIndex(Integer parameterCode)
+    {
+    	for(int i=0;i<this.getWeatherParameters().length;i++)
+    	{
+    		if(this.getWeatherParameters()[i].equals(parameterCode))
+    		{
+    			return i;
+    		}
+    	}
+    	return null;
+    }
+    
 
 }

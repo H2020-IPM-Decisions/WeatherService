@@ -11,7 +11,7 @@
   description: The parameter has been QC'd by the IPM Decisions platform and found to be OK
 - id: 4
   name: Failed. Not an actual number
-  description: TODO
+  description: The value is not a valid number
 - id: 8
   name: Failed. Interval test
   description: TODO
@@ -24,3 +24,6 @@
 - id: 64
   name: Failed. Freeze test
   description: TODO
+- id: 128
+  name: Failed. Missing value(s)
+  description: Either empty or NULL values have been detected

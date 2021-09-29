@@ -30,7 +30,7 @@ import com.webcohesion.enunciate.metadata.DocumentationExample;
  * @copyright 2020 <a href="http://www.nibio.no/">NIBIO</a>
  * @author Tor-Einar Skog <tor-einar.skog@nibio.no>
  */
-public class QC {
+public class QCType {
     
     public final static Integer NO_QC = 0;
     public final static Integer OK_FROM_EXTERNAL = 1;

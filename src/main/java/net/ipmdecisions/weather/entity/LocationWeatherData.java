@@ -19,8 +19,15 @@
 
 package net.ipmdecisions.weather.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.kjetland.jackson.jsonSchema.annotations.JsonSchemaTitle;
+
+import net.ipmdecisions.weather.entity.serializers.LocationWeatherDataDeserializer;
+
+import java.util.Arrays;
+
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
@@ -34,6 +41,7 @@ import javax.validation.constraints.Size;
  * @copyright 2020 <a href="http://www.nibio.no/">NIBIO</a>
  * @author Tor-Einar Skog <tor-einar.skog@nibio.no>
  */
+@JsonDeserialize(using = LocationWeatherDataDeserializer.class)
 public class LocationWeatherData {
 
     @NotNull
@@ -51,6 +59,9 @@ public class LocationWeatherData {
     @JsonSchemaTitle("QC")
     @JsonPropertyDescription("Quality control results for each weather parameter. Bitmapped against list of tests. For reference, see (TODO)")
     private Integer[] QC;
+    @JsonSchemaTitle("Amalgamation")
+    @JsonPropertyDescription("TODO")
+    private Integer[] amalgamation;
     @JsonSchemaTitle("Weather data per location")
     @JsonPropertyDescription("The data. In rows, ordered chronologically. Columns ordered as given in weatherParameters.")
     private Double[][] data;
@@ -105,14 +116,36 @@ public class LocationWeatherData {
         return this.data[row];
     }
     
-    public Double[] getColumn(Integer column)
+    /**
+     * Get data from one column (one parameter)
+     * @param columnIndex the index of the column, zero based
+     * @return
+     * @throws LocationWeatherDataException 
+     */
+    public Double[] getColumn(Integer columnIndex) throws LocationWeatherDataException
     {
+    	if(this.data == null)
+    	{
+    		throw new LocationWeatherDataException("ERROR: No data");
+    	}
         Double[] columnValues = new Double[this.data.length];
         for(Integer i=0; i < this.data.length; i++)
         {
-            columnValues[i] = this.data[i][column];
+            columnValues[i] = this.data[i][columnIndex];
         }
         return columnValues;
+    }
+    
+    public void setColumn(Integer columnIndex, Double[] columnData) throws LocationWeatherDataException
+    {
+    	if(columnData.length != this.data.length)
+    	{
+    		throw new LocationWeatherDataException("ERROR: Array length of inserted data (" + columnData.length +") does not match matrix length (" + this.data.length + ")");
+    	}
+    	for(Integer i=0; i < columnData.length; i++)
+        {
+            this.data[i][columnIndex] = columnData[i];
+        }
     }
     
     @Override
@@ -177,7 +210,12 @@ public class LocationWeatherData {
      * @return the QC
      */
     public Integer[] getQC() {
-        return QC;
+    	if(this.QC == null)
+    	{
+    		this.QC = new Integer[this.getWidth()];
+    		Arrays.fill(this.QC, QCType.NO_QC);
+    	}
+        return this.QC;
     }
 
     /**
@@ -186,4 +224,41 @@ public class LocationWeatherData {
     public void setQC(Integer[] QC) {
         this.QC = QC;
     }
+
+	/**
+	 * @return the amalgamation
+	 */
+	public Integer[] getAmalgamation() {
+		if(this.amalgamation == null)
+		{
+			this.amalgamation = new Integer[this.getWidth()];
+			Arrays.fill(this.amalgamation, AmalgamationType.NONE);
+		}
+		return this.amalgamation;
+	}
+
+	/**
+	 * @param amalgamation the amalgamation to set
+	 */
+	public void setAmalgamation(Integer[] amalgamation) {
+		this.amalgamation = amalgamation;
+	}
+	
+	/**
+	 * Convenience method to check if there are any unchecked parameters in the data set
+	 * @return
+	 */
+    @JsonIgnore
+    public Boolean needsQC()
+    {
+    	for(int i=0;i<this.getQC().length;i++)
+    	{
+    		if(this.getQC()[i] == 0)
+    		{
+    			return true;
+    		}
+    	}
+    	return false;
+    }
+    
 }

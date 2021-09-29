@@ -231,6 +231,10 @@ public class WeatherUtils {
      */
     public WeatherData getWeatherDataFromVIPSWeatherObservations(List<VIPSWeatherObservation> observations, Double longitude, Double latitude, Integer defaultQC)
     {
+    	if(observations == null || observations.size() == 0)
+    	{
+    		return null;
+    	}
         // TODO: Ensure that both VIPS named parameters and IPM parameter codes are mapped
         // Some adapters have included the IPM parameter codes already
         Integer[] parameters = observations.stream()

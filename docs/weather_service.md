@@ -222,6 +222,7 @@ Making the service available in the platform is done by providing IPM Decisions 
 
 ``` json
 {
+    "id": "no.met.lmt",
     "name": "Landbruksmeteorologisk tjeneste",
     "description": "Weather station network covering major agricultural areas of Norway. Data before 2010 are available by request. Email lmt@nibio.no",
     "public_URL": "https://lmt.nibio.no/",

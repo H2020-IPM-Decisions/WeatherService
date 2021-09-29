@@ -32,7 +32,7 @@ import java.time.LocalDate;
  * @author Tor-Einar Skog <tor-einar.skog@nibio.no>
  */
 public class WeatherDataSource {
-    private String name, description, public_URL,endpoint, authentication_required, needs_data_control, access_type;
+    private String id, name, description, public_URL,endpoint, authentication_required, needs_data_control, access_type;
     private Temporal temporal;
     private Parameters parameters; 
     private Spatial spatial;
@@ -336,7 +336,16 @@ public class WeatherDataSource {
         }
     }            
 
-    /**
+    @DocumentationExample("no.met.locationforecast")
+    public String getId() {
+		return id;
+	}
+
+	public void setId(String id) {
+		this.id = id;
+	}
+
+	/**
      * @return the name
      */
     @DocumentationExample("Agromet Norway")

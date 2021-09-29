@@ -23,8 +23,14 @@ package net.ipmdecisions.weather.services;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+
+import net.ipmdecisions.weather.entity.serializers.CustomInstantDeserializer;
+
 import java.text.SimpleDateFormat;
+import java.time.Instant;
+
 import javax.ws.rs.Consumes;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
@@ -32,9 +38,9 @@ import javax.ws.rs.ext.ContextResolver;
 import javax.ws.rs.ext.Provider;
 
 /**
- * Add this to no.nibio.vips.logic.VIPSLogicApplication if you want all
+ * Add this to your JAXActivator if you want all
  * dates to be serialized as ISO formatted date strings
- * @copyright 2018 <a href="http://www.nibio.no/">NIBIO</a>
+ * @copyright 2020 <a href="http://www.nibio.no/">NIBIO</a>
  * @author Tor-Einar Skog <tor-einar.skog@nibio.no>
  */
 @Provider
@@ -46,11 +52,13 @@ public class JacksonConfig implements ContextResolver<ObjectMapper>
 
     public JacksonConfig() throws Exception
     {
+    	
         objectMapper = new ObjectMapper().configure(
                            SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
-        objectMapper.setDateFormat(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX"));
+        JavaTimeModule javaTimeModule =  new JavaTimeModule();
+        objectMapper.registerModule(javaTimeModule);
+        objectMapper.setDateFormat(new SimpleDateFormat("yyyy-MM-dd'TEST'HH:mm:ssXXX"));
         objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-        objectMapper.registerModule(new JavaTimeModule());
     }
 
     @Override
