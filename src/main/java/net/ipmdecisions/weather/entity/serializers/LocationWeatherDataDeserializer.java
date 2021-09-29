@@ -36,22 +36,27 @@ public class LocationWeatherDataDeserializer extends JsonDeserializer<LocationWe
 			{
 				for(JsonNode col:row)
 				{
-					data[i][j++] = col.asDouble();
+					data[i][j++] = col.asText().toLowerCase().equals("null")  ? null: col.asDouble();
 				}
 				j = 0;
 				i++;
 			}
-			Integer[] qc = new Integer[node.get("qc").size()];
-			i = 0;
-			for(JsonNode qcNode:node.get("qc"))
-			{
-				qc[i++] = qcNode.asInt();
-			}
+			
 			LocationWeatherData retVal = new LocationWeatherData(longitude,latitude,altitude, data.length, data[0].length);
 			retVal.setData(data);
-			retVal.setQC(qc);
+			
+			// QC is optional
+			if(node.get("qc") != null)
+			{
+				Integer[] qc = new Integer[node.get("qc").size()];
+				i = 0;
+				for(JsonNode qcNode:node.get("qc"))
+				{
+					qc[i++] = qcNode.asInt();
+				}
+				retVal.setQC(qc);
+			}
 			return retVal;
-		
 	}
 	
 }

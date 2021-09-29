@@ -42,6 +42,9 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import net.ipmdecisions.weather.amalgamation.Interpolation;
+import net.ipmdecisions.weather.entity.LocationWeatherData;
+import net.ipmdecisions.weather.entity.LocationWeatherDataException;
 import net.ipmdecisions.weather.entity.WeatherData;
 
 /**
@@ -81,19 +84,29 @@ public class AmalgamationService {
 			URL completeURL = new URL(endpointURL + "?" + endpointQueryStr);
 			WeatherData dataFromSource = this.getWeatherDataFromSource(completeURL); 
 			// Checks!
-			// 1. Missing parameters?
+			
+			// 1. Are there missing parameters?
 			List<Integer> requestedParameters = this.getParametersFromQueryString(endpointQueryStr);
-			//requestedParameters.stream().forEach(param -> System.out.println(param));
-			List<Integer> missingParameters = this.getMissingParameters(requestedParameters, Arrays.asList(dataFromSource.getWeatherParameters())); 
-			//missingParameters.forEach(p->System.out.println(p));
+			List<Integer> missingParameters = this.getMissingParameters(requestedParameters, Arrays.asList(dataFromSource.getWeatherParameters()));  
+			
 			// 2. Parameters which failed QC tests?
-			Set<Integer> failedParameters = new HashSet<>();
-			Integer[] QC = dataFromSource.getLocationWeatherData().get(0).getQC();
-			for(int i=0;i<QC.length;i++)
+			// NB!! Only checking one of potentially many locationweatherdata sets!!!!!
+			LocationWeatherData lwd = dataFromSource.getLocationWeatherData().get(0);
+			
+			if(lwd.needsQC())
 			{
-				if(QC[i] >= 4)
+				// TODO: Run the QC
+			}
+			Set<Integer> failedParameters = new HashSet<>();
+			Integer[] QC = lwd.getQC();
+			if(QC != null)
+			{
+				for(int i=0;i<QC.length;i++)
 				{
-					failedParameters.add(dataFromSource.getWeatherParameters()[i]);
+					if(QC[i] >= 4)
+					{
+						failedParameters.add(dataFromSource.getWeatherParameters()[i]);
+					}
 				}
 			}
 			
@@ -103,14 +116,31 @@ public class AmalgamationService {
 				// Amalgamations!
 				// ---> Prioritized replacement sources (advanced algorithm??)
 				// ---> Data that can be calculated (LW, others?)
-				// ---> Data that can be interpolated (TM, TT, others?)
+				
+				// Parameters missing entirely
+				for(Integer missingParameter:missingParameters)
+				{
+					// Can it be calculated? Case of LW
+					// Can it be obtained from Mars/ECMWF?
+				}
+				
+				// 
+				// ---> Data that can be interpolated (TM, TT, NOT others), and max 1 hour (for now)
+				// Failed parameters that are interpolatable should be attempted interpolated
+				// NOTE: Failed parameters may be NOT missing (but rather be of value -6999 etc). Should we NULL them first? And how?
+				// Need a list of these parameters
+				// 2021-09-28 Testing with three missing values: https://lmt.nibio.no/services/rest/ipmdecisions/getdata/?weatherStationId=23&parameters=2001,1002&interval=3600&timeStart=2021-08-19T00:00:00%2B02:00&timeEnd=2021-08-20T15:00:00%2B02:00
+				Set<Integer> paramsToInterpolate = failedParameters.stream()
+						.filter(p-> p >= 1000 && p < 2000) // Temperatures are in the range of 1000-1999
+						.collect(Collectors.toSet());
+				dataFromSource = new Interpolation().interpolate(dataFromSource, paramsToInterpolate, 1);
 			}
 			
 			
 			
 			// this.dumpResponse(completeURL);
 			return Response.ok().entity(dataFromSource).build();
-		} catch (IOException ex) {
+		} catch (IOException | LocationWeatherDataException ex) {
 			ex.printStackTrace();
 			return Response.serverError().entity(ex.getMessage()).build();
 		}
@@ -162,8 +192,7 @@ public class AmalgamationService {
 			response.append(inputLine);
 		}
 		in.close();
-		// System.out.println(response.toString());
-		// print result
+		//System.out.println(response.toString());
 		return response.toString();
 	}
 

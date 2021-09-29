@@ -22,6 +22,7 @@ package net.ipmdecisions.weather.amalgamation;
 import java.util.List;
 import java.util.Set;
 
+import net.ipmdecisions.weather.entity.AmalgamationType;
 import net.ipmdecisions.weather.entity.LocationWeatherData;
 import net.ipmdecisions.weather.entity.LocationWeatherDataException;
 import net.ipmdecisions.weather.entity.WeatherData;
@@ -71,10 +72,14 @@ public class Interpolation {
 						}
 					}
 				}
-				// Insert the data into the 
+				// Insert the data into the returned data
 				try 
 				{
 					l.setColumn(input.getParameterIndex(param), dataToInterpolate);
+					// Set the method used (Adding to existing)
+					Integer[] amalgamation = l.getAmalgamation();
+					// "|" is the bitwise OR operator
+					amalgamation[input.getParameterIndex(param)] = amalgamation[input.getParameterIndex(param)] | AmalgamationType.INTERPOLATED;
 				}
 				catch(LocationWeatherDataException ex)
 				{

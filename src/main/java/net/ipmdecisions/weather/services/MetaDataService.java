@@ -45,7 +45,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import net.ipmdecisions.weather.entity.QC;
+import net.ipmdecisions.weather.entity.QCType;
 import net.ipmdecisions.weather.entity.WeatherParameter;
 import net.ipmdecisions.weather.util.SchemaProvider;
 import net.ipmdecisions.weather.util.SchemaUtils;
@@ -187,7 +187,7 @@ public class MetaDataService {
     @GET
     @Path("qc")
     @Produces(MediaType.APPLICATION_JSON)
-    @TypeHint(QC[].class)
+    @TypeHint(QCType[].class)
     public Response listQCCodes()
     {
         try
@@ -195,9 +195,9 @@ public class MetaDataService {
             BufferedInputStream inputStream = new BufferedInputStream(this.getClass().getResourceAsStream("/qc_tests.yaml"));
             ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
             List prelimResult = mapper.readValue(inputStream, ArrayList.class);
-            List<QC> retVal = new ArrayList<>();
+            List<QCType> retVal = new ArrayList<>();
             prelimResult.forEach((pre) -> {
-                retVal.add(mapper.convertValue(pre, new TypeReference<QC>(){}));
+                retVal.add(mapper.convertValue(pre, new TypeReference<QCType>(){}));
             });
            
             return Response.ok().entity(retVal).build();
