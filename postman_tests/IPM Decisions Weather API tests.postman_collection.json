@@ -189,8 +189,9 @@
 									"pm.test(\"Status code is 200\", function () {",
 									"    pm.response.to.have.status(200);",
 									"});",
-									"pm.test(\"Data is valid WeatherData\", function(){",
-									"    pm.sendRequest(pm.environment.get(\"wx_url\") + \"/rest/schema/weatherdata\",function(err,res){",
+									"",
+									"pm.sendRequest(pm.environment.get(\"wx_url\") + \"/rest/schema/weatherdata\",function(err,res){",
+									"        pm.test(\"Data is valid WeatherData\", function(){",
 									"        var schema = res.json();",
 									"        pm.expect(tv4.validate(pm.response.json(), schema)).to.be.true;",
 									"    });",
@@ -304,8 +305,9 @@
 									"pm.test(\"Status code is 200\", function () {",
 									"    pm.response.to.have.status(200);",
 									"});",
-									"pm.test(\"Data is valid WeatherData\", function(){",
-									"    pm.sendRequest(pm.environment.get(\"wx_url\") + \"/rest/schema/weatherdata\",function(err,res){",
+									"",
+									"pm.sendRequest(pm.environment.get(\"wx_url\") + \"/rest/schema/weatherdata\",function(err,res){",
+									"        pm.test(\"Data is valid WeatherData\", function(){",
 									"        var schema = res.json();",
 									"        pm.expect(tv4.validate(pm.response.json(), schema)).to.be.true;",
 									"    });",
@@ -416,14 +418,14 @@
 							"listen": "test",
 							"script": {
 								"exec": [
-									"pm.test(\"Status code is 200 or 204 (no data)\", function () {",
+									"pm.test(\"Status code is 201 or 204 (no data)\", function () {",
 									"    pm.expect(pm.response.code).to.be.oneOf([201,204]);",
 									"});",
 									"",
 									"if(pm.response.code == 200)",
 									"{",
-									"    pm.test(\"Data is valid WeatherData\", function(){",
-									"        pm.sendRequest(pm.environment.get(\"wx_url\") + \"/rest/schema/weatherdata\",function(err,res){",
+									"    pm.sendRequest(pm.environment.get(\"wx_url\") + \"/rest/schema/weatherdata\",function(err,res){",
+									"        pm.test(\"Data is valid WeatherData\", function(){",
 									"            var schema = res.json();",
 									"            pm.expect(tv4.validate(pm.response.json(), schema)).to.be.true;",
 									"        });",
@@ -538,8 +540,10 @@
 									"pm.test(\"Status code is 200\", function () {",
 									"    pm.response.to.have.status(200);",
 									"});",
-									"pm.test(\"Data is valid WeatherData\", function(){",
-									"    pm.sendRequest(pm.environment.get(\"wx_url\") + \"/rest/schema/weatherdata\",function(err,res){",
+									"",
+									"pm.sendRequest(pm.environment.get(\"wx_url\") + \"/rest/schema/weatherdata\",function(err,res){",
+									"    pm.test(\"Data is valid WeatherData\", function(){",
+									"    ",
 									"        var schema = res.json();",
 									"        pm.expect(tv4.validate(pm.response.json(), schema)).to.be.true;",
 									"    });",
@@ -607,8 +611,10 @@
 									"pm.test(\"Status code is 200\", function () {",
 									"    pm.response.to.have.status(200);",
 									"});",
-									"pm.test(\"Data is valid WeatherData\", function(){",
-									"    pm.sendRequest(pm.environment.get(\"wx_url\") + \"/rest/schema/weatherdata\",function(err,res){",
+									"",
+									"pm.sendRequest(pm.environment.get(\"wx_url\") + \"/rest/schema/weatherdata\",function(err,res){",
+									"    pm.test(\"Data is valid WeatherData\", function(){",
+									"",
 									"        var schema = res.json();",
 									"        pm.expect(tv4.validate(pm.response.json(), schema)).to.be.true;",
 									"    });",
@@ -667,8 +673,9 @@
 									"pm.test(\"Status code is 200\", function () {",
 									"    pm.response.to.have.status(200);",
 									"});",
-									"pm.test(\"Data is valid WeatherData\", function(){",
-									"    pm.sendRequest(pm.environment.get(\"wx_url\") + \"/rest/schema/weatherdata\",function(err,res){",
+									"",
+									"pm.sendRequest(pm.environment.get(\"wx_url\") + \"/rest/schema/weatherdata\",function(err,res){",
+									"    pm.test(\"Data is valid WeatherData\", function(){",
 									"        var schema = res.json();",
 									"        pm.expect(tv4.validate(pm.response.json(), schema)).to.be.true;",
 									"    });",
@@ -1001,7 +1008,7 @@
 			"name": "AmalgamationService",
 			"item": [
 				{
-					"name": "Amalgamate basic test",
+					"name": "Amalgamate basic interpolation test",
 					"event": [
 						{
 							"listen": "test",
@@ -1010,7 +1017,23 @@
 									"pm.test(\"Status code is 200\", function () {",
 									"    pm.response.to.have.status(200);",
 									"});",
-									""
+									"",
+									"",
+									"pm.test(\"The single missing value (index 6) has been interpolated\", function () {",
+									"    var data = pm.response.json()[\"locationWeatherData\"][0][\"data\"];",
+									"    console.info(data[6][1]);",
+									"    pm.expect(data[6][1]).to.be.not.null;",
+									"});",
+									"",
+									"",
+									"pm.test(\"The three missing values (index 19-21) have not been interpolated\", function () {",
+									"    var data = pm.response.json()[\"locationWeatherData\"][0][\"data\"];",
+									"    console.info(data[6][1]);",
+									"    for(var i=19;i<22;i++)",
+									"    {",
+									"        pm.expect(data[i][1]).to.be.null;",
+									"    }",
+									"});"
 								],
 								"type": "text/javascript"
 							}
@@ -1020,7 +1043,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{wx_url}}/rest/amalgamation/amalgamate/?endpointURL=https%3A%2F%2Fipmdecisions.nibio.no%2Fapi%2Fwx%2Frest%2Fweatheradapter%2Fyr%2F&endpointQueryStr=longitude%3D14.3711%26latitude%3D67.2828%26altitude%3D70%26parameters%3D1001%2C3001&latitude=67.2828&longitude=14.3711",
+							"raw": "{{wx_url}}/rest/amalgamation/amalgamate/?longitude=14.3711&latitude=67.2828&endpointURL=http%3A%2F%2Flocalhost:8080%2FWeatherService%2Frest%2Ftestdata%2Fweather%2Finterpolation%2Ftemperature&endpointQueryStr=longitude%3D14.3711%26latitude%3D67.2828%26altitude%3D70%26parameters%3D1001%2C3001",
 							"host": [
 								"{{wx_url}}"
 							],
@@ -1033,13 +1056,11 @@
 							"query": [
 								{
 									"key": "longitude",
-									"value": "14.3711",
-									"disabled": true
+									"value": "14.3711"
 								},
 								{
 									"key": "latitude",
-									"value": "67.2828",
-									"disabled": true
+									"value": "67.2828"
 								},
 								{
 									"key": "altitude",
@@ -1053,7 +1074,7 @@
 								},
 								{
 									"key": "endpointURL",
-									"value": "https%3A%2F%2Fipmdecisions.nibio.no%2Fapi%2Fwx%2Frest%2Fweatheradapter%2Fyr%2F"
+									"value": "http%3A%2F%2Flocalhost:8080%2FWeatherService%2Frest%2Ftestdata%2Fweather%2Finterpolation%2Ftemperature"
 								},
 								{
 									"key": "endpointQueryStr",
@@ -1063,14 +1084,6 @@
 								{
 									"key": "endpointQueryStr",
 									"value": "longitude%3D14.3711%26latitude%3D67.2828%26altitude%3D70%26parameters%3D1001%2C3001"
-								},
-								{
-									"key": "latitude",
-									"value": "67.2828"
-								},
-								{
-									"key": "longitude",
-									"value": "14.3711"
 								}
 							]
 						}
