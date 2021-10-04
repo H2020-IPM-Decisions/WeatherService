@@ -91,6 +91,52 @@
 					"response": []
 				},
 				{
+					"name": "Get amalgamation type list",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"pm.test(\"The set of ids follows the bitmap pattern\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    for(var i=0;i<jsonData.length;i++)",
+									"    {",
+									"        if(i==0)",
+									"        {",
+									"            pm.expect(jsonData[i].id).to.eql(0)",
+									"        }",
+									"        else",
+									"        {",
+									"            pm.expect(jsonData[i].id).to.eql(Math.pow(2,i-1));",
+									"        }",
+									"    }",
+									"    ",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{wx_url}}/rest/amalgamationType",
+							"host": [
+								"{{wx_url}}"
+							],
+							"path": [
+								"rest",
+								"amalgamationType"
+							]
+						}
+					},
+					"response": []
+				},
+				{
 					"name": "Get weather data schema",
 					"event": [
 						{

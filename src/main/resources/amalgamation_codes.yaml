@@ -1,0 +1,17 @@
+# Represents an amalgamation type for a parameter. This is used in the amalgamation property of
+# the weather data standard. The id is in binary, so it's bitmapped
+# This means that if several tests fails for a parameter, each test can be specified.
+# E.g. If a parameter has been both interpolated (value=2) and replaced (value=2), the 
+# value will be 3 (1 + 2)
+- id: 0
+  name: Original value
+  description: The weather station value was found OK by the IPM quality control tests and has not been changed or replaced
+- id: 1
+  name: Replaced
+  description: The weather station value failed the IPM quality control and has been replaced with archived data
+- id: 2
+  name: Interpolated
+  description: The weather station value is missing and has been interpolated
+- id: 4
+  name: Calculated
+  description: The weather parameter is missing from the set of data and has been calculated based on other parameters in the set

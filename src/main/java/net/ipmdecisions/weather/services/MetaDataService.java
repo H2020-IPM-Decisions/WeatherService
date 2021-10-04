@@ -45,6 +45,8 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+
+import net.ipmdecisions.weather.entity.AmalgamationType;
 import net.ipmdecisions.weather.entity.QCType;
 import net.ipmdecisions.weather.entity.WeatherParameter;
 import net.ipmdecisions.weather.util.SchemaProvider;
@@ -198,6 +200,39 @@ public class MetaDataService {
             List<QCType> retVal = new ArrayList<>();
             prelimResult.forEach((pre) -> {
                 retVal.add(mapper.convertValue(pre, new TypeReference<QCType>(){}));
+            });
+           
+            return Response.ok().entity(retVal).build();
+        }
+        catch(IOException ex)
+        {
+            return Response.serverError().entity(ex.getMessage()).build();
+        }
+    }
+    
+    /**
+     * 
+     * @return The list of Amalgamation codes
+     * Represents an amalgamation type for a parameter. This is used in the amalgamation property of
+	 * the weather data standard. The id is in binary, so it's bitmapped
+	 * This means that if several tests fails for a parameter, each test can be specified.
+	 * E.g. If a parameter has been both interpolated (value=2) and replaced (value=2), the 
+	 * value will be 3 (1 + 2)
+     */
+    @GET
+    @Path("amalgamationType")
+    @Produces(MediaType.APPLICATION_JSON)
+    @TypeHint(AmalgamationType[].class)
+    public Response listAmalgamationCodes()
+    {
+        try
+        {
+            BufferedInputStream inputStream = new BufferedInputStream(this.getClass().getResourceAsStream("/amalgamation_codes.yaml"));
+            ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
+            List prelimResult = mapper.readValue(inputStream, ArrayList.class);
+            List<AmalgamationType> retVal = new ArrayList<>();
+            prelimResult.forEach((pre) -> {
+                retVal.add(mapper.convertValue(pre, new TypeReference<AmalgamationType>(){}));
             });
            
             return Response.ok().entity(retVal).build();
