@@ -99,6 +99,20 @@
             }
           ]
         },
+        "amalgamation": {
+          "oneOf": [
+            {
+              "type": "null",
+              "title": "Not included"
+            },
+            {
+              "type": "array",
+              "items": {
+                "type": "integer"
+              }
+            }
+          ]
+        },
         "data": {
           "oneOf": [
             {
