@@ -31,6 +31,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
@@ -145,6 +146,38 @@ public class AmalgamationService {
 			return Response.serverError().entity(ex.getMessage()).build();
 		}
 	}
+	
+	/**
+	 * Linear interpolation. Send the weather data in the request body. Specify what to do with query parameters
+	 * @param maxMissingValues Don't interpolate if the number of contiguously missing values exceeds this number (default = 1)
+	 * @param paramsToInterpolate the parameters to interpolate
+	 * @param weatherDataStr Json weather data in the request body. Can very well include parameters that aren't to be interpolated 
+	 * @pathExample /rest/amalgamation/interpolate?maxMissingValues=3&paramsToInterpolate=1002
+	 * @return the weather data set with performed interpolation of the specified parameters
+	 */
+	@GET
+	@Path("interpolate")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response getInterpolatedData(
+			@QueryParam("maxMissingValues") Integer maxMissingValues,
+			@QueryParam("paramsToInterpolate") Set<Integer> paramsToInterpolate,
+			String weatherDataStr // This actually is the request body. Quite neat!
+			)
+	{
+		try
+		{
+			maxMissingValues = maxMissingValues != null ? maxMissingValues : 1;
+			WeatherData input = WeatherData.getInstanceFromString(weatherDataStr);
+			WeatherData output = new Interpolation().interpolate(input, paramsToInterpolate, maxMissingValues);
+			return Response.ok().entity(output).build();
+		}
+		catch(JsonProcessingException | LocationWeatherDataException ex)
+		{
+			return Response.serverError().entity(ex.getMessage()).build();
+		}
+	}
+	
 	
 	private List<Integer> getMissingParameters(List<Integer> requestedParameters, List<Integer> returnedParameters)
 	{
