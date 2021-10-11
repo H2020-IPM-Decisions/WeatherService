@@ -15,8 +15,8 @@ FROM jboss/base-jdk:11
 
 
 # Set the WILDFLY_VERSION env variable
-ENV WILDFLY_VERSION 20.0.0.Final
-ENV WILDFLY_SHA1 3cab3453c9270c662766417adf16c27806124361
+ENV WILDFLY_VERSION 25.0.0.Final
+ENV WILDFLY_SHA1 238e67f48f1bd1e79f2d845cba9194dcd54b4d89
 ENV JBOSS_HOME /opt/jboss/wildfly
 
 USER root
@@ -24,7 +24,7 @@ USER root
 # Add the WildFly distribution to /opt, and make wildfly the owner of the extracted tar content
 # Make sure the distribution is available from a well-known place
 RUN cd $HOME \
-    && curl -O https://download.jboss.org/wildfly/$WILDFLY_VERSION/wildfly-$WILDFLY_VERSION.tar.gz \
+    && curl -O curl -O -L https://github.com/wildfly/wildfly/releases/download/$WILDFLY_VERSION/wildfly-$WILDFLY_VERSION.tar.gz \
     && sha1sum wildfly-$WILDFLY_VERSION.tar.gz | grep $WILDFLY_SHA1 \
     && tar xf wildfly-$WILDFLY_VERSION.tar.gz \
     && mv $HOME/wildfly-$WILDFLY_VERSION $JBOSS_HOME \
@@ -32,12 +32,14 @@ RUN cd $HOME \
     && chown -R jboss:0 ${JBOSS_HOME} \
     && chmod -R g+rw ${JBOSS_HOME}
 
+ENV APP_VERSION=BETA-SNAPSHOT
+
 # copy only the artifacts we need from the first stage and discard the rest
-COPY --from=MAVEN_BUILD /target/IPMDecisionsWeatherService-ALPHA-SNAPSHOT.war /IPMDecisionsWeatherService-ALPHA-SNAPSHOT.war
+COPY --from=MAVEN_BUILD /target/IPMDecisionsWeatherService-$APP_VERSION.war /IPMDecisionsWeatherService-$APP_VERSION.war
 #COPY --from=MAVEN_BUILD /geo-countries/data/countries.geojson /countries.geojson
 # This requires you to have cloned the formats repository from GitHub: https://github.com/H2020-IPM-Decisions/formats
 COPY  --from=MAVEN_BUILD /formats/weather_data/Weather_data_sources.yaml /Weather_data_sources.yaml
-RUN ln -s /IPMDecisionsWeatherService-ALPHA-SNAPSHOT.war ${JBOSS_HOME}/standalone/deployments/IPMDecisionsWeatherService.war
+RUN ln -s /IPMDecisionsWeatherService-$APP_VERSION.war ${JBOSS_HOME}/standalone/deployments/IPMDecisionsWeatherService.war
 
 # Ensure signals are forwarded to the JVM process correctly for graceful shutdown
 ENV LAUNCH_JBOSS_IN_BACKGROUND true

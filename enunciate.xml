@@ -2,7 +2,7 @@
 	<title>IPM Decisions Weather Service</title>
 	<description format="markdown" file="README.md"/>
 	<copyright>IPM Decisions</copyright>
-	<version>ALPHA</version>
+	<version>BETA</version>
 
 	<namespaces>
 		<namespace id="model" uri="http://ipmdecisions.net"/>
@@ -13,5 +13,7 @@
 			<download file="LICENSE" name="GNU Affero GPL v3" description="The license governing this API" showLink="true"/>
 		</docs>
 		<swagger basePath="/api/wx/" docsSubdir="swagger" />
+		<java-json-client javac-source="11" javac-target="11"/>
+    	<java-xml-client javac-source="11" javac-target="11"/>
 	</modules>
 </enunciate>
