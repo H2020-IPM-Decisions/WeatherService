@@ -30,6 +30,7 @@ import javax.validation.constraints.NotNull;
  * @author Tor-Einar Skog <tor-einar.skog@nibio.no>
  */
 public class WeatherParameter {
+	
     @NotNull
     private Integer id;
     @NotNull
@@ -97,4 +98,5 @@ public class WeatherParameter {
     public void setUnit(String unit) {
         this.unit = unit;
     }
+    
 }

@@ -33,6 +33,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.Date;
 import java.util.stream.Collectors;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.FormParam;
@@ -41,13 +42,9 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
-import javax.ws.rs.core.SecurityContext;
 import net.ipmdecisions.weather.datasourceadapters.DavisFruitwebAdapter;
 import net.ipmdecisions.weather.datasourceadapters.MeteobotAPIAdapter;
 import net.ipmdecisions.weather.datasourceadapters.MetosAPIAdapter;
@@ -57,8 +54,10 @@ import net.ipmdecisions.weather.datasourceadapters.finnishmeteorologicalinstitut
 import net.ipmdecisions.weather.entity.WeatherData;
 import net.ipmdecisions.weather.util.WeatherDataUtil;
 import org.jboss.resteasy.annotations.GZIP;
-import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import javax.xml.datatype.DatatypeConfigurationException;
+import net.ipmdecisions.weather.datasourceadapters.dmi.DMIPointWebDataParser;
+import net.ipmdecisions.weather.datasourceadapters.dmi.generated.WeatherInterval;
 
 /**
  * Some weather data sources may agree to deliver their weather data in the 
@@ -223,6 +222,90 @@ public class WeatherAdapterService {
         WeatherData theData = new FinnishMeteorologicalInstituteAdapter().getHourlyData(weatherStationId, timeStartInstant, timeEndInstant, ipmDecisionsParameters, ignoreErrorsB);
 
         return Response.ok().entity(theData).build();       
+    }
+    
+    /**
+     * Get weather observations and forecasts in the IPM Decision's weather data format from the Danish Meteorological Institute
+     * 
+     * @param longitude WGS84 Decimal degrees
+     * @param latitude WGS84 Decimal degrees
+     * @param timeStart Start of weather data period (ISO-8601 Timestamp, e.g. 2020-06-12T00:00:00+03:00)
+     * @param timeEnd End of weather data period (ISO-8601 Timestamp, e.g. 2020-07-03T00:00:00+03:00)
+     * @param logInterval The measuring interval in seconds. Please note that the only allowed interval in this version is 3600 (hourly)
+     * @param parameters Comma separated list of the requested weather parameters, given by <a href="/rest/parameter" target="new">their codes</a>
+     * @param ignoreErrors Set to "true" if you want the service to return weather data regardless of there being errors in the service
+     * @pathExample /rest/weatheradapter/dmipoint?latitude=56.488&longitude=9.583&parameters=2001&timeStart=2021-10-01&timeEnd=2021-10-20&interval=86400
+     * @return 
+     */
+    @GET
+    @POST
+    @Path("dmipoint/")
+    @GZIP
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getDMIPointWebObservations(
+            @QueryParam("longitude") Double longitude,
+            @QueryParam("latitude") Double latitude,
+            @QueryParam("timeStart") String timeStart,
+            @QueryParam("timeEnd") String timeEnd,
+            @QueryParam("interval") Integer logInterval,
+            @QueryParam("parameters") String parameters,
+            @QueryParam("ignoreErrors") String ignoreErrors
+    )
+    {
+         Set<Integer> ipmDecisionsParameters = Arrays.asList(parameters.split(",")).stream()
+                    .map(paramstr->Integer.parseInt(paramstr.strip())).collect(Collectors.toSet());
+        
+        
+        Instant timeStartInstant;
+        Instant timeEndInstant;
+        
+        // Date parsing
+        // Is it a ISO-8601 timestamp or date?
+        try
+        {
+            timeStartInstant = ZonedDateTime.parse(timeStart).toInstant();
+            timeEndInstant = ZonedDateTime.parse(timeEnd).toInstant();
+        }
+        catch(DateTimeParseException ex)
+        {
+            DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+            timeStartInstant = LocalDate.parse(timeStart, dtf).atStartOfDay(ZoneId.of("Europe/Helsinki")).toInstant();//.atZone().toInstant();
+            timeEndInstant = LocalDate.parse(timeEnd, dtf).atStartOfDay(ZoneId.of("Europe/Helsinki")).toInstant();//.atZone(ZoneId.of("Europe/Helsinki")).toInstant();     
+        }
+        
+        Boolean ignoreErrorsB = ignoreErrors != null ? ignoreErrors.equals("true") : false;
+        
+        
+        // Default is hourly, optional is daily
+        logInterval = (logInterval == null || logInterval != 86400) ? 3600 : 86400;
+        
+        if(longitude == null || latitude == null)
+        {
+            return Response.status(Response.Status.BAD_REQUEST).entity("Missing longitude and/or latitude. Please correct this.").build();
+        }
+        
+        try
+        {
+            WeatherData theData = new DMIPointWebDataParser().getData(
+                    longitude, latitude, 
+                    Date.from(timeStartInstant), Date.from(timeEndInstant),
+                    logInterval
+            );
+            if(theData == null)
+            {
+                return Response.noContent().build();
+            }
+            if(ipmDecisionsParameters != null && ipmDecisionsParameters.size() > 0)
+            {
+            	theData = new WeatherDataUtil().filterParameters(theData, ipmDecisionsParameters);
+            }
+            return Response.ok().entity(theData).build();
+        }
+        catch(DatatypeConfigurationException ex)
+        {
+            return Response.serverError().entity(ex.getMessage()).build();
+        }
+
     }
     
     /**

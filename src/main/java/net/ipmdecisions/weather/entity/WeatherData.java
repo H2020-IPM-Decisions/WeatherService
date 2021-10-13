@@ -19,7 +19,6 @@
 
 package net.ipmdecisions.weather.entity;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -33,7 +32,6 @@ import com.kjetland.jackson.jsonSchema.annotations.JsonSchemaString;
 import com.kjetland.jackson.jsonSchema.annotations.JsonSchemaTitle;
 
 import net.ipmdecisions.weather.entity.serializers.CustomInstantDeserializer;
-import net.ipmdecisions.weather.entity.serializers.LocationWeatherDataDeserializer;
 
 import java.time.Instant;
 import java.util.ArrayList;

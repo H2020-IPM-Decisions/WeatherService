@@ -46,6 +46,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import net.ipmdecisions.weather.controller.MetaDataBean;
 import net.ipmdecisions.weather.entity.AmalgamationType;
 import net.ipmdecisions.weather.entity.QCType;
 import net.ipmdecisions.weather.entity.WeatherParameter;
@@ -64,6 +65,9 @@ import org.jboss.resteasy.spi.HttpRequest;
  */
 @Path("rest")
 public class MetaDataService {
+	
+	private MetaDataBean metaDataBean;
+	
     @Context
     private HttpRequest httpRequest;
     @Context
@@ -165,22 +169,16 @@ public class MetaDataService {
     {
         try
         {
-            BufferedInputStream inputStream = new BufferedInputStream(this.getClass().getResourceAsStream("/weather_parameters_draft_v2.yaml"));
-            ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
-            Map prelimResult = mapper.readValue(inputStream, HashMap.class);
-            List<Map> parameters = (List<Map>) prelimResult.get("parameters");
-            List<WeatherParameter> retVal = new ArrayList<>();
-            parameters.forEach((pre) -> {
-                retVal.add(mapper.convertValue(pre, new TypeReference<WeatherParameter>(){}));
-            });
-           
-            return Response.ok().entity(retVal).build();
+            return Response.ok().entity(this.getMetaDataBean().getWeatherParameterList()).build();
         }
         catch(IOException ex)
         {
             return Response.serverError().entity(ex.getMessage()).build();
         }
     }
+    
+    
+    
     
     /**
      * 
@@ -241,5 +239,14 @@ public class MetaDataService {
         {
             return Response.serverError().entity(ex.getMessage()).build();
         }
+    }
+    
+    private MetaDataBean getMetaDataBean()
+    {
+    	if(this.metaDataBean == null)
+    	{
+    		this.metaDataBean = new MetaDataBean();
+    	}
+    	return this.metaDataBean;
     }
 }

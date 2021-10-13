@@ -71,9 +71,6 @@ public class WeatherDataUtil {
             lwd.setQC(filteredQC);
         });
         
-        
-
-        
         source.setWeatherParameters(paramsToKeep.toArray(new Integer[paramsToKeep.size()]));
         
         return source;
