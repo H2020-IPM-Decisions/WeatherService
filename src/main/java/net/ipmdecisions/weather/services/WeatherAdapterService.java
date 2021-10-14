@@ -57,7 +57,6 @@ import org.jboss.resteasy.annotations.GZIP;
 import java.time.format.DateTimeFormatter;
 import javax.xml.datatype.DatatypeConfigurationException;
 import net.ipmdecisions.weather.datasourceadapters.dmi.DMIPointWebDataParser;
-import net.ipmdecisions.weather.datasourceadapters.dmi.generated.WeatherInterval;
 
 /**
  * Some weather data sources may agree to deliver their weather data in the 
@@ -252,8 +251,9 @@ public class WeatherAdapterService {
             @QueryParam("ignoreErrors") String ignoreErrors
     )
     {
-         Set<Integer> ipmDecisionsParameters = Arrays.asList(parameters.split(",")).stream()
-                    .map(paramstr->Integer.parseInt(paramstr.strip())).collect(Collectors.toSet());
+         Set<Integer> ipmDecisionsParameters = parameters != null ? Arrays.asList(parameters.split(",")).stream()
+                    .map(paramstr->Integer.parseInt(paramstr.strip())).collect(Collectors.toSet())
+                 : null;
         
         
         Instant timeStartInstant;

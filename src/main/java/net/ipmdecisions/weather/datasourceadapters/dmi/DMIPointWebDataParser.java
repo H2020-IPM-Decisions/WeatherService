@@ -46,7 +46,7 @@ import net.ipmdecisions.weather.entity.WeatherData;
 /**
  * Gets data from the Danish Meteorological Institute's Point Web service
  * Source files (except this and the others in the same package) have been auto generated using this command:
- * <code>wsimport -keep -Xnocompile -p net.ipmdecisions.weather.datasourceadapters.dmi.generated  https://dmiweatherservice-plant.dlbr.dk/DMIWeatherService.svc?wsdl</code>
+    * <code>wsimport -keep -Xnocompile -p net.ipmdecisions.weather.datasourceadapters.dmi.generated  https://dmiweatherservice-plant.dlbr.dk/DMIWeatherService.svc?wsdl</code>
  * @author Tor-Einar Skog <tor-einar.skog@nibio.no>
  */
 public class DMIPointWebDataParser {
