@@ -769,6 +769,79 @@
 						}
 					},
 					"response": []
+				},
+				{
+					"name": "DMI (Danish Meteorological Service) PointWeb GRID",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.sendRequest(pm.environment.get(\"wx_url\") + \"/rest/schema/weatherdata\",function(err,res){",
+									"    pm.test(\"Data is valid WeatherData\", function(){",
+									"        var schema = res.json();",
+									"        pm.expect(tv4.validate(pm.response.json(), schema)).to.be.true;",
+									"    });",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": []
+						},
+						"url": {
+							"raw": "{{wx_url}}/rest/weatheradapter/dmipoint?latitude=56.488&longitude=9.583&timeStart=2021-10-13&timeEnd=2021-10-20&interval=3600",
+							"host": [
+								"{{wx_url}}"
+							],
+							"path": [
+								"rest",
+								"weatheradapter",
+								"dmipoint"
+							],
+							"query": [
+								{
+									"key": "latitude",
+									"value": "56.488"
+								},
+								{
+									"key": "longitude",
+									"value": "9.583"
+								},
+								{
+									"key": "parameters",
+									"value": "2001",
+									"disabled": true
+								},
+								{
+									"key": "timeStart",
+									"value": "2021-10-13"
+								},
+								{
+									"key": "timeEnd",
+									"value": "2021-10-20"
+								},
+								{
+									"key": "interval",
+									"value": "3600"
+								}
+							]
+						}
+					},
+					"response": []
 				}
 			]
 		},
@@ -1054,7 +1127,7 @@
 			"name": "AmalgamationService",
 			"item": [
 				{
-					"name": "Amalgamate basic interpolation test",
+					"name": "Amalgamate endpoint test",
 					"event": [
 						{
 							"listen": "test",
@@ -1130,6 +1203,47 @@
 								{
 									"key": "endpointQueryStr",
 									"value": "longitude%3D14.3711%26latitude%3D67.2828%26altitude%3D70%26parameters%3D1001%2C3001"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Interpolation test",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"timeStart\": \"2021-08-18T22:00:00Z\",\n    \"timeEnd\": \"2021-08-20T13:00:00Z\",\n    \"interval\": 3600,\n    \"weatherParameters\": [\n        2001,\n        1002\n    ],\n    \"locationWeatherData\": [\n        {\n            \"longitude\": 9.89166,\n            \"latitude\": 59.76152,\n            \"altitude\": 15.0,\n            \"data\": [\n                [\n                    0.0,\n                    10.75\n                ],\n                [\n                    0.0,\n                    9.77\n                ],\n                [\n                    0.0,\n                    9.38\n                ],\n                [\n                    0.0,\n                    9.07\n                ],\n                [\n                    0.0,\n                    7.428\n                ],\n                [\n                    0.0,\n                    6.713\n                ],\n                [\n                    0.0,\n                    null\n                ],\n                [\n                    0.0,\n                    8.07\n                ],\n                [\n                    0.0,\n                    11.82\n                ],\n                [\n                    0.0,\n                    15.79\n                ],\n                [\n                    0.0,\n                    17.93\n                ],\n                [\n                    0.0,\n                    19.46\n                ],\n                [\n                    0.0,\n                    20.6\n                ],\n                [\n                    0.0,\n                    21.77\n                ],\n                [\n                    0.0,\n                    22.29\n                ],\n                [\n                    0.0,\n                    21.29\n                ],\n                [\n                    0.8,\n                    18.9\n                ],\n                [\n                    0.0,\n                    17.19\n                ],\n                [\n                    0.0,\n                    17.46\n                ],\n                [\n                    null,\n                    null\n                ],\n                [\n                    null,\n                    null\n                ],\n                [\n                    null,\n                    null\n                ],\n                [\n                    0.0,\n                    9.95\n                ],\n                [\n                    0.0,\n                    10.09\n                ],\n                [\n                    0.0,\n                    10.33\n                ],\n                [\n                    0.0,\n                    9.38\n                ],\n                [\n                    0.0,\n                    8.06\n                ],\n                [\n                    0.0,\n                    7.072\n                ],\n                [\n                    0.0,\n                    5.752\n                ],\n                [\n                    0.0,\n                    5.107\n                ],\n                [\n                    0.0,\n                    4.955\n                ],\n                [\n                    0.0,\n                    5.675\n                ],\n                [\n                    0.0,\n                    8.28\n                ],\n                [\n                    0.0,\n                    12.65\n                ],\n                [\n                    0.0,\n                    16.25\n                ],\n                [\n                    0.0,\n                    18.3\n                ],\n                [\n                    0.0,\n                    18.91\n                ],\n                [\n                    0.0,\n                    18.7\n                ],\n                [\n                    0.0,\n                    19.79\n                ],\n                [\n                    0.0,\n                    19.83\n                ]\n            ],\n            \"qc\":\n            [\n            \t4,\n            \t4\n            ]\n            ,\n            \"length\": 40,\n            \"width\": 2\n        }\n    ]\n}\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{wx_url}}/rest/amalgamation/interpolate?maxMissingValues=3&paramsToInterpolate=1002",
+							"host": [
+								"{{wx_url}}"
+							],
+							"path": [
+								"rest",
+								"amalgamation",
+								"interpolate"
+							],
+							"query": [
+								{
+									"key": "maxMissingValues",
+									"value": "3"
+								},
+								{
+									"key": "paramsToInterpolate",
+									"value": "1002"
 								}
 							]
 						}
