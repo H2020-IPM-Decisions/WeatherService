@@ -63,4 +63,24 @@ public class TestDataService {
 		}
     	
 	}
+      
+        @GET
+    @Path("weather/qualitycontrol")
+    @GZIP
+    @Produces(MediaType.APPLICATION_JSON)
+	public Response getQualityControlData()
+	{
+		FileUtils fileUtils = new FileUtils();
+		try 
+		{
+			String weatherDataJson = fileUtils.getStringFromFileInApp("/weatherdata_no_errors.json");
+			return Response.ok().entity(weatherDataJson).build();
+		}
+		catch(Exception ex)
+		{
+			return Response.serverError().entity(ex.getMessage()).build();
+		}
+    	
+	}
+        
 }
