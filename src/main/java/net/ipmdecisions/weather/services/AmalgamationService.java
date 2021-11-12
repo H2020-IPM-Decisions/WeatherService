@@ -88,7 +88,9 @@ public class AmalgamationService {
 			
 			// 1. Are there missing parameters?
 			List<Integer> requestedParameters = this.getParametersFromQueryString(endpointQueryStr);
-			List<Integer> missingParameters = this.getMissingParameters(requestedParameters, Arrays.asList(dataFromSource.getWeatherParameters()));  
+			List<Integer> missingParameters = requestedParameters != null && ! requestedParameters.isEmpty() ? 
+					this.getMissingParameters(requestedParameters, Arrays.asList(dataFromSource.getWeatherParameters()))
+					: new ArrayList<>();
 			
 			// 2. Parameters which failed QC tests?
 			// NB!! Only checking one of potentially many locationweatherdata sets!!!!!
