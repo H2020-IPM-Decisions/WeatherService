@@ -82,7 +82,7 @@ public class AmalgamationService {
 		try {
 			//System.out.println(endpointURL);
 			//System.out.println(endpointQueryStr);
-			URL completeURL = new URL(endpointURL + "?" + endpointQueryStr);
+			URL completeURL = new URL(endpointURL + (endpointQueryStr.indexOf("?") == 0 ? "" : "?") + endpointQueryStr);
 			WeatherData dataFromSource = this.getWeatherDataFromSource(completeURL); 
 			// Checks!
 			
