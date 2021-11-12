@@ -219,6 +219,14 @@ public class AmalgamationService {
 
 	private String getResponseAsPlainText(URL theURL) throws IOException {
 		HttpURLConnection conn = (HttpURLConnection) theURL.openConnection();
+		int resultCode = conn.getResponseCode();
+		// Follow redirects, also https
+		if(resultCode == HttpURLConnection.HTTP_MOVED_PERM || resultCode == HttpURLConnection.HTTP_MOVED_TEMP)
+		{
+			String location = conn.getHeaderField("Location");
+			conn.disconnect();
+			conn = (HttpURLConnection)  new URL(location).openConnection();
+		}
 		BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
 		String inputLine;
 		StringBuffer response = new StringBuffer();
