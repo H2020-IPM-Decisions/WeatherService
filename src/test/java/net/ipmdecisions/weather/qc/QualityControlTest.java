@@ -7,6 +7,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.List;
+import net.ipmdecisions.weather.entity.LocationWeatherData;
 
 //import static org.junit.jupiter.api.Assertions.*;
 
@@ -20,6 +22,7 @@ import net.ipmdecisions.weather.entity.WeatherData;
 import net.ipmdecisions.weather.util.FileUtils;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 
 public class QualityControlTest {
     
@@ -53,12 +56,15 @@ public class QualityControlTest {
         WeatherData testData = oMapper.readValue(weatherDataJson, WeatherData.class);
         
         QualityControlMethods instance = new QualityControlMethods();
-        WeatherData result = instance.getQC(testData, "RT");
-         
+        WeatherData wd = instance.getQC(testData, "RT");
+        List<LocationWeatherData> lwd = wd.getLocationWeatherData();
+        Integer[] result = lwd.get(0).getQC();
+        
         Integer[] expResult = {2,2,2,2,2,2,2,2,2,2,2}; // All tests passed ok
         
-        assertEquals(expResult,result);
+        assertArrayEquals(expResult,result);
     }
+    
     /*
     @Test
     public void testRTQualityControlFail() throws Exception{
