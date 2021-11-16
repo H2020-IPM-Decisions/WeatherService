@@ -142,6 +142,11 @@ public class WeatherDataSourceService {
             {
                 return true;
             }
+            // We do a nullpointercheck as well
+            if(dataSourceGeoJsonStr == null)
+            {
+            	return false;
+            }
             FeatureCollection dataSourceFeatures = (FeatureCollection) GeoJSONFactory.create(dataSourceGeoJsonStr);
             // Match with all geometries in request. If found, add data source to
             // list of matching data sources
