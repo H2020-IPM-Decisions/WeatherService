@@ -26,10 +26,19 @@ import javax.validation.constraints.NotNull;
  * Represents a type of agrometeorological measurement relevant to the 
  * IPM Decisions platform. Complete list: https://ipmdecisions.nibio.no/weather/rest/parameter/list
  * 
- * @copyright 2020 <a href="http://www.nibio.no/">NIBIO</a>
+ * @copyright 2021 <a href="http://www.nibio.no/">NIBIO</a>
  * @author Tor-Einar Skog <tor-einar.skog@nibio.no>
  */
 public class WeatherParameter {
+	
+	/** Method for how to create e.g. daily values from hourly values */
+	public final static String AGGREGATION_TYPE_AVERAGE = "AVG";
+	/** Method for how to create e.g. daily values from hourly values */
+	public final static String AGGREGATION_TYPE_MINIMUM = "MIN";
+	/** Method for how to create e.g. daily values from hourly values */
+	public final static String AGGREGATION_TYPE_MAXIMUM = "MAX";
+	/** Method for how to create e.g. daily values from hourly values */
+	public final static String AGGREGATION_TYPE_SUM = "SUM";
 	
     @NotNull
     private Integer id;
@@ -38,6 +47,7 @@ public class WeatherParameter {
     private String description;
     @NotNull
     private String unit;
+    private String aggregationType;
 
     /**
      * @return A numeric code for unique reference to this parameter
@@ -98,5 +108,26 @@ public class WeatherParameter {
     public void setUnit(String unit) {
         this.unit = unit;
     }
+
+	/**
+	 * @return Method for how to create e.g. daily values from hourly values. 
+	 * Possible values: 
+	 * <ul>
+	 * <li>WeatherParameter.AGGREGATION_TYPE_AVERAGE</li>
+	 * <li>WeatherParameter.AGGREGATION_TYPE_MINIMUM</li>
+	 * <li>WeatherParameter.AGGREGATION_TYPE_MAXIMUM</li>
+	 * <li>WeatherParameter.AGGREGATION_TYPE_SUM</li>
+	 * </ul>
+	 */
+	public String getAggregationType() {
+		return aggregationType;
+	}
+
+	/**
+	 * @param aggregationType the aggregationType to set
+	 */
+	public void setAggregationType(String aggregationType) {
+		this.aggregationType = aggregationType;
+	}
     
 }
