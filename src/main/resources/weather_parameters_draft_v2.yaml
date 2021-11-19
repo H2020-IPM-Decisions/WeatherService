@@ -33,7 +33,7 @@ parameters:
  - id: 1024
    name: Maximum air temperature in canopy
    unit: Celcius
-   aggregationType: MQAX
+   aggregationType: MAX
 #
  - id: 1101
    name: Instantaneous temperature at -5cm (Celcius)
