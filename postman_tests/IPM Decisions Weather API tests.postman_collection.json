@@ -984,7 +984,9 @@
 									"    for(var i=0;i<dataSourceList.length;i++)",
 									"    {",
 									"        var endpoint = dataSourceList[i].endpoint;",
+									"        ",
 									"        pm.sendRequest(endpoint, function (err, response2) {",
+									"            console.info(\"Investigating endpoint \" + endpoint)",
 									"            pm.expect(response2.code).to.not.equal(404);",
 									"        });",
 									"    }",
@@ -1011,7 +1013,7 @@
 					"response": []
 				},
 				{
-					"name": "Get weather data sources for simple point",
+					"name": "Get weather data sources for simple point in Norway",
 					"event": [
 						{
 							"listen": "test",
@@ -1061,6 +1063,63 @@
 								{
 									"key": "longitude",
 									"value": "12.01629638671875"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get weather data sources for simple point in Denmark",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"DMI Pointweather service can be found\", function(){",
+									"    var dataSourceList = pm.response.json();",
+									"    var locationForecastFound = false;",
+									"    for(var i=0;i<dataSourceList.length;i++)",
+									"    {",
+									"        if(dataSourceList[i].name == \"DMI Pointweather service\")",
+									"        {",
+									"            locationForecastFound = true;",
+									"        }",
+									"    }",
+									"    pm.expect(locationForecastFound).to.be.true;",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{wx_url}}/rest/weatherdatasource/location/point/?latitude=56.488&longitude=9.583",
+							"host": [
+								"{{wx_url}}"
+							],
+							"path": [
+								"rest",
+								"weatherdatasource",
+								"location",
+								"point",
+								""
+							],
+							"query": [
+								{
+									"key": "latitude",
+									"value": "56.488"
+								},
+								{
+									"key": "longitude",
+									"value": "9.583"
 								}
 							]
 						}
@@ -1162,7 +1221,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{wx_url}}/rest/amalgamation/amalgamate/?longitude=14.3711&latitude=67.2828&endpointURL=http%3A%2F%2Flocalhost:8080%2FWeatherService%2Frest%2Ftestdata%2Fweather%2Finterpolation%2Ftemperature&endpointQueryStr=longitude%3D14.3711%26latitude%3D67.2828%26altitude%3D70%26parameters%3D1001%2C3001",
+							"raw": "{{wx_url}}/rest/amalgamation/amalgamate/?endpointURL=http%3A%2F%2Flocalhost:8080%2FWeatherService%2Frest%2Ftestdata%2Fweather%2Finterpolation%2Ftemperature&endpointQueryStr=longitude%3D14.3711%26latitude%3D67.2828%26altitude%3D70%26parameters%3D1001%2C3001",
 							"host": [
 								"{{wx_url}}"
 							],
@@ -1175,11 +1234,13 @@
 							"query": [
 								{
 									"key": "longitude",
-									"value": "14.3711"
+									"value": "14.3711",
+									"disabled": true
 								},
 								{
 									"key": "latitude",
-									"value": "67.2828"
+									"value": "67.2828",
+									"disabled": true
 								},
 								{
 									"key": "altitude",
