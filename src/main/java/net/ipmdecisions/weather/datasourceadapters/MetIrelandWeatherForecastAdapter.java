@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 NIBIO <http://www.nibio.no/>. 
+ * Copyright (c) 2021 NIBIO <http://www.nibio.no/>. 
  * 
  * This file is part of IPMDecisionsWeatherService.
  * IPMDecisionsWeatherService is free software: you can redistribute it and/or modify
@@ -25,7 +25,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.net.URLConnection;
-import java.text.MessageFormat;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.HashMap;
@@ -43,10 +42,13 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 /**
- * @copyright 2020 <a href="http://www.nibio.no/">NIBIO</a>
+ * Using the open data API of https://data.gov.ie/dataset/met-eireann-weather-forecast-api
+ * This is a direct rip-off of Met Norway's locationforecast
+ * 
+ * @copyright 2021 <a href="http://www.nibio.no/">NIBIO</a>
  * @author Tor-Einar Skog <tor-einar.skog@nibio.no>
  */
-public class YrWeatherForecastAdapter {
+public class MetIrelandWeatherForecastAdapter {
     Integer[] parameters = {
         1001, // Instantaneous temperature at 2m (Celcius)
         3001, // Instantaneous RH at 2m (%)
@@ -58,22 +60,22 @@ public class YrWeatherForecastAdapter {
     Integer[] QC = {1,1,1,1};
     
 
-    private final static String YR_API_URL = "https://api.met.no/weatherapi/locationforecast/2.0/classic?lat=%f&lon=%f&altitude=%d";
+    private final static String IRELAND_API_URL = "http://metwdb-openaccess.ichec.ie/metno-wdb2ts/locationforecast?lat=%f&long=%f";
     
 
     
     public WeatherData getWeatherForecasts(Double longitude, Double latitude, Double altitude) throws ParseWeatherDataException 
     {
-        URL yrURL;
-        LocationWeatherData yrValues;
+        URL irelandURL;
+        LocationWeatherData irelandValues;
         try {
-            yrURL = new URL(String.format(Locale.US,
-                    YrWeatherForecastAdapter.YR_API_URL,
+            irelandURL = new URL(String.format(Locale.US,
+                    MetIrelandWeatherForecastAdapter.IRELAND_API_URL,
                     latitude,
                     longitude,
                     altitude.intValue()) // Need to do this in order to avoid formatting the int 2000 to "2,000"
             );
-            URLConnection connection = yrURL.openConnection();
+            URLConnection connection = irelandURL.openConnection();
             // LocationForecast >= 2.0 requires a unique User-Agent
             connection.setRequestProperty("User-Agent", "net.ipmdecisions.weatherapi/BETA-07 IPMDecisions@adas.co.uk");
             connection.connect();
@@ -93,7 +95,7 @@ public class YrWeatherForecastAdapter {
             Instant timeEnd = Instant.parse(nodes.item(nodes.getLength()-1).getAttributes().getNamedItem("to").getNodeValue());
             Integer interval = 3600; // Hourly intervals
             Long rows = 1 + timeStart.until(timeEnd,ChronoUnit.SECONDS)/interval;
-            yrValues = new LocationWeatherData(longitude,latitude, altitude, rows.intValue(), parameters.length);
+            irelandValues = new LocationWeatherData(longitude,latitude, altitude, rows.intValue(), parameters.length);
             for(int i=0;i<nodes.getLength();i++)
             {
                 Node node = nodes.item(i);
@@ -105,7 +107,7 @@ public class YrWeatherForecastAdapter {
                 // The instantaneous measured values
                 if(fromTime.compareTo(toTime) == 0 && DOMUtils.getNode("temperature", node2.getChildNodes()) != null)
                 {
-                    yrValues.setValue(
+                    irelandValues.setValue(
                             Long.valueOf(timeStart.until(fromTime, ChronoUnit.SECONDS)/interval).intValue(),
                             0,
                             Double.valueOf(DOMUtils.getNodeAttr("temperature","value",node2.getChildNodes()))
@@ -114,7 +116,7 @@ public class YrWeatherForecastAdapter {
                 if(fromTime.compareTo(toTime) == 0 && DOMUtils.getNode("humidity", node2.getChildNodes()) != null)
                 {
 
-                    yrValues.setValue(
+                    irelandValues.setValue(
                             Long.valueOf(timeStart.until(fromTime, ChronoUnit.SECONDS)/interval).intValue(),
                             1,
                             Double.valueOf(DOMUtils.getNodeAttr("humidity","value",node2.getChildNodes()))
@@ -122,7 +124,7 @@ public class YrWeatherForecastAdapter {
                 }
                 if(fromTime.compareTo(toTime) == 0 && DOMUtils.getNode("windSpeed", node2.getChildNodes()) != null)
                 {
-                    yrValues.setValue(
+                    irelandValues.setValue(
                             Long.valueOf(timeStart.until(fromTime, ChronoUnit.SECONDS)/interval).intValue(),
                             3,
                             Double.valueOf(DOMUtils.getNodeAttr("windSpeed","mps",node2.getChildNodes()))
@@ -146,19 +148,19 @@ public class YrWeatherForecastAdapter {
             // Adding all the precipitation values
             for(Long row:RRMap.keySet())
             {
-                yrValues.setValue(row.intValue(), 2, Double.valueOf(RRMap.get(row).split("_")[1]));
+                irelandValues.setValue(row.intValue(), 2, Double.valueOf(RRMap.get(row).split("_")[1]));
             }
-            yrValues = this.createHourlyDataFromYr(yrValues);
-            yrValues.setLongitude(longitude);
-            yrValues.setLatitude(latitude);
-            yrValues.setAltitude(altitude);
-            yrValues.setQC(QC);
+            irelandValues = this.createHourlyDataFromYr(irelandValues);
+            irelandValues.setLongitude(longitude);
+            irelandValues.setLatitude(latitude);
+            irelandValues.setAltitude(altitude);
+            irelandValues.setQC(QC);
             WeatherData retVal = new WeatherData();
             retVal.setInterval(3600);
             retVal.setWeatherParameters(this.parameters);
             retVal.setTimeStart(timeStart);
             retVal.setTimeEnd(timeEnd);
-            retVal.addLocationWeatherData(yrValues);
+            retVal.addLocationWeatherData(irelandValues);
             return retVal;
         }
         catch(IOException | ParserConfigurationException | SAXException | NullPointerException ex)
