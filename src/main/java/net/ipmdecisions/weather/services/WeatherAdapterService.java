@@ -46,6 +46,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import net.ipmdecisions.weather.datasourceadapters.DavisFruitwebAdapter;
+import net.ipmdecisions.weather.datasourceadapters.MetIrelandWeatherForecastAdapter;
 import net.ipmdecisions.weather.datasourceadapters.MeteobotAPIAdapter;
 import net.ipmdecisions.weather.datasourceadapters.MetosAPIAdapter;
 import net.ipmdecisions.weather.datasourceadapters.ParseWeatherDataException;
@@ -112,6 +113,55 @@ public class WeatherAdapterService {
         try 
         {
             WeatherData theData = new YrWeatherForecastAdapter().getWeatherForecasts(longitude, latitude, altitude);
+            if(ipmDecisionsParameters != null && ipmDecisionsParameters.size() > 0)
+            {
+            	theData = new WeatherDataUtil().filterParameters(theData, ipmDecisionsParameters);
+            }
+            return Response.ok().entity(theData).build();
+        } 
+        catch (ParseWeatherDataException ex) 
+        {
+            return Response.serverError().entity(ex.getMessage()).build();
+        }
+
+    }
+    
+    /**
+     * Get 9 day weather forecasts from <a href="https://data.gov.ie/" target="new">Met Éireann (Ireland)</a>'s 
+     * <a href="https://data.gov.ie/dataset/met-eireann-weather-forecast-api" target="new">Locationforecast API</a> 
+     * @param longitude WGS84 Decimal degrees
+     * @param latitude WGS84 Decimal degrees
+     * @pathExample /rest/weatheradapter/meteireann/?longitude=-7.644361&latitude=52.597709&parameters=1001, 3001
+     * @return the weather forecast formatted in the IPM Decision platform's weather data format
+     */
+    @GET
+    @POST
+    @Path("meteireann/")
+    @GZIP
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getMetIrelandForecasts(
+                    @QueryParam("longitude") Double longitude,
+                    @QueryParam("latitude") Double latitude,
+                    @QueryParam("altitude") Double altitude,
+                    @QueryParam("parameters") String parameters
+    )
+    {
+        if(longitude == null || latitude == null)
+        {
+            return Response.status(Response.Status.BAD_REQUEST).entity("Missing longitude and/or altitude. Please correct this.").build();
+        }
+        if(altitude == null)
+        {
+            altitude = 0.0;
+        }
+        
+        Set<Integer> ipmDecisionsParameters = parameters != null ? Arrays.asList(parameters.split(",")).stream()
+                .map(paramstr->Integer.parseInt(paramstr.strip())).collect(Collectors.toSet())
+                : null;
+        
+        try 
+        {
+            WeatherData theData = new MetIrelandWeatherForecastAdapter().getWeatherForecasts(longitude, latitude, altitude);
             if(ipmDecisionsParameters != null && ipmDecisionsParameters.size() > 0)
             {
             	theData = new WeatherDataUtil().filterParameters(theData, ipmDecisionsParameters);

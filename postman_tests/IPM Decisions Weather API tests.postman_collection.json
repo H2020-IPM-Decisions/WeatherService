@@ -710,6 +710,68 @@
 					"response": []
 				},
 				{
+					"name": "Met Ireland forecasts",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.sendRequest(pm.environment.get(\"wx_url\") + \"/rest/schema/weatherdata\",function(err,res){",
+									"    pm.test(\"Data is valid WeatherData\", function(){",
+									"",
+									"        var schema = res.json();",
+									"        pm.expect(tv4.validate(pm.response.json(), schema)).to.be.true;",
+									"    });",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": []
+						},
+						"url": {
+							"raw": "{{wx_url}}/rest/weatheradapter/meteireann/?longitude=-7.644361&latitude=52.597709&parameters=1001, 3001",
+							"host": [
+								"{{wx_url}}"
+							],
+							"path": [
+								"rest",
+								"weatheradapter",
+								"meteireann",
+								""
+							],
+							"query": [
+								{
+									"key": "longitude",
+									"value": "-7.644361"
+								},
+								{
+									"key": "latitude",
+									"value": "52.597709"
+								},
+								{
+									"key": "parameters",
+									"value": "1001, 3001"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
 					"name": "FMI (Finnish Meteorological Service) forecasts",
 					"event": [
 						{
@@ -1120,6 +1182,63 @@
 								{
 									"key": "longitude",
 									"value": "9.583"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get weather data sources for simple point in Ireland",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Met Eireann locationforecast service can be found\", function(){",
+									"    var dataSourceList = pm.response.json();",
+									"    var locationForecastFound = false;",
+									"    for(var i=0;i<dataSourceList.length;i++)",
+									"    {",
+									"        if(dataSourceList[i].name == \"Met Éireann Locationforecast\")",
+									"        {",
+									"            locationForecastFound = true;",
+									"        }",
+									"    }",
+									"    pm.expect(locationForecastFound).to.be.true;",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{wx_url}}/rest/weatherdatasource/location/point/?latitude=52.597709&longitude=-7.644361",
+							"host": [
+								"{{wx_url}}"
+							],
+							"path": [
+								"rest",
+								"weatherdatasource",
+								"location",
+								"point",
+								""
+							],
+							"query": [
+								{
+									"key": "latitude",
+									"value": "52.597709"
+								},
+								{
+									"key": "longitude",
+									"value": "-7.644361"
 								}
 							]
 						}
