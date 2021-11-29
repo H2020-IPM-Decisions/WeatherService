@@ -22,6 +22,8 @@ package net.ipmdecisions.weather.util.vips;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import java.util.Date;
 import javax.json.bind.annotation.JsonbDateFormat;
 
@@ -32,6 +34,7 @@ import javax.json.bind.annotation.JsonbDateFormat;
  * @copyright 2020 <a href="http://www.nibio.no/">NIBIO</a>
  * @author  Tor-Einar Skog <tor-einar.skog@nibio.no>
  */
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class VIPSWeatherObservation implements Comparable{
     
     public final static Integer LOG_INTERVAL_ID_1M = 8;

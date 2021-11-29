@@ -19,6 +19,11 @@
 
 package net.ipmdecisions.weather.util.vips;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
@@ -31,8 +36,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.TimeZone;
 import java.util.stream.Collectors;
+
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import net.ipmdecisions.weather.entity.LocationWeatherData;
 import net.ipmdecisions.weather.entity.WeatherData;
+import net.ipmdecisions.weather.entity.WeatherDataSourceException;
 
 
 /**
@@ -220,6 +230,38 @@ public class WeatherUtils {
             maximum = maximum == null ? value : Math.max(maximum, value);
         }
         return maximum;
+    }
+    
+    public WeatherData getWeatherDataFromVIPSWeatherObservations(URL sourceURL, Double longitude, Double latitude, Integer defaultQC) throws IOException, WeatherDataSourceException
+    {
+    	HttpURLConnection conn = (HttpURLConnection) sourceURL.openConnection();
+    	int resultCode = conn.getResponseCode();
+		// Follow redirects, also https
+		if(resultCode == HttpURLConnection.HTTP_MOVED_PERM || resultCode == HttpURLConnection.HTTP_MOVED_TEMP)
+		{
+			String location = conn.getHeaderField("Location");
+			conn.disconnect();
+			conn = (HttpURLConnection)  new URL(location).openConnection();
+		}
+		
+		BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+		String inputLine;
+		String response = "";
+
+		while ((inputLine = in.readLine()) != null) {
+			response += inputLine;
+		}
+		in.close();
+		//System.out.println("response = " + response);
+		// Are we getting anything else but 200? Raise error
+		if(conn.getResponseCode() != HttpURLConnection.HTTP_OK)
+		{
+			throw new WeatherDataSourceException("ERROR: Got Http response code " + conn.getResponseCode() + " from data source. Message from server was: " + response.toString());
+		}
+		ObjectMapper objectMapper = new ObjectMapper();
+		List<VIPSWeatherObservation> observations = objectMapper.readValue(response, new TypeReference<List<VIPSWeatherObservation>>(){});
+		//System.out.println("getWeatherDataFromVIPSWeatherObservations = " + observations);
+		return this.getWeatherDataFromVIPSWeatherObservations(observations, longitude, latitude, defaultQC);
     }
     
     /**

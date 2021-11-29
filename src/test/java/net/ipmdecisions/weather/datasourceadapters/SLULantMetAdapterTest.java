@@ -24,6 +24,10 @@ import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.text.SimpleDateFormat;
@@ -66,20 +70,26 @@ public class SLULantMetAdapterTest {
         System.out.println("getWeatherForecasts");
         
         TimeZone tz = TimeZone.getTimeZone("GMT+1");
-        SimpleDateFormat format = new SimpleDateFormat("YYYY-mm-dd");
-        Double longitude = 14.3711;
-        Double latitude = 67.2828;
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+        format.setTimeZone(tz);
+        Double longitude = 13.039;
+        Double latitude = 55.752;
         Date dateFrom = format.parse("2021-08-01");
-        Date dateTo = format.parse("2021-10-01");
+        Date dateTo = format.parse("2021-08-03");
         Integer interval = 3600;
         Integer[] params = {1002,2001};
         List<Integer> parameters = Arrays.asList(params); 
-        Double altitude = 70.0;
         SLULantMetAdapter instance = new SLULantMetAdapter();
-        WeatherData result = instance.getData(longitude, latitude, dateFrom, dateTo, interval, parameters);
+        WeatherData result = instance.getData(longitude, latitude, dateFrom.toInstant(), dateTo.toInstant(), interval, parameters);
         assertNotNull(result);
-        System.out.println(result.toString());
         
+        // Optional print
+        /*
+        ObjectMapper om = new ObjectMapper();
+        JavaTimeModule javaTimeModule =  new JavaTimeModule();
+        om.registerModule(javaTimeModule);
+        System.out.println(om.writeValueAsString(result));
+        */
     }
     
 }
