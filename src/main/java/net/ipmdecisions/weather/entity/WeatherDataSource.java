@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 NIBIO <http://www.nibio.no/>. 
+ * Copyright (c) 2021 NIBIO <http://www.nibio.no/>. 
  * 
  * This file is part of IPMDecisionsWeatherService.
  * IPMDecisionsWeatherService is free software: you can redistribute it and/or modify
@@ -22,21 +22,47 @@ package net.ipmdecisions.weather.entity;
 import com.webcohesion.enunciate.metadata.DocumentationExample;
 import com.webcohesion.enunciate.metadata.rs.TypeHint;
 import java.time.LocalDate;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * A weather data source is an online service that provides weather data to the
  * platform. It could be anything from a national meteorological service to a 
  * single weather station set up by a farmer
  * 
- * @copyright 2020 <a href="http://www.nibio.no/">NIBIO</a>
+ * @copyright 2021 <a href="http://www.nibio.no/">NIBIO</a>
  * @author Tor-Einar Skog <tor-einar.skog@nibio.no>
  */
 public class WeatherDataSource {
-    private String id, name, description, public_URL,endpoint, authentication_required, needs_data_control, access_type;
+    private String id, name, description, public_URL,endpoint, authentication_type, needs_data_control, access_type;
     private Temporal temporal;
     private Parameters parameters; 
     private Spatial spatial;
     private Organization organization;
+    
+    /** No authentication required for the data source */
+    public static String AUTHENTICATION_TYPE_NONE = "NONE";
+    
+    /** 
+     * <p>
+     * This implies http POST and sending 
+     * parameters x-www-form-urlencoded, adding parameter 
+     * <code>credentials={"username":"XXX", "password":"XXX"}</code>
+     * </p>
+     */
+    public static String AUTHENTICATION_TYPE_CREDENTIALS = "CREDENTIALS";
+    
+    /**
+     * A bearer token must be provided in the Authorization header
+     */
+    public static String AUTHENTICATION_TYPE_BEARER_TOKEN = "BEARER_TOKEN";
+    
+    private List<String> authenticationTypes = Stream.of(
+    		WeatherDataSource.AUTHENTICATION_TYPE_NONE,
+    		WeatherDataSource.AUTHENTICATION_TYPE_CREDENTIALS,
+    		WeatherDataSource.AUTHENTICATION_TYPE_BEARER_TOKEN
+    		).collect(Collectors.toList());
     
     /**
      * A data class for identifying the Organization behind/responsible for the Weather data source
@@ -493,21 +519,21 @@ public class WeatherDataSource {
 
     /**
      * <p>
-     * The default value is "false". If "true", this implies http POST and sending 
-     * parameters x-www-form-urlencoded, adding parameter 
-     * <code>credentials={"username":"XXX", "password":"XXX"}</code>
+     * The default value is "NONE". 
      * </p>
      * @return the authentication_required
+     * @DocumentationExample("NONE")
      */
-    @DocumentationExample("false")
-    public String getAuthentication_required() {
-        return authentication_required != null ? authentication_required : "false";
+    public String getAuthentication_type() {
+    	return this.authentication_type != null ? this.authentication_type : WeatherDataSource.AUTHENTICATION_TYPE_NONE;
     }
-
-    /**
-     * @param authentication_required the authentication_required to set
-     */
-    public void setAuthentication_required(String authentication_required) {
-        this.authentication_required = authentication_required;
+    
+    public void setAuthentication_type(String authentication_type)
+    {
+    	if(!this.authenticationTypes.contains(authentication_type))
+    	{
+    		throw new IllegalArgumentException("Authentication type must be one of [" + String.join(",", authenticationTypes) + "]");
+    	}
+    	this.authentication_type = authentication_type;
     }
 }

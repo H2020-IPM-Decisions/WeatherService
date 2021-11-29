@@ -227,7 +227,7 @@ Making the service available in the platform is done by providing IPM Decisions 
     "description": "Weather station network covering major agricultural areas of Norway. Data before 2010 are available by request. Email lmt@nibio.no",
     "public_URL": "https://lmt.nibio.no/",
     "endpoint": "https://lmt.nibio.no/services/rest/ipmdecisions/getdata/",
-    "authentication_required": "false",
+    "authentication_type": "NONE",
     "needs_data_control": "true",
     "access_type": "stations",
     "temporal": {
