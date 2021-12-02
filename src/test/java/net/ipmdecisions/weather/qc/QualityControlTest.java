@@ -65,20 +65,22 @@ public class QualityControlTest {
         assertArrayEquals(expResult,result);
     }
     
-    /*
+    
     @Test
     public void testRTQualityControlFail() throws Exception{
         
         System.out.println("testRTQualityControlFail");
     	FileUtils fileUtils = new FileUtils();
-    	String weatherDataJson = fileUtils.getStringFromFileInApp("/weatherdata_with_errors.json");
+    	String weatherDataJson = fileUtils.getStringFromFileInApp("/weatherdata_rt_errors.json");
         ObjectMapper oMapper = new ObjectMapper();
         WeatherData testData = oMapper.readValue(weatherDataJson, WeatherData.class);
         
         QualityControlMethods instance = new QualityControlMethods();
-        WeatherData result = instance.getQC(testData, "RT");
-         
-        Integer[] expResult = {2,2,2,2,2,2,2,2,2,2,2}; // need to be changed to correct bitmap values for failure on all tests
+        WeatherData wd = instance.getQC(testData, "RT");
+        List<LocationWeatherData> lwd = wd.getLocationWeatherData();
+        Integer[] result = lwd.get(0).getQC();
+        
+        Integer[] expResult = {2,8,16,24,2,2,8,2,8,4,8,2,8}; // need to be changed to correct bitmap values for failure on all tests
         
         assertEquals(expResult,result);
     }
@@ -95,10 +97,28 @@ public class QualityControlTest {
         QualityControlMethods instance = new QualityControlMethods();
         WeatherData result = instance.getQC(testData, "NONRT");
         
-        Boolean expResult = true;
-        Boolean testresult = false;  //instance.isJsonValid(schema, jsonNode);
+        Integer[] expResult = {2,2,2,2,2,2,2,2,2,2,2}; // All tests passed ok
         
-        assertNotEquals(expResult,testresult);
-    }*/
+        assertNotEquals(expResult,result);
+    }
+    
+    @Test
+    public void testNONRTQualityControlFail() throws Exception{
+        
+        System.out.println("testNONRTQualityControlFail");
+    	FileUtils fileUtils = new FileUtils();
+    	String weatherDataJson = fileUtils.getStringFromFileInApp("/weatherdata_nonrt_errors.json");
+        ObjectMapper oMapper = new ObjectMapper();
+        WeatherData testData = oMapper.readValue(weatherDataJson, WeatherData.class);
+        
+        QualityControlMethods instance = new QualityControlMethods();
+        WeatherData result = instance.getQC(testData, "NONRT");
+        
+        Integer[] expResult = {2,32,64,2,2,2,64,2,2,2,2,32,2}; // All tests passed ok
+        
+        assertNotEquals(expResult,result);
+    }
+    
+    
 }
 

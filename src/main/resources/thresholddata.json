@@ -83,7 +83,7 @@
         "parameter":"Wind speed",
         "id_array":["4002","4003","4004","4005","4012","4013","4014","4015"],
         "lower_limit":0,
-        "upper_limit":75,
+        "upper_limit":50,
         "step_test_threshold": 13,
         "step_test_threshold_type": "absolute"
     },
