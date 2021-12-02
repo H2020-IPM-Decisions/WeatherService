@@ -147,11 +147,6 @@ public class QualityControlMethods {
                 // We can only do other tests if prequalification test didn't fail, as value needs to be a number.
                 if (testResult == QCType.NO_QC) {
                     testResult = testResult | QCRTTester.getIntervalTestResult(weatherParameterValues, weatherParameter);
-
-                    // If none of the tests have failed, we can declare the data as valid.
-                    if (testResult == QCType.NO_QC) {
-                        testResult = QCType.OK_FROM_IPM_DECISIONS;
-                    }
                 }
                 //Put the final test result into qcResult
                 //getFinalRestResult(int) returns 2 if the final result remains 0
@@ -167,6 +162,11 @@ public class QualityControlMethods {
         
         for (Integer i=0; i<qcResult.length; i++) {
             qcResult[i] = qcResult[i] | qcResultLogical[i];
+            
+            // If none of the tests have failed, we can declare the data as valid.
+            if (qcResult[i] == QCType.NO_QC) {
+                qcResult[i] = QCType.OK_FROM_IPM_DECISIONS;
+            }
         }
         
         return qcResult;
