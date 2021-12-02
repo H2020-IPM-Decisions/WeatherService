@@ -36,6 +36,10 @@ import net.ipmdecisions.weather.entity.LocationWeatherData;
 import net.ipmdecisions.weather.entity.LocationWeatherDataException;
 import net.ipmdecisions.weather.entity.QCType;
 import net.ipmdecisions.weather.entity.WeatherData;
+import net.ipmdecisions.weather.qc.QCRTTester;
+import net.ipmdecisions.weather.qc.QCNonRTTester;
+import net.ipmdecisions.weather.qc.util.QCHelpers;
+import net.ipmdecisions.weather.qc.util.QCTestType;
 
 import org.json.JSONArray;
 
@@ -65,8 +69,6 @@ public class QualityControlMethods {
      * locationWeatherData object
      */
     public WeatherData getQC(WeatherData weatherData, String qcType) {
-        
-
         
         //Location weather data array from inbound weather data
         List<LocationWeatherData> locationWeatherData = weatherData.getLocationWeatherData();
@@ -116,94 +118,59 @@ public class QualityControlMethods {
      * @return QC result as JSONArray
      */
     private Integer[] getRtQC(Integer[] weatherParameters, LocationWeatherData locationWeatherData) {
-        
+
         //Weather parameter values in specific index as List
         //Basically jsonArray[index] -> List
         Double[] weatherParameterValues;
-        
+
         //Quality control result as JSONArray
         Integer[] qcResult = new Integer[weatherParameters.length];
         
         //Quality control test result
         int testResult;
-        
+
         //Weather parameter (from weatherParameters[index])
         int weatherParameter;
         
         //Iterate the weather parameter key array and couple weather data parameter keys and values
         for (int index=0; index<weatherParameters.length; index++) {
-        	try
-        	{
-	        	testResult = 0;
-	            //Weather parameter from weather parameter array
-	            weatherParameter = weatherParameters[index];
-	            //Index pointed weather data parameter values into List
-	            weatherParameterValues = locationWeatherData.getColumn(index);
-	            
-	            //Interval test result
-	            testResult = testResult | getIntervalTestResult(weatherParameterValues, weatherParameter);
-	            
-	            //Put the final test result into qcResult
-	            //getFinalRestResult(int) returns 2 if the final result remains 0
-	            qcResult[index] = testResult;
-        	}
-        	catch(LocationWeatherDataException ex)
-        	{
-        		// Pass
-        	}
-        }
-        
-        return qcResult;
-    }
-    
-    
-    
-    
-    /**
-     * Interval test for weather data parameter values. Interval test is performed against predefined
-     * upper and lower limits. The threshold data is accessed using ThresholdData class.
-     * This release implements file based rules but builds foundation for getting the
-     * rules form REST or other type external source.
-     * @param weatherParameterValuesAsList Weather data parameter values as List
-     * @param weatherParameter Weather data parameter key
-     * @return QC result as integer
-     * Returns
-     * - 8 if fails
-     * - 2 if success
-     */
-    private int getIntervalTestResult(Double[] weatherParameterValues, int weatherParameter) {
-        
-        //QC result return variable. Default is set as pass
-        int qcResult = QCType.OK_FROM_IPM_DECISIONS;
-        
-        //Threshold data Object
-        ThresholdData thresholdData = new ThresholdData();
-        //Threshold data as JSONObject
-        JSONObject lowerAndUpperLimits = thresholdData.getThresholdDataObject(String.valueOf(weatherParameter));
-        //Lower limit value
-        double lowerLimit = lowerAndUpperLimits.getDouble("lower_limit");
-        //Upper limit value
-        double upperLimit = lowerAndUpperLimits.getDouble("upper_limit");
-        //Weather data parameter value placeholder
-        double parameterValue;
-        
-        
-        //Weather parameter value iterator loop
-        for(int i=0;i<weatherParameterValues.length;i++) 
-        {
-            //Weather data parameter value as double
-            parameterValue = weatherParameterValues[i];
-            //Interval test. Weather data parameter values higher than upper limit
-            //or lower than lower limit causes abort with exit code 8 (QC pass false)
-            if (parameterValue > upperLimit || parameterValue < lowerLimit) {
-                return QCType.FAILED_INTERVAL_TEST;
+            try
+            {
+                testResult = QCType.NO_QC;
+                //Weather parameter from weather parameter array
+                weatherParameter = weatherParameters[index];
+                //Index pointed weather data parameter values into List
+                weatherParameterValues = locationWeatherData.getColumn(index);
+
+                testResult = testResult | QCRTTester.getPrequalificationTestResult(weatherParameterValues, weatherParameter);
+
+                // We can only do other tests if prequalification test didn't fail, as value needs to be a number.
+                if (testResult == QCType.NO_QC) {
+                    testResult = testResult | QCRTTester.getIntervalTestResult(weatherParameterValues, weatherParameter);
+
+                    // If none of the tests have failed, we can declare the data as valid.
+                    if (testResult == QCType.NO_QC) {
+                        testResult = QCType.OK_FROM_IPM_DECISIONS;
+                    }
+                }
+                //Put the final test result into qcResult
+                //getFinalRestResult(int) returns 2 if the final result remains 0
+                qcResult[index] = testResult;
+            }
+            catch(LocationWeatherDataException ex)
+            {
+                    // Pass
             }
         }
         
-        return qcResult;
+        Integer[] qcResultLogical = QCRTTester.testForLogicalErrors(locationWeatherData.getData(), weatherParameters, qcResult);
         
+        for (Integer i=0; i<qcResult.length; i++) {
+            qcResult[i] = qcResult[i] | qcResultLogical[i];
+        }
+        
+        return qcResult;
     }
-    
     
     /**
      * Non-real time quality control main method. The non-real time QC includes step test
@@ -237,50 +204,36 @@ public class QualityControlMethods {
         for (int index=0; index<weatherParameters.length; index++) {
         	try
         	{
-	        	testResult = 0;
+                    testResult = QCType.NO_QC;
 	            //Weather parameter from weather parameter array
 	            weatherParameter = weatherParameters[index];
 	            //Index pointed weather data parameter values into List
 	            weatherParameterValues = locationWeatherData.getColumn(index);
+
 	            //Freeze test
-	            testResult = getFreezeTestResult(weatherParameterValues);
-	            //Step test
-	            testResult = testResult | getStepTestResult(weatherParameterValues,weatherParameter);
+                    if (QCHelpers.isWeatherParameterHandledByQCTest(weatherParameter, QCTestType.STEP)) {
+                        testResult = testResult | QCNonRTTester.testForFreezeErrors(weatherParameterValues, weatherParameter);
+                    }
+
+                    //Step test
+                    if (QCHelpers.isWeatherParameterHandledByQCTest(weatherParameter, QCTestType.STEP)) {
+                        testResult = testResult | QCNonRTTester.getStepTestResult(weatherParameterValues, weatherParameter);
+                    }
+
 	            //Put the final test result into qcResult
 	            //getFinalRestResult(int) returns 2 if the final result remains 0
+                    
+                    if (testResult == 0) testResult = QCType.OK_FROM_IPM_DECISIONS;
+                    
 	            qcResult[index] = testResult;
         	}
         	catch(LocationWeatherDataException ex)
         	{
-        		// PAss
+        		// Pass
         	}
         }
         
         return qcResult;
-    }
-    
-    
-    /**
-     * Freeze test for weather data parameter values. Checks the duplicates in
-     * specific weather data parameter values List. Note, that this algorithm
-     * checks the whole data array and does not enable temporal filtering!
-     * @param weatherParameterValuesAsList Weather data parameter values as List
-     * @param index Index of weather parameter key to be tested as int
-     * @return QC result as integer
-     * Returns
-     * - 64 if fails
-     * - 2 if success
-     */
-    private Integer getFreezeTestResult(Double[] weatherParameterValues) {
-        //Weather data parameter values List into HashSet for dublicate check
-        HashSet<Double> unique = new HashSet(Arrays.asList(weatherParameterValues));
-        if (unique.size() == 1 && weatherParameterValues.length > 1) {
-            return QCType.FAILED_FREEZE_TEST;
-        } else if (weatherParameterValues.length == 1) {
-            return QCType.NO_QC;
-        } else {
-            return QCType.OK_FROM_IPM_DECISIONS;
-        }
     }
     
     
@@ -300,121 +253,8 @@ public class QualityControlMethods {
     private int getLogicalTestResult(JSONArray data, int index, int weatherParameter, int interval, String timeStart, String timeEnd, double longitude, double latitude, int altitude) {
         return QCType.NO_QC;
     }
-    
-    
-    /**
-     * Step test result for weather data parameter values. The steps are defined in
-     * the threshold data that is accessed using ThresholdData class. This method
-     * is host for intGetStepTestRun(params) method.
-     * @param weatherParameterValuesAsList Weather data parameter values as List
-     * @param weatherParameter Weather data paramteter key as int
-     * @return QC result as int
-     * Returns
-     * - 32 if fails (the teest is performed in the int getStepTestRun(params) method)
-     * - 2 if success
-     * - 0 if not tested
-     */
-    private int getStepTestResult(Double[] weatherParameterValues, int weatherParameter) {
-        
-        //Default QC response is set to pass with return value 2
-        int returnValue = QCType.OK_FROM_IPM_DECISIONS;
-        
-        //ThresholdData object
-        ThresholdData thresholdData = new ThresholdData();
-        //Weather data parameter key specific threshold data object
-        JSONObject thresholdDataObject = thresholdData.getThresholdDataObject(String.valueOf(weatherParameter));
-        
-        //Variable for step test type. This is weather data prameter specific and
-        //is either absolute or relative
-        String stepTestType;
-        //Threshold value from threshold data
-        double thresholdValue;
-        
-        //Run the test if the threshold data exists
-        if (thresholdDataObject.has("step_test_threshold")) {
-            //Threshold value as double
-            thresholdValue = thresholdDataObject.getDouble("step_test_threshold");
-            //Threshold test. Threshold test type is retrieved from threshold data object from the key step_test_threshold_type
-            returnValue =  getStepTestRun(weatherParameterValues, thresholdValue, thresholdDataObject.getString("step_test_threshold_type"));
-        } else {
-            returnValue = QCType.NO_QC;
-        }
-        
-        return returnValue;
-        
-    }
-    
-    
-    /**
-     * Runs the actual step test based on variable values (previous and current) and
-     * test type as well as the threshold value in question
-     * @param weatherParameterValuesAsList Weather data parameter values as List
-     * @param thresholdValue Threshold value as double
-     * @param thresholdType Threshold type as string being either absolute or relative
-     * @return QC result as integer
-     * Returns
-     * - 2 if success
-     * - 32 if fail
-     */
-    private int getStepTestRun(Double[] weatherParameterValues, double thresholdValue, String thresholdType) {
-        
-   
-        //Parameter value from iterator as String
-        String weatherParameterValueAsString;
-        //Weather data parameter value as double
-        double weatherParameterValue;
-        //Previous weather data parameter value for comparison
-        double previousWeatherParameterValue = 0.0;
-        //Test values for relative model
-        double testValue_max;
-        double testValue_min;
-        //Counter for while loop
-        int counter = 0;
-        
-        // If there is only one weather data parameter value the step test cannor run
-        //and returns 0 (no quality control performed)
-        if (weatherParameterValues.length == 1) {
-            return QCType.NO_QC;
-        //Step test
-        } else {
-            //Loop for weather data parameter values
-            for(int i=0;i<weatherParameterValues.length;i++)
-            {
-                weatherParameterValue = weatherParameterValues[i];
-                counter ++;
-                //If counter > 1 the step test can be performed (we now have current value and previous value)
-                if (counter > 1) {
-                    switch (thresholdType) {
-                        case "absolute":
-                            //Step test for absolute type where the threshold is + or - n units
-                            //Immediate abort if the test fails
-                            if (abs(previousWeatherParameterValue-weatherParameterValue) > thresholdValue) {
-                                return QCType.FAILED_STEP_TEST;
-                            }
-                            break;
-                        case "relative":
-                            //Calculate the current MAX value based on threshold and previous weather data parameter value
-                            testValue_max = previousWeatherParameterValue + ((previousWeatherParameterValue/100) * thresholdValue);
-                            //Calculate the current MIN value based on threshold and previous weather data parameter value
-                            testValue_min = previousWeatherParameterValue - ((previousWeatherParameterValue/100) * thresholdValue);
-                            //Step test for relative type where the threshold is + or - n presentage
-                            //Abort with return value 32 if the test fails
-                            if (weatherParameterValue >= testValue_max || weatherParameterValue <= testValue_min) {
-                                return QCType.FAILED_STEP_TEST;
-                            }
-                            break;
-                    }
-                }
-                //Set the previous weather data parameter value
-                previousWeatherParameterValue = weatherParameterValue;
-            }
-        }
-        
-        //Return OK if test passes and reaches this point
-        return QCType.OK_FROM_IPM_DECISIONS;
-    }
-    
-    
+
+
     /**
      * @deprecated
      * Final test result correction from 0 to 2 in the case the test could be performed but
