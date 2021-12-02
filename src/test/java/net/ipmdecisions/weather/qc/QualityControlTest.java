@@ -95,7 +95,9 @@ public class QualityControlTest {
         WeatherData testData = oMapper.readValue(weatherDataJson, WeatherData.class);
         
         QualityControlMethods instance = new QualityControlMethods();
-        WeatherData result = instance.getQC(testData, "NONRT");
+        WeatherData wd = instance.getQC(testData, "NONRT");
+        List<LocationWeatherData> lwd = wd.getLocationWeatherData();
+        Integer[] result = lwd.get(0).getQC();
         
         Integer[] expResult = {2,2,2,2,2,2,2,2,2,2,2}; // All tests passed ok
         
@@ -112,7 +114,9 @@ public class QualityControlTest {
         WeatherData testData = oMapper.readValue(weatherDataJson, WeatherData.class);
         
         QualityControlMethods instance = new QualityControlMethods();
-        WeatherData result = instance.getQC(testData, "NONRT");
+        WeatherData wd = instance.getQC(testData, "NONRT");
+        List<LocationWeatherData> lwd = wd.getLocationWeatherData();
+        Integer[] result = lwd.get(0).getQC();
         
         Integer[] expResult = {2,32,64,2,2,2,64,2,2,2,2,32,2}; // All tests passed ok
         
