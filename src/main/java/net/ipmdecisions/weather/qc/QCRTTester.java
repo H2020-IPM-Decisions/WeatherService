@@ -174,17 +174,13 @@ public class QCRTTester {
                 // check that minValue <= mean
                 if (mins != null && mins[i] > means[i]) {
                     isCorrect = false;
+                    qcResults[tuple[1]] = QCType.FAILED_LOGIC_TEST;
                 }
                 // check that mean <= maxValue
                 if (maxs != null && means[i] > maxs[i]) { 
                     isCorrect = false;
+                    qcResults[tuple[2]] = QCType.FAILED_LOGIC_TEST;
                 }
-            }
- 
-            if (!isCorrect) {
-                qcResults[tuple[0]] = QCType.FAILED_LOGIC_TEST;
-                if (tuple[1] != null) qcResults[tuple[1]] = QCType.FAILED_LOGIC_TEST;
-                if (tuple[2] != null) qcResults[tuple[2]] = QCType.FAILED_LOGIC_TEST;
             }
         });
 
