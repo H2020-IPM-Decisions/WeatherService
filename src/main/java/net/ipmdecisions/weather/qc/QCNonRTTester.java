@@ -87,7 +87,7 @@ public class QCNonRTTester {
      * @param thresholdType Threshold type as string being either absolute or relative
      * @return QC result as integer
      * Returns
-     * - 2 if success
+     * - 0 if success
      * - 32 if fail
      */
     public static int getStepTestRun(Double[] weatherParameterValues, double thresholdValue, String thresholdType) {
@@ -144,7 +144,7 @@ public class QCNonRTTester {
         }
         
         //Return OK if test passes and reaches this point
-        return QCType.OK_FROM_IPM_DECISIONS;
+        return QCType.NO_QC;
     }
     
     /**
