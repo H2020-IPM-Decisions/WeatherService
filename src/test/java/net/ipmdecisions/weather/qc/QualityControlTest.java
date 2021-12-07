@@ -201,6 +201,7 @@ public class QualityControlTest {
         QualityControlTest.printTestName();
 
         Integer[] weatherParameters = {1001};
+        // doubles are valid values
         Double[][] data = {{2.0}, {0.0}};
         
         WeatherData testData = QualityControlTest.getWeatherDataForTests(weatherParameters, data);
@@ -217,8 +218,11 @@ public class QualityControlTest {
         QualityControlTest.printTestName();
 
         Integer[] weatherParameters = {1001};
-        Double[][] data = {{null}, {0.0}};
-        
+        Double[][] data = {
+            {null}, // fail: null is not valid value 
+            {0.0},
+        };
+
         WeatherData testData = QualityControlTest.getWeatherDataForTests(weatherParameters, data);
         Integer[] result = QualityControlTest.getQCResultForTests(testData, "RT");
 
@@ -268,8 +272,8 @@ public class QualityControlTest {
         QualityControlTest.printTestName();
 
         Integer[] weatherParameters = {1001, 1002};
-        // below (-55.1) is incorrect, but equal to limit (-55.0) is correct
-        Double[][] data = {{0.0, 0.0}};
+        // sanity check
+        Double[][] data = {{0.0, 10.0}};
 
         WeatherData testData = QualityControlTest.getWeatherDataForTests(weatherParameters, data);
         Integer[] result = QualityControlTest.getQCResultForTests(testData, "RT");
@@ -293,8 +297,12 @@ public class QualityControlTest {
         QualityControlTest.printTestName();
 
         Integer[] weatherParameters = {1001, 1002};
-        // below (-55.1) is incorrect, but equal to limit (-55.0) is correct
-        Double[][] data = {{-55.1, -55.0}, {0.0, 0.0}};
+        // 1001: fail - below (-55.1) is incorrect
+        // 1002: success - equal to limit (-55.0) is correct
+        Double[][] data = {
+            {-55.1, -55.0}, // 1001 fails.
+            {0.0, 0.0},
+        };
 
         WeatherData testData = QualityControlTest.getWeatherDataForTests(weatherParameters, data);
         Integer[] result = QualityControlTest.getQCResultForTests(testData, "RT");
@@ -318,8 +326,12 @@ public class QualityControlTest {
         QualityControlTest.printTestName();
 
         Integer[] weatherParameters = {1001, 1002};
-        // above (50.1) is incorrect, but equal to limit (50.0) is correct
-        Double[][] data = {{50.1, 50.0}, {0.0, 0.0}};
+        // 1001: fail - above (50.1) is incorrect
+        // 1002: success - equal to limit (50.0) is correct
+        Double[][] data = {
+            {50.1, 50.0}, // 1001 fails.
+            {0.0, 0.0}
+        };
 
         WeatherData testData = QualityControlTest.getWeatherDataForTests(weatherParameters, data);
         Integer[] result = QualityControlTest.getQCResultForTests(testData, "RT");
@@ -338,7 +350,10 @@ public class QualityControlTest {
         QualityControlTest.printTestName();
 
         Integer[] weatherParameters = {1003, 1002, 1004};
-        Double[][] data = {{0.0, 1.0, 2.0}, {0.0, 0.0, 0.0}};
+        Double[][] data = {
+            {0.0, 1.0, 2.0}, // success: min <  mean <  max
+            {0.0, 0.0, 0.0}, // success: min <= mean <= max
+        };
 
         WeatherData testData = QualityControlTest.getWeatherDataForTests(weatherParameters, data);
         Integer[] result = QualityControlTest.getQCResultForTests(testData, "RT");
@@ -349,12 +364,14 @@ public class QualityControlTest {
     }
 
     @Test
-    public void testRTQCLogicalMinMaxIncorrect() throws Exception {
+    public void testRTQCLogicalMinMax() throws Exception {
         QualityControlTest.printTestName();
 
         Integer[] weatherParameters = {1003, 1004};
-        // min > max
-        Double[][] data = {{1.0, 0.0}, {0.0, 0.0}};
+        Double[][] data = {
+            {1.0, 0.0}, // fail:    min >  max
+            {0.0, 0.0}, // success: min <= max
+        };
 
         WeatherData testData = QualityControlTest.getWeatherDataForTests(weatherParameters, data);
         Integer[] result = QualityControlTest.getQCResultForTests(testData, "RT");
@@ -365,12 +382,14 @@ public class QualityControlTest {
     }
 
     @Test
-    public void testRTQCLogicalMinMeanIncorrect() throws Exception {
+    public void testRTQCLogicalMinMean() throws Exception {
         QualityControlTest.printTestName();
 
         Integer[] weatherParameters = {1003, 1002, 1004};
-        // min > mean
-        Double[][] data = {{1.0, 0.0, 2.0}, {0.0, 0.0, 0.0}};
+        Double[][] data = {
+            {1.0, 0.0, 2.0}, // fail:    min >  mean
+            {0.0, 0.0, 0.0}, // success: min <= mean
+        };
 
         WeatherData testData = QualityControlTest.getWeatherDataForTests(weatherParameters, data);
         Integer[] result = QualityControlTest.getQCResultForTests(testData, "RT");
@@ -381,12 +400,14 @@ public class QualityControlTest {
     }
 
     @Test
-    public void testRTQCLogicalMeanMaxIncorrect() throws Exception {
+    public void testRTQCLogicalMeanMax() throws Exception {
         QualityControlTest.printTestName();
 
         Integer[] weatherParameters = {1003, 1002, 1004};
-        // mean > max
-        Double[][] data = {{0.0, 1.0, 0.0}, {0.0, 0.0, 0.0}};
+        Double[][] data = {
+            {0.0, 1.0, 0.0}, // fail:    mean >  max
+            {0.0, 0.0, 0.0}, // success: mean <= max
+        };
 
         WeatherData testData = QualityControlTest.getWeatherDataForTests(weatherParameters, data);
         Integer[] result = QualityControlTest.getQCResultForTests(testData, "RT");
@@ -414,9 +435,16 @@ public class QualityControlTest {
         QualityControlTest.printTestName();
 
         Integer[] weatherParameters = {1001, 1002, 1003};
-        // Sanity check: values increasing, decreasing or staying same doesn't 
-        // break things, when inside step threshold.
-        Double[][] data = {{0.0, 1.0, 0.0}, {1.0, 0.0, 0.0}};
+        // Sanity check: values increasing, decreasing or staying same do not 
+        // break things (when inside step threshold).
+        //
+        // 1001: increases
+        // 1002: decreases
+        // 1003: stays same
+        Double[][] data = {
+            {0.0, 1.0, 0.0}, 
+            {1.0, 0.0, 0.0},
+        };
 
         WeatherData testData = QualityControlTest.getWeatherDataForTests(weatherParameters, data);
         Integer[] result = QualityControlTest.getQCResultForTests(testData, "NONRT");
@@ -467,7 +495,11 @@ public class QualityControlTest {
         // 1002: large negative failing step
         // 1003: minimal failing step
         // 1004: maximal non-failing step
-        Double[][] data = {{-55.0, 50.0, 0.0, 0.0}, {50.0, -55.0, 7.6, 7.5}, {50.0, -55.0, 7.6, 7.5}};
+        Double[][] data = {
+            {-55.0,  50.0, 0.0, 0.0}, 
+            { 50.0, -55.0, 7.6, 7.5}, // 1001, 1002 and 1003 fail.
+            { 50.0, -55.0, 7.6, 7.5},
+        };
 
         WeatherData testData = QualityControlTest.getWeatherDataForTests(weatherParameters, data);
         Integer[] result = QualityControlTest.getQCResultForTests(testData, "NONRT");
@@ -496,7 +528,11 @@ public class QualityControlTest {
         // 3002: large negative failing step
         // 3021: minimal failing step
         // 3022: maximal non-failing step
-        Double[][] data = {{0.0, 103.0, 100.0, 0.0}, {103.0, 0.0, 70.0, 30.0}, {103.0, 0.0, 70.0, 60.0}};
+        Double[][] data = {
+            {  0.0, 103.0, 100.0,  0.0}, 
+            {103.0,   0.0,  70.0, 30.0}, // 3001, 3002 and 3021 fail. 
+            {103.0,   0.0,  70.0, 60.0},
+        };
 
         WeatherData testData = QualityControlTest.getWeatherDataForTests(weatherParameters, data);
         Integer[] result = QualityControlTest.getQCResultForTests(testData, "NONRT");
@@ -505,7 +541,6 @@ public class QualityControlTest {
 
         assertArrayEquals(expResult,result);
     }
-
 
     // ------------------------
     // NON RT - FREEZE QC
@@ -537,7 +572,7 @@ public class QualityControlTest {
             {4.0, 3.0, 10.0}, // 5th
             {5.0, 2.0, 11.0}, // 6th
             {6.0, 1.0, 12.0}, // 7th
-            {7.0, 0.0, 11.0}, // 8th
+            {7.0, 0.0, 11.0}, // 8th - no freeze
         };
 
         WeatherData testData = QualityControlTest.getWeatherDataForTests(weatherParameters, data);
@@ -569,7 +604,7 @@ public class QualityControlTest {
             {0.0}, // 5th
             {0.0}, // 6th
             {0.0}, // 7th
-            {0.0}, // 8th
+            {0.0}, // 8th - still valid
         };
 
         WeatherData testData = QualityControlTest.getWeatherDataForTests(weatherParameters, data);
@@ -596,11 +631,14 @@ public class QualityControlTest {
             {0.0, 60.0, 100.0, 100.0}, // 4th
             {0.0, 60.0, 100.0, 100.0}, // 5th
             {0.0, 60.0, 100.0, 100.0}, // 6th - 1001 and 1101 fail
-            {0.0, 60.0, 100.0, 100.0}, // 7th
-            {0.0, 60.0, 100.0,  99.0}, // 8th - 3001 fails
+            {0.0, 60.0, 100.0, 100.0}, // 7th - 3002 ends: does not fail
+            {0.0, 60.0, 100.0,  99.0}, // 8th - 3001 ends: fails
         };
 
+        Integer oneHourInSeconds = 3600;
+
         WeatherData testData = QualityControlTest.getWeatherDataForTests(weatherParameters, data);
+        testData.setInterval(oneHourInSeconds);
         Integer[] result = QualityControlTest.getQCResultForTests(testData, "NONRT");
 
         Integer[] expResult = {64, 64, 64, 2};
@@ -619,8 +657,8 @@ public class QualityControlTest {
         // 4001: success - maximal non-failing freeze
         Double[][] data = {
             {0.0, 60.0, 100.0, 100.0}, // 1st
-            {0.0, 60.0, 100.0, 100.0}, // 2nd
-            {0.0, 60.0, 100.0,  99.0}, // 3rd 1001, 1101 and 3001 fail
+            {0.0, 60.0, 100.0, 100.0}, // 2nd - 3002 ends (does not fail) (4h freeze)
+            {0.0, 60.0, 100.0,  99.0}, // 3rd - 1001, 1101 and 3001 fail  (6h freeze)
             {0.0, 60.0,  99.0,  99.0}, // 4th
         };
 
