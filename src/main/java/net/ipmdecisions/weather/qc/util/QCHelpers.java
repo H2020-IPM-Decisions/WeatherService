@@ -69,9 +69,11 @@ public class QCHelpers {
      * 2. index of min value (in the list of weather parameters)
      * 3. index of max value (in the list of weather parameters)
      * 
-     * * If a min or max value is missing, null will be in its place in tuple.
-     * * If both min and max are missing, no tuple is returned for that mean 
-     *   value.
+     * * If a mean, min or max value is missing, null will be in its place in tuple.
+     * * If all mean, min and max are missing, no tuple is returned for that type.
+     * 
+     * A tuple is only returned, if at least two of the three aggregation types 
+     * (of the same group) are available in the data.
      * 
      * Returned tuples are ordered in ascending order of ids (= the values 
      * that the indices in tuples point to).
@@ -123,14 +125,18 @@ public class QCHelpers {
         Integer[][] initialTuples = new Integer[typeKeys.length][3];
         int iInitialTuples = 0;
 
+        // filter out tuples that have only one agg value.
         for (Integer type : typeKeys) {
             Integer[] aggs = types.get(type);
+            
+            int nValues = 0;
 
-            // mean needs to be given
-            if (aggs[0] == null) continue;
+            for (int i=0; i<aggs.length; i++) {
+                if (aggs[i] != null) nValues++;                
+            }
 
-            // either min or max needs to be given
-            if (aggs[1] == null && aggs[2] == null) continue;
+            // at least two of mean, min and max needs to be given
+            if (nValues <= 1) continue;
             
             initialTuples[iInitialTuples] = aggs;
             iInitialTuples++;

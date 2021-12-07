@@ -81,12 +81,13 @@ public class QCHelpersTest {
             3101,
             1112,
             1114,
+            4013,
             5001
         };
         
         Integer[][] result = QCHelpers.getLogicalTuplesFromWeatherParameters(weatherParameters);
 
-        Integer[][] expResult = {{0,1,2}, {11, null, 12}, {6, 7, null}};
+        Integer[][] expResult = {{0,1,2}, {11, null, 12}, {6, 7, null}, {null, 13, 9}};
         
         assertArrayEquals(expResult,result);
     }
