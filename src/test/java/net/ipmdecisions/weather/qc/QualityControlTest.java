@@ -422,7 +422,7 @@ public class QualityControlTest {
     // ------------------------
 
     @Test
-    public void testNoNRTQCStepSuccess() throws Exception {
+    public void testNonRTQCStepSuccess() throws Exception {
         /*
         "parameter":"Air temperature",
         "id_array":["1001","1002","1003","1004"],
@@ -455,7 +455,7 @@ public class QualityControlTest {
     }
 
     @Test
-    public void testNoNRTQCStepPrecipitationIsNotTested() throws Exception {
+    public void testNonRTQCStepPrecipitationIsNotTested() throws Exception {
         /*
         "parameter":"Precipitation",
         "id_array":["2001"],
@@ -478,7 +478,7 @@ public class QualityControlTest {
     }
     
     @Test
-    public void testNoNRTQCStepAbsolute() throws Exception {
+    public void testNonRTQCStepAbsolute() throws Exception {
         /*
         "parameter":"Air temperature",
         "id_array":["1001","1002","1003","1004"],
@@ -511,7 +511,7 @@ public class QualityControlTest {
 
     
     @Test
-    public void testNoNRTQCStepRelative() throws Exception {
+    public void testNonRTQCStepRelative() throws Exception {
         /*
         "parameter":"Relative humidty",
         "id_array":["3001","3002","3003","3004","3021","3022","3023","3024"],
@@ -547,7 +547,7 @@ public class QualityControlTest {
     // ------------------------
 
     @Test
-    public void testNoNRTQCFreezeSuccess() throws Exception {
+    public void testNonRTQCFreezeSuccess() throws Exception {
         /*
         "parameter":"Relative humidty",
         "id_array":["3001","3002","3003","3004","3021","3022","3023","3024"],
@@ -584,7 +584,7 @@ public class QualityControlTest {
     }
 
     @Test
-    public void testNoNRTQCFreezePrecipitationZeroCannotFail() throws Exception {
+    public void testNonRTQCFreezePrecipitationZeroCannotFail() throws Exception {
         /*
         "parameter":"Precipitation",
         "id_array":["2001"],
@@ -647,7 +647,7 @@ public class QualityControlTest {
     }
 
     @Test
-    public void testNoNRTQCFreezeFailsWithTwoHourDataInterval() throws Exception {
+    public void testNonRTQCFreezeFailsWithTwoHourDataInterval() throws Exception {
         QualityControlTest.printTestName();
 
         Integer[] weatherParameters = {1001, 1101, 3001, 3002};
