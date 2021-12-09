@@ -163,29 +163,29 @@ public class QCRTTester {
             Double[] mins = null;
             Double[] maxs = null;
 
-            if (tuple[0] != null) { 
+            if (tuple[0] != null) {
                 means = valuesById[tuple[0]];
             }
-            if (tuple[1] != null) { 
+            if (tuple[1] != null) {
                 mins = valuesById[tuple[1]];
             }
-            if (tuple[2] != null) { 
+            if (tuple[2] != null) {
                 maxs = valuesById[tuple[2]];
             }
 
             for (Integer i=0; i < weatherParameterValuesByTime.length; i++) {
                 // check that minValue <= maxValue
-                if (mins != null && maxs != null && mins[i] != null && maxs[i] != null  && mins[i] > maxs[i]) {
+                if (mins != null && maxs != null && mins[i] != null && maxs[i] != null && mins[i] > maxs[i]) {
                     qcResults[tuple[1]] = QCType.FAILED_LOGIC_TEST;
                     qcResults[tuple[2]] = QCType.FAILED_LOGIC_TEST;
                 }
                 // check that minValue <= mean
-                if (means != null && mins != null && mins[i] != null && means[i] != null  && mins[i] > means[i]) {
+                if (means != null && mins != null && mins[i] != null && means[i] != null && mins[i] > means[i]) {
                     qcResults[tuple[0]] = QCType.FAILED_LOGIC_TEST;
                     qcResults[tuple[1]] = QCType.FAILED_LOGIC_TEST;
                 }
                 // check that mean <= maxValue
-                if (means != null && maxs != null && means[i] != null && maxs[i] != null  && means[i] > maxs[i]) { 
+                if (means != null && maxs != null && means[i] != null && maxs[i] != null && means[i] > maxs[i]) { 
                     qcResults[tuple[0]] = QCType.FAILED_LOGIC_TEST;
                     qcResults[tuple[2]] = QCType.FAILED_LOGIC_TEST;
                 }
