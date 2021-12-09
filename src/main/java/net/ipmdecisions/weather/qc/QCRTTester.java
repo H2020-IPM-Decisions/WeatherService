@@ -99,13 +99,16 @@ public class QCRTTester {
         double upperLimit = lowerAndUpperLimits.getDouble("upper_limit");
 
         //Weather data parameter value placeholder
-        double parameterValue;
+        Double parameterValue;
 
         //Weather parameter value iterator loop
         for(int i=0;i<weatherParameterValues.length;i++) 
         {
             //Weather data parameter value as double
             parameterValue = weatherParameterValues[i];
+            
+            if (parameterValue == null) continue;
+            
             //Interval test. Weather data parameter values higher than upper limit
             //or lower than lower limit causes abort with exit code 8 (QC pass false)
             if (parameterValue > upperLimit || parameterValue < lowerLimit) {

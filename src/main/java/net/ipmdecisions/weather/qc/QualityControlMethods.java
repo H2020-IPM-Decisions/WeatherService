@@ -144,10 +144,8 @@ public class QualityControlMethods {
 
                 testResult = testResult | QCRTTester.getPrequalificationTestResult(weatherParameterValues, weatherParameter);
 
-                // We can only do other tests if prequalification test didn't fail, as value needs to be a number.
-                if (testResult == QCType.NO_QC) {
-                    testResult = testResult | QCRTTester.getIntervalTestResult(weatherParameterValues, weatherParameter);
-                }
+                testResult = testResult | QCRTTester.getIntervalTestResult(weatherParameterValues, weatherParameter);
+
                 //Put the final test result into qcResult
                 //getFinalRestResult(int) returns 2 if the final result remains 0
                 qcResult[index] = testResult;
