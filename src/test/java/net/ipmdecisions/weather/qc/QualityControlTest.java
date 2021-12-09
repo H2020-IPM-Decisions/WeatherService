@@ -235,9 +235,11 @@ public class QualityControlTest {
      * Check that strings in data are marked to fail prequalification QC for
      * real time data.
      * 
-     * @todo Both the test and the check for strings need to be done differently.
+     * @todo Both the test and the check for strings need to be done differently if done at all.
+     * Currently this test is not needed.
      * @throws Exception 
      */
+    /*
     @Test
     public void testRTQCPrequalificationString() throws Exception {
         QualityControlTest.printTestName();
@@ -253,6 +255,7 @@ public class QualityControlTest {
 
         assertArrayEquals(expResult,result);
     }
+    */
 
     // ------------------------
     // RT - INTERVAL QC
