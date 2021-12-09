@@ -85,7 +85,7 @@ public class QualityControlTest {
         List<LocationWeatherData> lwd = wd.getLocationWeatherData();
         Integer[] result = lwd.get(0).getQC();
         
-        Integer[] expResult = {2,8,16,24,2,2,8,2,8,4,8,2,8}; // need to be changed to correct bitmap values for failure on all tests
+        Integer[] expResult = {16,24,16,24,2,16,8,2,8,4,8,2,8}; // need to be changed to correct bitmap values for failure on all tests
         
         assertEquals(expResult,result);
     }
