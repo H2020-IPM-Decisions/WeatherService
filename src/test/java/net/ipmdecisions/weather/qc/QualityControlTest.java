@@ -403,16 +403,16 @@ public class QualityControlTest {
     public void testRTQCLogicalMeanMax() throws Exception {
         QualityControlTest.printTestName();
 
-        Integer[] weatherParameters = {1003, 1002, 1004};
+        Integer[] weatherParameters = {1003, 1002, 1004, 3022, 3023, 3024};
         Double[][] data = {
-            {0.0, 1.0, 0.0}, // fail:    mean >  max
-            {0.0, 0.0, 0.0}, // success: mean <= max
+            {0.0, 1.0, 0.0,                     // fail: mean >  max
+                            103.0, 79.7, 88.0}, // fail: mean >  max
         };
 
         WeatherData testData = QualityControlTest.getWeatherDataForTests(weatherParameters, data);
         Integer[] result = QualityControlTest.getQCResultForTests(testData, "RT");
 
-        Integer[] expResult = {2, 16, 16};
+        Integer[] expResult = {2, 16, 16, 16, 2, 16};
 
         assertArrayEquals(expResult,result);
     }
