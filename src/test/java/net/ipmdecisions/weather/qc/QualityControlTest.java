@@ -476,6 +476,34 @@ public class QualityControlTest {
 
         assertArrayEquals(expResult,result);
     }
+
+    @Test
+    public void testNonRTQCStepLeafWetnessIsNotTested() throws Exception {
+        /*
+        "parameter":"Leaf wetness",
+        "id_array":["3101","3102","3103"],
+        "lower_limit":0,
+        "upper_limit":60
+        */
+        
+        QualityControlTest.printTestName();
+
+        Integer[] weatherParameters = {3101, 3102, 3103};
+        // No step tests are done for leaf wetness, even if they do maximum jumps.
+        Double[][] data = {
+            { 0.0,  0.0,  0.0}, 
+            {60.0, 60.0, 60.0},
+            { 0.0,  0.0,  0.0}, 
+            {60.0, 60.0, 60.0},
+        };
+
+        WeatherData testData = QualityControlTest.getWeatherDataForTests(weatherParameters, data);
+        Integer[] result = QualityControlTest.getQCResultForTests(testData, "NONRT");
+
+        Integer[] expResult = {2, 2, 2};
+
+        assertArrayEquals(expResult,result);
+    }
     
     @Test
     public void testNonRTQCStepAbsolute() throws Exception {
@@ -491,10 +519,10 @@ public class QualityControlTest {
         QualityControlTest.printTestName();
 
         Integer[] weatherParameters = {1001, 1002, 1003, 1004};
-        // 1001: large positive failing step
-        // 1002: large negative failing step
-        // 1003: minimal failing step
-        // 1004: maximal non-failing step
+        // 1001: fail - large positive failing step
+        // 1002: fail - large negative failing step
+        // 1003: fail - minimal failing step
+        // 1004: valid - maximal non-failing step
         Double[][] data = {
             {-55.0,  50.0, 0.0, 0.0}, 
             { 50.0, -55.0, 7.6, 7.5}, // 1001, 1002 and 1003 fail.
@@ -523,21 +551,22 @@ public class QualityControlTest {
         
         QualityControlTest.printTestName();
 
-        Integer[] weatherParameters = {3001, 3002, 3021, 3031};
-        // 3001: large positive failing step
-        // 3002: large negative failing step
-        // 3021: minimal failing step
-        // 3022: maximal non-failing step
+        Integer[] weatherParameters = {3001, 3002, 3021, 3022, 3023};
+        // 3001: fail - large positive failing step
+        // 3002: fail - large negative failing step
+        // 3021: fail - minimal failing step
+        // 3022: fail - incorrect relative jump
+        // 3023: valid - maximal non-failing step
         Double[][] data = {
-            {  0.0, 103.0, 100.0,  0.0}, 
-            {103.0,   0.0,  70.0, 30.0}, // 3001, 3002 and 3021 fail. 
-            {103.0,   0.0,  70.0, 60.0},
+            {  0.0, 103.0, 100.0,  0.0, 100.0}, 
+            {103.0,   0.0,  70.0, 30.0,  70.1}, // 3001, 3002 and 3021 fail. 
+            {103.0,   0.0,  70.0, 60.0,  60.0},
         };
 
         WeatherData testData = QualityControlTest.getWeatherDataForTests(weatherParameters, data);
         Integer[] result = QualityControlTest.getQCResultForTests(testData, "NONRT");
 
-        Integer[] expResult = {32, 32, 32, 2};
+        Integer[] expResult = {32, 32, 32, 32, 2};
 
         assertArrayEquals(expResult,result);
     }
@@ -616,36 +645,67 @@ public class QualityControlTest {
     }
     
     @Test
-    public void testNoNRTQCFreezeFailsWithHourlyDataInterval() throws Exception {        
+    public void testNonRTQCFreezeLeafWetnessCannotFail() throws Exception {
+        /*
+        "parameter":"Leaf wetness",
+        "id_array":["3101","3102","3103"],
+        "lower_limit":0,
+        "upper_limit":60
+        */
+        
         QualityControlTest.printTestName();
 
-        Integer[] weatherParameters = {1001, 1101, 3001, 3002};
-        // 1001: fail - all zeroes (only precipitation should allow 0.0 freezing).
-        // 1101: fail - all random number
-        // 3001: fail - minimal failing freeze
-        // 4001: success - maximal non-failing freeze
+        Integer[] weatherParameters = {3101, 3102, 3103};
+        // Leaf wetness is a special case that cannot fail freeze QC.
         Double[][] data = {
-            {0.0, 60.0,  99.0,  99.0}, // 1st - 1001 and 1101 start freeze
-            {0.0, 60.0, 100.0, 100.0}, // 2nd - 3001 and 3002 start freeze
-            {0.0, 60.0, 100.0, 100.0}, // 3rd
-            {0.0, 60.0, 100.0, 100.0}, // 4th
-            {0.0, 60.0, 100.0, 100.0}, // 5th
-            {0.0, 60.0, 100.0, 100.0}, // 6th - 1001 and 1101 fail
-            {0.0, 60.0, 100.0, 100.0}, // 7th - 3002 ends: does not fail
-            {0.0, 60.0, 100.0,  99.0}, // 8th - 3001 ends: fails
+            {0.0, 10.0, 110.0}, // 1st
+            {0.0, 10.0, 110.0}, // 2nd
+            {0.0, 10.0, 110.0}, // 3rd
+            {0.0, 10.0, 110.0}, // 4th
+            {0.0, 10.0, 110.0}, // 5th
+            {0.0, 10.0, 110.0}, // 6th
+            {0.0, 10.0, 110.0}, // 7th
+            {0.0, 10.0, 110.0}, // 8th - still valid
         };
 
-        Integer oneHourInSeconds = 3600;
-
         WeatherData testData = QualityControlTest.getWeatherDataForTests(weatherParameters, data);
-        testData.setInterval(oneHourInSeconds);
         Integer[] result = QualityControlTest.getQCResultForTests(testData, "NONRT");
 
-        Integer[] expResult = {64, 64, 64, 2};
+        Integer[] expResult = {2,2,2};
 
         assertArrayEquals(expResult,result);
     }
 
+    @Test
+    public void testNonRTQCFreezeFails() throws Exception {
+        QualityControlTest.printTestName();
+
+        Integer[] weatherParameters = {1001, 1101, 2001, 3001, 3002};
+        // 1001: fail - zeroes (only precipitation should allow 0.0 freezing).
+        // 1101: fail - random number
+        // 2001: fail - precipitation will still fail on values other than 0.0.
+        // 3001: fail - minimal failing freeze (not starting from first cell)
+        // 3002: success - maximal non-failing freeze
+        Double[][] data = {
+            {0.0, 60.0, 60.0,  99.0,  99.0}, // 1st - 1001, 1101 and 2001 start freeze.
+            {0.0, 60.0, 60.0,  99.0,  99.0}, // 2nd
+            {0.0, 60.0, 60.0, 100.0, 100.0}, // 3rd - 3001 and 3002 start freeze.
+            {0.0, 60.0, 60.0, 100.0, 100.0}, // 4th
+            {0.0, 60.0, 60.0, 100.0, 100.0}, // 5th
+            {0.0, 60.0, 60.0, 100.0, 100.0}, // 6th - 1001, 1101 and 2001 fail.
+            {0.1, 60.0, 60.0, 100.0, 100.0}, // 7th - 3002 ends: does not fail.
+            {0.1, 60.0, 60.0, 100.0,  99.0}, // 8th - 3001 ends: fails.
+        };
+
+        WeatherData testData = QualityControlTest.getWeatherDataForTests(weatherParameters, data);
+        Integer[] result = QualityControlTest.getQCResultForTests(testData, "NONRT");
+
+        Integer[] expResult = {64, 64, 64, 64, 2};
+
+        assertArrayEquals(expResult,result);
+    }
+
+    /*
     @Test
     public void testNonRTQCFreezeFailsWithTwoHourDataInterval() throws Exception {
         QualityControlTest.printTestName();
@@ -672,4 +732,5 @@ public class QualityControlTest {
 
         assertArrayEquals(expResult,result);
     }
+    */
 }

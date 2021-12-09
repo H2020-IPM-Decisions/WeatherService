@@ -108,7 +108,8 @@ public class QCHelpersTest {
             4004,
             3101,
             1112,
-            5001
+            5001,
+            3022,
         };
         
         Integer[] result = QCHelpers.filterWeatherParametersBasedOnQCType(weatherParameters, QCTestType.LOGICAL);
@@ -125,6 +126,7 @@ public class QCHelpersTest {
             3101,
             1112,
             null,
+            3022,
         };
         
         assertArrayEquals(expResult, result);

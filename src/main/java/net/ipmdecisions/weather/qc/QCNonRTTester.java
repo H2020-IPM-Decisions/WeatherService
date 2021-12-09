@@ -238,14 +238,14 @@ public class QCNonRTTester {
             // Treat the first value and the case of differing values the same way: reset comparison.
             if (previousValue == null || Double.compare(previousValue, value) != 0) {
                 previousValue = value;
-                count = 0;
+                count = 1;
                 continue;
             }
 
             count++;
 
             // special case: precipitation with 0.0mm cannot fail
-            if (Double.compare(value, 0.0) == 0 && QCHelpers.isWeatherParameterPrecipitation(weatherParameter)) {
+            if (QCHelpers.isWeatherParameterPrecipitation(weatherParameter) && Double.compare(value, 0.0) == 0) {
                 continue;
             }
 

@@ -176,14 +176,17 @@ public class QCHelpers {
             // all weather parameters are checked for step qc except:
             // * precipitation 2000
             case STEP: {
-                Pattern pattern = Pattern.compile("^(2\\d\\d\\d)$");
+                Pattern pattern = Pattern.compile("^(31\\d\\d)|(2\\d\\d\\d)$");
                 Matcher m = pattern.matcher("" + weatherParameterId);
                 return !m.matches();
             }
 
-            // all weather parameters are checked for interval
+            // all weather parameters are checked for freeze qc except:
+            // * leaf wetness 3100
             case FREEZE: {
-                return true;
+                Pattern pattern = Pattern.compile("^(31\\d\\d)$");
+                Matcher m = pattern.matcher("" + weatherParameterId);
+                return !m.matches();
             }
 
             // other qctypes are expected to be handled for all weather 
@@ -207,7 +210,6 @@ public class QCHelpers {
         Matcher m = pattern.matcher("" + weatherParameter);
         return m.matches();
     }
-
     
     /**
      * Remove from array of weather parameters the weather parameters that are
