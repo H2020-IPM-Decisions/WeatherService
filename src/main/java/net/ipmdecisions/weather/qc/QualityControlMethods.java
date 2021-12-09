@@ -53,60 +53,102 @@ public class QualityControlMethods {
     public QualityControlMethods() {
         
     }
-    
-    public WeatherData getQC(String inboundWeatherData, String qcType) throws JsonMappingException, JsonProcessingException
-    {
-    	 WeatherData weatherData = WeatherData.getInstanceFromString(inboundWeatherData);
-		 return this.getQC(weatherData, qcType);
-    	
+
+    /**
+     * Get Quality Control information for data given as a string.
+     * 
+     * Calls internally QC tests for RT and NONRT data.
+     * 
+     * @param inboundWeatherData
+     * @return
+     * @throws JsonMappingException
+     * @throws JsonProcessingException 
+     */
+    public WeatherData getQC(String inboundWeatherData) throws JsonMappingException, JsonProcessingException {
+        WeatherData weatherData = WeatherData.getInstanceFromString(inboundWeatherData);
+        this.getQC(weatherData, null);
+
+        return weatherData;
+    }
+
+    public WeatherData getQC(String inboundWeatherData, String qcType) throws JsonMappingException, JsonProcessingException {
+        WeatherData weatherData = WeatherData.getInstanceFromString(inboundWeatherData);
+        return this.getQC(weatherData, qcType);
     }
     
     /**
-     * Access point for quality control methods being the only public method in the class
+     * Get Quality Control information for data given as an instance of WeatherData.
+     * 
+     * @param weatherData Weather data
+     * @return Inbound weather data added with quality control JSON array in each as String
+     * locationWeatherData object
+     */
+    public WeatherData getQC(WeatherData weatherData) {
+        this.getQC(weatherData, null);
+
+        return weatherData;
+    }
+
+    /**
+     * Access point for quality control methods being the only public method in the class.
+     * 
      * @param inboundWeatherData Weather data as JSON Object as String
      * @param qcType Quality control type 
      * @return Inbound weather data added with quality control JSON array in each as String
      * locationWeatherData object
      */
     public WeatherData getQC(WeatherData weatherData, String qcType) {
-        
         //Location weather data array from inbound weather data
         List<LocationWeatherData> locationWeatherData = weatherData.getLocationWeatherData();
         //Location weather data object def
         LocationWeatherData locationWeatherDataObject;
         //Weather parameters as JSON array from inpound weather data
         Integer[] weatherParameters = weatherData.getWeatherParameters();
-        
-        
+
         //Iterate through location weather data array
         for (int i=0; i<locationWeatherData.size(); i++) {
             //Location weather data object into variable
             locationWeatherDataObject = locationWeatherData.get(i);
+            
+            Integer[] qc = locationWeatherDataObject.getQC();
+            
             //Decision tree based on data type (either real time or non-real time)
             switch(qcType) {
                 //Real time weather data QC
-                case "RT":
-                	// TODO: Check that this object is changed in the WeatherData "mother object"
-                	locationWeatherDataObject.setQC(this.getRtQC(weatherParameters, locationWeatherDataObject));
-                break;
+                case "RT": {
+                    // TODO: Check that this object is changed in the WeatherData "mother object"
+                    qc = this.getRtQC(weatherParameters, locationWeatherDataObject, qc);
+                    break;
+                }
                 //Non-real time weather data QC
-                case "NONRT":
-                     //Non-real time QC result to qcResult JSONArray
-                	locationWeatherDataObject.setQC(getNonRtQC(weatherParameters, locationWeatherDataObject));
-                break;
-                
+                case "NONRT": {
+                    qc = this.getNonRtQC(weatherParameters, locationWeatherDataObject, qc);
+                    break;
+                }
+                default: {
+                    qc = this.getRtQC(weatherParameters, locationWeatherDataObject, qc);
+                    qc = this.getNonRtQC(weatherParameters, locationWeatherDataObject, qc);                    
+                    break;
+                }
             }
-        
+            
+            for (Integer j=0; j<qc.length; j++) {
+                // If none of the tests have failed, we can declare the data as valid.
+                if (qc[j] == QCType.NO_QC) {
+                    qc[j] = QCType.OK_FROM_IPM_DECISIONS;
+                }
+            }
+
+            locationWeatherDataObject.setQC(qc);
         }
-        
+
         return weatherData;
-        
     }
-    
-    
+
     /**
      * Real time quality control main method. The real time QC includes interval test. 
      * The test result values are combined bitmapped integer values.
+     * 
      * @param data USED -> Location weather data object weather parameter value array
      * @param interval Not used but implemented for future use. Sampling interval value
      * @param timeStart Not used but implemented for future use. Sampling start datetime 
@@ -117,14 +159,10 @@ public class QualityControlMethods {
      * @param altitude Not used but implemented for future use. Geolocation variables
      * @return QC result as JSONArray
      */
-    private Integer[] getRtQC(Integer[] weatherParameters, LocationWeatherData locationWeatherData) {
-
+    private Integer[] getRtQC(Integer[] weatherParameters, LocationWeatherData locationWeatherData, Integer[] qcResult) {
         //Weather parameter values in specific index as List
         //Basically jsonArray[index] -> List
         Double[] weatherParameterValues;
-
-        //Quality control result as JSONArray
-        Integer[] qcResult = new Integer[weatherParameters.length];
         
         //Quality control test result
         int testResult;
@@ -134,9 +172,8 @@ public class QualityControlMethods {
         
         //Iterate the weather parameter key array and couple weather data parameter keys and values
         for (int index=0; index<weatherParameters.length; index++) {
-            try
-            {
-                testResult = QCType.NO_QC;
+            try {
+                testResult = qcResult[index];
                 //Weather parameter from weather parameter array
                 weatherParameter = weatherParameters[index];
                 //Index pointed weather data parameter values into List
@@ -147,24 +184,19 @@ public class QualityControlMethods {
                 testResult = testResult | QCRTTester.getIntervalTestResult(weatherParameterValues, weatherParameter);
 
                 //Put the final test result into qcResult
-                //getFinalRestResult(int) returns 2 if the final result remains 0
                 qcResult[index] = testResult;
             }
             catch(LocationWeatherDataException ex)
             {
-                    // Pass
+                // Pass
+                
             }
         }
         
         Integer[] qcResultLogical = QCRTTester.testForLogicalErrors(locationWeatherData.getData(), weatherParameters, qcResult);
-        
+
         for (Integer i=0; i<qcResult.length; i++) {
             qcResult[i] = qcResult[i] | qcResultLogical[i];
-            
-            // If none of the tests have failed, we can declare the data as valid.
-            if (qcResult[i] == QCType.NO_QC) {
-                qcResult[i] = QCType.OK_FROM_IPM_DECISIONS;
-            }
         }
         
         return qcResult;
@@ -183,14 +215,10 @@ public class QualityControlMethods {
      * @param altitude Not used but implemented for future use. Geolocation variables
      * @return QC result as JSONArray
      */
-    private Integer[] getNonRtQC(Integer[] weatherParameters, LocationWeatherData locationWeatherData) {
-        
+    private Integer[] getNonRtQC(Integer[] weatherParameters, LocationWeatherData locationWeatherData, Integer[] qcResult) {
         //Weather parameter values in specific index as List
         //Basically jsonArray[index] -> List
         Double[] weatherParameterValues;
-        
-        //Quality control result as JSONArray
-        Integer[] qcResult = new Integer[weatherParameters.length];
         
         //Quality control test result
         int testResult;
@@ -202,7 +230,7 @@ public class QualityControlMethods {
         for (int index=0; index<weatherParameters.length; index++) {
         	try
         	{
-                    testResult = QCType.NO_QC;
+                    testResult = qcResult[index];
 	            //Weather parameter from weather parameter array
 	            weatherParameter = weatherParameters[index];
 	            //Index pointed weather data parameter values into List
@@ -217,11 +245,6 @@ public class QualityControlMethods {
                     if (QCHelpers.isWeatherParameterHandledByQCTest(weatherParameter, QCTestType.STEP)) {
                         testResult = testResult | QCNonRTTester.getStepTestResult(weatherParameterValues, weatherParameter);
                     }
-
-	            //Put the final test result into qcResult
-	            //getFinalRestResult(int) returns 2 if the final result remains 0
-                    
-                    if (testResult == 0) testResult = QCType.OK_FROM_IPM_DECISIONS;
                     
 	            qcResult[index] = testResult;
         	}
