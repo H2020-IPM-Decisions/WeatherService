@@ -237,7 +237,7 @@ public class QualityControlMethods {
 	            weatherParameterValues = locationWeatherData.getColumn(index);
 
 	            //Freeze test
-                    if (QCHelpers.isWeatherParameterHandledByQCTest(weatherParameter, QCTestType.STEP)) {
+                    if (QCHelpers.isWeatherParameterHandledByQCTest(weatherParameter, QCTestType.FREEZE)) {
                         testResult = testResult | QCNonRTTester.testForFreezeErrors(weatherParameterValues, weatherParameter);
                     }
 
