@@ -173,7 +173,7 @@ public class QCRTTester {
                 maxs = valuesById[tuple[2]];
             }
 
-            for (Integer i=0; i < parameterTuples.length; i++) {
+            for (Integer i=0; i < weatherParameterValuesByTime.length; i++) {
                 // check that minValue <= maxValue
                 if (mins != null && maxs != null && mins[i] != null && maxs[i] != null  && mins[i] > maxs[i]) {
                     qcResults[tuple[1]] = QCType.FAILED_LOGIC_TEST;
