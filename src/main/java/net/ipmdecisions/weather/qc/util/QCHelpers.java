@@ -1,14 +1,18 @@
 package net.ipmdecisions.weather.qc.util;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import net.ipmdecisions.weather.qc.util.QCTestType;
+import net.ipmdecisions.weather.qc.util.QCWeatherParameter;
+import net.ipmdecisions.weather.controller.MetaDataBean;
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Stream;
+import net.ipmdecisions.weather.entity.WeatherParameter;
 
 public class QCHelpers {
     
@@ -48,6 +52,33 @@ public class QCHelpers {
     }
     
     /**
+     * Given weather parameter, gets its group and aggregation type.
+     * 
+     * @param weatherParameter
+     * @return Array containing group and aggregation type for given weather parameter.
+     */
+    public static QCWeatherParameter getQCWeatherParameter(Integer weatherParameter) {                    
+        QCWeatherParameter qcwp = new QCWeatherParameter();
+
+        if (weatherParameter == null) return qcwp;
+
+        // get WeatherParameter instance for getting aggregation type.
+        WeatherParameter wp = null;
+
+        try {
+            wp = new MetaDataBean().getWeatherParameter(weatherParameter);                
+        } catch(IOException e) {
+            // pass
+        }
+
+        if (wp != null) {
+            qcwp.setWeatherParameter(wp);
+        }
+
+        return qcwp;
+    }
+    
+    /**
      * Pick aggregate values of a same type from a given list of weather 
      * parameters.
      * 
@@ -81,7 +112,7 @@ public class QCHelpers {
      * @param weatherParameters
      * @return a list of aggregate tuples
      */
-    public static Integer[][] getLogicalTuplesFromWeatherParameters(Integer[] weatherParameters) {
+    public static Integer[][] getLogicalTuplesFromWeatherParameters(Integer[] weatherParameters) {        
         // Key is type of weather parameter (its three first numbers - 123x), 
         // value is an array of 3 indices (mean, min, max - in that order),
         // where indices point to that values location in the 
@@ -94,16 +125,18 @@ public class QCHelpers {
             // is removed from the list, as it doesn't need logical QC.
             if (weatherParameters[i] == null) continue;
 
-            // Get the three first numbers (123) of the four number (1234) 
-            // weather parameter, indicating the type of value.
-            Integer type = weatherParameters[i] / 10;
-            // Get the last number (4) of the four number (1234) weather 
-            // parameter, indicating the aggregation type.
-            Integer aggregationType = weatherParameters[i] % 10;
+            QCWeatherParameter wp = QCHelpers.getQCWeatherParameter(weatherParameters[i]);
             
-            // We are only interested in aggregation types 2, 3 and 4 (mean, 
-            // min and max).
-            if (aggregationType < 2 || aggregationType > 4) continue;
+            Integer type = wp.getType();
+            QCWeatherParameterAggregationType aggregationType = wp.getAggregationType();
+            
+            if (aggregationType == null) continue;
+
+            // We are only interested in aggregation types mean, min and max.
+            if (   aggregationType != QCWeatherParameterAggregationType.MEAN
+                && aggregationType != QCWeatherParameterAggregationType.MINIMUM
+                && aggregationType != QCWeatherParameterAggregationType.MAXIMUM
+            ) continue;
 
             Integer aggs[];
             if (types.containsKey(type)) {
@@ -112,9 +145,14 @@ public class QCHelpers {
                 aggs = new Integer[3];
             }
 
-            // Aggregation types start from 2, while arrays start from 0, so we
-            // remove padding of 2.
-            aggs[aggregationType - 2] = i;
+            if (aggregationType == QCWeatherParameterAggregationType.MEAN) {
+                aggs[0] = i;
+            } else if (aggregationType == QCWeatherParameterAggregationType.MINIMUM) {
+                aggs[1] = i;
+            } else if (aggregationType == QCWeatherParameterAggregationType.MAXIMUM) {
+                aggs[2] = i;
+            }
+
             types.put(type, aggs);
         }
 

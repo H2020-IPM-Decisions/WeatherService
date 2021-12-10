@@ -7,10 +7,13 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import net.ipmdecisions.weather.entity.LocationWeatherData;
 
 import net.ipmdecisions.weather.entity.WeatherData;
+import net.ipmdecisions.weather.entity.WeatherParameter;
 import net.ipmdecisions.weather.util.FileUtils;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -29,7 +32,7 @@ public class QCHelpersTest {
     @AfterAll
     public static void tearDownClass() {
     }
-    
+
     @BeforeEach
     public void setUp() {
     }
@@ -40,9 +43,9 @@ public class QCHelpersTest {
     
     @Test
     public void testSwitchingRowsAndColumnsOfLocationWeatherData() throws Exception{
-        
+
         System.out.println("testSwitchingRowsAndColumnsOfLocationWeatherData");
-        
+
         Double[][] data = {
             {1.0, 2.0, 3.0},
             {4.0, 5.0, 6.0},
@@ -50,9 +53,9 @@ public class QCHelpersTest {
             {10.0, 11.0, 12.0},
             {13.0, 14.0, 15.0}
         };
-        
+
         Double[][] result = QCHelpers.switchRowsAndColumnsForLocationWeatherData(data, 3);
-        
+
         Double[][] expResult = {
             {1.0, 4.0, 7.0, 10.0, 13.0},
             {2.0, 5.0, 8.0, 11.0, 14.0},
@@ -63,31 +66,72 @@ public class QCHelpersTest {
     }
     
     @Test
+    public void testGettingWeatherParameterTypeAndAggType() throws Exception{
+        
+        System.out.println("testGettingWeatherParameterTypeAndAggType");
+        
+        Integer[] weatherParameters = {
+            1002,     // mean
+            4002,     // avg
+            4005,     // min
+            null,     // null
+            5001,     // sum
+            99999999, // null
+        };
+        
+        QCWeatherParameter[] result = new ArrayList<Integer>(Arrays.asList(weatherParameters))
+            .stream()
+            .map((Integer weatherParameter) -> {
+                return QCHelpers.getQCWeatherParameter(weatherParameter);
+            }
+        ).toArray(QCWeatherParameter[]::new);
+
+        QCWeatherParameter[] expResult = {
+            new QCWeatherParameter(100, QCWeatherParameterAggregationType.MEAN),
+            new QCWeatherParameter(400, QCWeatherParameterAggregationType.AVERAGE),
+            new QCWeatherParameter(400, QCWeatherParameterAggregationType.MINIMUM),
+            new QCWeatherParameter(null, null),
+            new QCWeatherParameter(500, QCWeatherParameterAggregationType.SUM),
+            new QCWeatherParameter(null, null),
+        };
+
+        for (int i=0; i<weatherParameters.length; i++) {
+            assertEquals(expResult[i].getType(), result[i].getType());
+            assertEquals(expResult[i].getAggregationType(), result[i].getAggregationType());
+        }
+    }
+
+    @Test
     public void testLogicalWeatherParameterPicking() throws Exception{
         
         System.out.println("testLogicalWeatherParameterPicking");
         
         Integer[] weatherParameters = {
-            1002,
-            1003,
-            1004,
-            3002,
-            2001,
-            4005,
-            4002,
-            4003,
-            null,
-            4014,
-            3101,
-            1112,
-            1114,
-            4013,
-            5001
+            1002, // mean +
+            1003, // min  +
+            1004, // max  +
+            3002, // mean -
+            2001, //
+            4005, // min  +
+            4002, //
+            4003, // mean +
+            null, //
+            4014, // max  +
+            3101, //
+            1023, // min  +
+            1024, // max  +
+            4013, // mean +
+            5001, // 
         };
         
         Integer[][] result = QCHelpers.getLogicalTuplesFromWeatherParameters(weatherParameters);
 
-        Integer[][] expResult = {{0,1,2}, {11, null, 12}, {6, 7, null}, {null, 13, 9}};
+        Integer[][] expResult = {
+            {   0,    1,    2},
+            {null,   11,   12},
+            {   7,    5, null},
+            {  13, null,    9},
+        };
         
         assertArrayEquals(expResult,result);
     }
