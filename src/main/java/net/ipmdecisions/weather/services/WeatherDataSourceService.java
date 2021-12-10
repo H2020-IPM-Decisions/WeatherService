@@ -29,6 +29,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -134,7 +135,15 @@ public class WeatherDataSourceService {
         GISUtils gisUtils = new GISUtils();
         List<WeatherDataSource> retVal = this.getAllWeatherDataSources().stream().filter(dataSource->{
             // Get all geometries in current weather data source
-            String dataSourceGeoJsonStr = dataSource.getSpatial().getGeoJSON();
+            String dataSourceGeoJsonStr = ""; 
+            try
+            {
+            	dataSourceGeoJsonStr = dataSource.getSpatial().getGeoJSON();
+
+            }
+            catch(NullPointerException ex)
+            { /* Pass */ }
+            
             // We do a brute force search for the string "Sphere" in the geoJSON string
             // to bypass any issues in deserialization of that custom type, which is 
             // short for creating a polygon that covers the entire globe
@@ -142,10 +151,33 @@ public class WeatherDataSourceService {
             {
                 return true;
             }
-            FeatureCollection dataSourceFeatures = (FeatureCollection) GeoJSONFactory.create(dataSourceGeoJsonStr);
+            
+            // Get all geometries for current Weather data source
+            // Country boundaries
+            List<Feature> dataSourceFeatures = new ArrayList<>();
+            try
+            {
+            	dataSourceFeatures = Arrays.asList(gisUtils.getCountryBoundaries(new HashSet<>(Arrays.asList(
+	                    dataSource.getSpatial().getCountries()
+	            ))).getFeatures());
+            }
+            catch(NullPointerException ex)
+            { /* Pass */ }
+            
+            try
+            {
+            	if(!dataSourceGeoJsonStr.isBlank())
+            	{
+            		dataSourceFeatures.addAll(Arrays.asList(
+            				((FeatureCollection) GeoJSONFactory.create(dataSourceGeoJsonStr)).getFeatures()
+            				));
+            	}
+            }
+            catch(RuntimeException ex) {}
+            //FeatureCollection dataSourceFeatures = (FeatureCollection) GeoJSONFactory.create(dataSourceGeoJsonStr);
             // Match with all geometries in request. If found, add data source to
             // list of matching data sources
-            List<Geometry> dataSourceGeometries = Arrays.asList(dataSourceFeatures.getFeatures()).stream()
+            List<Geometry> dataSourceGeometries = dataSourceFeatures.stream()
             .map(f->{ return reader.read(f.getGeometry()); })
             .filter(dataSourceGeometry->{
                 Boolean matching = false;

@@ -46,12 +46,15 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import net.ipmdecisions.weather.datasourceadapters.DavisFruitwebAdapter;
+import net.ipmdecisions.weather.datasourceadapters.MetIrelandWeatherForecastAdapter;
 import net.ipmdecisions.weather.datasourceadapters.MeteobotAPIAdapter;
 import net.ipmdecisions.weather.datasourceadapters.MetosAPIAdapter;
 import net.ipmdecisions.weather.datasourceadapters.ParseWeatherDataException;
+import net.ipmdecisions.weather.datasourceadapters.SLULantMetAdapter;
 import net.ipmdecisions.weather.datasourceadapters.YrWeatherForecastAdapter;
 import net.ipmdecisions.weather.datasourceadapters.finnishmeteorologicalinstitute.FinnishMeteorologicalInstituteAdapter;
 import net.ipmdecisions.weather.entity.WeatherData;
+import net.ipmdecisions.weather.entity.WeatherDataSourceException;
 import net.ipmdecisions.weather.util.WeatherDataUtil;
 import org.jboss.resteasy.annotations.GZIP;
 import java.time.format.DateTimeFormatter;
@@ -112,6 +115,55 @@ public class WeatherAdapterService {
         try 
         {
             WeatherData theData = new YrWeatherForecastAdapter().getWeatherForecasts(longitude, latitude, altitude);
+            if(ipmDecisionsParameters != null && ipmDecisionsParameters.size() > 0)
+            {
+            	theData = new WeatherDataUtil().filterParameters(theData, ipmDecisionsParameters);
+            }
+            return Response.ok().entity(theData).build();
+        } 
+        catch (ParseWeatherDataException ex) 
+        {
+            return Response.serverError().entity(ex.getMessage()).build();
+        }
+
+    }
+    
+    /**
+     * Get 9 day weather forecasts from <a href="https://data.gov.ie/" target="new">Met Éireann (Ireland)</a>'s 
+     * <a href="https://data.gov.ie/dataset/met-eireann-weather-forecast-api" target="new">Locationforecast API</a> 
+     * @param longitude WGS84 Decimal degrees
+     * @param latitude WGS84 Decimal degrees
+     * @pathExample /rest/weatheradapter/meteireann/?longitude=-7.644361&latitude=52.597709&parameters=1001, 3001
+     * @return the weather forecast formatted in the IPM Decision platform's weather data format
+     */
+    @GET
+    @POST
+    @Path("meteireann/")
+    @GZIP
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getMetIrelandForecasts(
+                    @QueryParam("longitude") Double longitude,
+                    @QueryParam("latitude") Double latitude,
+                    @QueryParam("altitude") Double altitude,
+                    @QueryParam("parameters") String parameters
+    )
+    {
+        if(longitude == null || latitude == null)
+        {
+            return Response.status(Response.Status.BAD_REQUEST).entity("Missing longitude and/or altitude. Please correct this.").build();
+        }
+        if(altitude == null)
+        {
+            altitude = 0.0;
+        }
+        
+        Set<Integer> ipmDecisionsParameters = parameters != null ? Arrays.asList(parameters.split(",")).stream()
+                .map(paramstr->Integer.parseInt(paramstr.strip())).collect(Collectors.toSet())
+                : null;
+        
+        try 
+        {
+            WeatherData theData = new MetIrelandWeatherForecastAdapter().getWeatherForecasts(longitude, latitude, altitude);
             if(ipmDecisionsParameters != null && ipmDecisionsParameters.size() > 0)
             {
             	theData = new WeatherDataUtil().filterParameters(theData, ipmDecisionsParameters);
@@ -268,9 +320,9 @@ public class WeatherAdapterService {
         }
         catch(DateTimeParseException ex)
         {
-            DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-            timeStartInstant = LocalDate.parse(timeStart, dtf).atStartOfDay(ZoneId.of("Europe/Helsinki")).toInstant();//.atZone().toInstant();
-            timeEndInstant = LocalDate.parse(timeEnd, dtf).atStartOfDay(ZoneId.of("Europe/Helsinki")).toInstant();//.atZone(ZoneId.of("Europe/Helsinki")).toInstant();     
+            DateTimeFormatter dtf = DateTimeFormatter.ISO_DATE;
+            timeStartInstant = LocalDate.parse(timeStart, dtf).atStartOfDay(ZoneId.of("Europe/Copenhagen")).toInstant();
+            timeEndInstant = LocalDate.parse(timeEnd, dtf).atStartOfDay(ZoneId.of("Europe/Copenhagen")).toInstant(); 
         }
         
         Boolean ignoreErrorsB = ignoreErrors != null ? ignoreErrors.equals("true") : false;
@@ -302,6 +354,91 @@ public class WeatherAdapterService {
             return Response.ok().entity(theData).build();
         }
         catch(DatatypeConfigurationException ex)
+        {
+            return Response.serverError().entity(ex.getMessage()).build();
+        }
+
+    }
+    
+    /**
+     * Get weather observations and forecasts in the IPM Decision's weather data format from the LantMet service
+     * of the Swedish University of Agricultural Sciences
+     * 
+     * @param longitude WGS84 Decimal degrees
+     * @param latitude WGS84 Decimal degrees
+     * @param timeStart Start of weather data period (ISO-8601 Timestamp, e.g. 2020-06-12T00:00:00+03:00)
+     * @param timeEnd End of weather data period (ISO-8601 Timestamp, e.g. 2020-07-03T00:00:00+03:00)
+     * @param logInterval The measuring interval in seconds. Please note that the only allowed interval in this version is 3600 (hourly)
+     * @param parameters Comma separated list of the requested weather parameters, given by <a href="/rest/parameter" target="new">their codes</a>
+     * @param ignoreErrors Set to "true" if you want the service to return weather data regardless of there being errors in the service
+     * @pathExample /rest/weatheradapter/dmipoint?latitude=56.488&longitude=9.583&parameters=2001&timeStart=2021-10-01&timeEnd=2021-10-20&interval=86400
+     * @return 
+     */
+    @GET
+    @POST
+    @Path("lantmet/")
+    @GZIP
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getSLULantMetObservations(
+            @QueryParam("longitude") Double longitude,
+            @QueryParam("latitude") Double latitude,
+            @QueryParam("timeStart") String timeStart,
+            @QueryParam("timeEnd") String timeEnd,
+            @QueryParam("interval") Integer logInterval,
+            @QueryParam("parameters") String parameters,
+            @QueryParam("ignoreErrors") String ignoreErrors
+    )
+    {
+         List<Integer> ipmDecisionsParameters = parameters != null ? Arrays.asList(parameters.split(",")).stream()
+                    .map(paramstr->Integer.parseInt(paramstr.strip())).collect(Collectors.toList())
+                 : null;
+        
+        
+        Instant timeStartInstant;
+        Instant timeEndInstant;
+        
+        // Date parsing
+        // Is it a ISO-8601 timestamp or date?
+        DateTimeFormatter dtf = DateTimeFormatter.ISO_DATE;
+        try
+        {
+            timeStartInstant = ZonedDateTime.parse(timeStart).toInstant();
+            timeEndInstant = ZonedDateTime.parse(timeEnd).toInstant();
+        }
+        catch(DateTimeParseException ex)
+        {
+            
+            timeStartInstant = LocalDate.parse(timeStart, dtf).atStartOfDay(ZoneId.of("GMT+1")).toInstant();//.atZone().toInstant();
+            timeEndInstant = LocalDate.parse(timeEnd, dtf).atStartOfDay(ZoneId.of("GMT+1")).toInstant();//.atZone(ZoneId.of("Europe/Helsinki")).toInstant();     
+        }
+        
+        Boolean ignoreErrorsB = ignoreErrors != null ? ignoreErrors.equals("true") : false;
+        
+        
+        // Default is hourly, optional is daily
+        logInterval = (logInterval == null || logInterval != 86400) ? 3600 : 86400;
+        
+        if(longitude == null || latitude == null)
+        {
+            return Response.status(Response.Status.BAD_REQUEST).entity("Missing longitude and/or latitude. Please correct this.").build();
+        }
+        
+        try
+        {
+            WeatherData theData = new SLULantMetAdapter().getData(
+                    longitude, latitude, 
+                    timeStartInstant,timeEndInstant,
+                    logInterval,
+                    ipmDecisionsParameters
+            );
+            if(theData == null)
+            {
+                return Response.noContent().build();
+            }
+            
+            return Response.ok().entity(theData).build();
+        }
+        catch(DatatypeConfigurationException | IOException | WeatherDataSourceException ex)
         {
             return Response.serverError().entity(ex.getMessage()).build();
         }

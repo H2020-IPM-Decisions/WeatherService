@@ -46,6 +46,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import net.ipmdecisions.weather.amalgamation.Interpolation;
 import net.ipmdecisions.weather.entity.LocationWeatherData;
 import net.ipmdecisions.weather.entity.LocationWeatherDataException;
+import net.ipmdecisions.weather.entity.WeatherDataSourceException;
 import net.ipmdecisions.weather.entity.WeatherData;
 
 /**
@@ -82,13 +83,15 @@ public class AmalgamationService {
 		try {
 			//System.out.println(endpointURL);
 			//System.out.println(endpointQueryStr);
-			URL completeURL = new URL(endpointURL + "?" + endpointQueryStr);
+			URL completeURL = new URL(endpointURL + (endpointQueryStr.indexOf("?") == 0 ? "" : "?") + endpointQueryStr);
 			WeatherData dataFromSource = this.getWeatherDataFromSource(completeURL); 
 			// Checks!
 			
 			// 1. Are there missing parameters?
 			List<Integer> requestedParameters = this.getParametersFromQueryString(endpointQueryStr);
-			List<Integer> missingParameters = this.getMissingParameters(requestedParameters, Arrays.asList(dataFromSource.getWeatherParameters()));  
+			List<Integer> missingParameters = requestedParameters != null && ! requestedParameters.isEmpty() ? 
+					this.getMissingParameters(requestedParameters, Arrays.asList(dataFromSource.getWeatherParameters()))
+					: new ArrayList<>();
 			
 			// 2. Parameters which failed QC tests?
 			// NB!! Only checking one of potentially many locationweatherdata sets!!!!!
@@ -141,7 +144,7 @@ public class AmalgamationService {
 			
 			// this.dumpResponse(completeURL);
 			return Response.ok().entity(dataFromSource).build();
-		} catch (IOException | LocationWeatherDataException ex) {
+		} catch (IOException | LocationWeatherDataException | WeatherDataSourceException ex) {
 			ex.printStackTrace();
 			return Response.serverError().entity(ex.getMessage()).build();
 		}
@@ -207,7 +210,7 @@ public class AmalgamationService {
 		return null;
 	}
 	
-	private WeatherData getWeatherDataFromSource(URL theURL) throws JsonMappingException, JsonProcessingException, IOException
+	private WeatherData getWeatherDataFromSource(URL theURL) throws JsonMappingException, JsonProcessingException, IOException, WeatherDataSourceException
 	{
 		ObjectMapper objectMapper = new ObjectMapper();
 		WeatherData weatherData = objectMapper.readValue(this.getResponseAsPlainText(theURL),
@@ -215,8 +218,18 @@ public class AmalgamationService {
 		return weatherData;
 	}
 
-	private String getResponseAsPlainText(URL theURL) throws IOException {
+	private String getResponseAsPlainText(URL theURL) throws IOException, WeatherDataSourceException {
 		HttpURLConnection conn = (HttpURLConnection) theURL.openConnection();
+		int resultCode = conn.getResponseCode();
+		// Follow redirects, also https
+		if(resultCode == HttpURLConnection.HTTP_MOVED_PERM || resultCode == HttpURLConnection.HTTP_MOVED_TEMP)
+		{
+			String location = conn.getHeaderField("Location");
+			conn.disconnect();
+			conn = (HttpURLConnection)  new URL(location).openConnection();
+		}
+		
+		
 		BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
 		String inputLine;
 		StringBuffer response = new StringBuffer();
@@ -225,6 +238,11 @@ public class AmalgamationService {
 			response.append(inputLine);
 		}
 		in.close();
+		// Are we getting anything else but 200? Raise error
+		if(conn.getResponseCode() != HttpURLConnection.HTTP_OK)
+		{
+			throw new WeatherDataSourceException("ERROR: Got Http response code " + conn.getResponseCode() + " from data source. Message from server was: " + response.toString());
+		}
 		//System.out.println(response.toString());
 		return response.toString();
 	}
