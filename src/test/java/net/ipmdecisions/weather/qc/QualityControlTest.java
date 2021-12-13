@@ -528,8 +528,8 @@ public class QualityControlTest {
         // 1004: valid - maximal non-failing step
         Double[][] data = {
             {-55.0,  50.0, 0.0, 0.0}, 
-            { 50.0, -55.0, 7.6, 7.5}, // 1001, 1002 and 1003 fail.
-            { 50.0, -55.0, 7.6, 7.5},
+            { 50.0, -55.0, 7.5, 7.49}, // 1001, 1002 and 1003 fail.
+            { 50.0, -55.0, 7.5, 7.49},
         };
 
         WeatherData testData = QualityControlTest.getWeatherDataForTests(weatherParameters, data);
