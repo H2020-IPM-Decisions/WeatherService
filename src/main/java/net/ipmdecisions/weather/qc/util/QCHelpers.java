@@ -213,6 +213,7 @@ public class QCHelpers {
 
             // all weather parameters are checked for step qc except:
             // * precipitation 2000
+            // * leaf wetness  3100
             case STEP: {
                 Pattern pattern = Pattern.compile("^(31\\d\\d)|(2\\d\\d\\d)$");
                 Matcher m = pattern.matcher("" + weatherParameterId);
