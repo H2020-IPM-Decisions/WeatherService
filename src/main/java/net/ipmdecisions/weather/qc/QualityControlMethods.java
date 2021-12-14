@@ -98,6 +98,8 @@ public class QualityControlMethods {
      * locationWeatherData object
      */
     public WeatherData getQC(WeatherData weatherData, String qcType) {
+        if (qcType == null) qcType = "ALL";
+        
         //Location weather data array from inbound weather data
         List<LocationWeatherData> locationWeatherData = weatherData.getLocationWeatherData();
         //Location weather data object def
@@ -125,6 +127,7 @@ public class QualityControlMethods {
                     qc = this.getNonRtQC(weatherParameters, locationWeatherDataObject, qc);
                     break;
                 }
+                case "ALL":
                 default: {
                     qc = this.getRtQC(weatherParameters, locationWeatherDataObject, qc);
                     qc = this.getNonRtQC(weatherParameters, locationWeatherDataObject, qc);                    
