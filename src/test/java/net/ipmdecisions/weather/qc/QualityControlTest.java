@@ -106,7 +106,7 @@ public class QualityControlTest {
         
         Integer[] expResult = {2,2,2,2,2,2,2,2,2,2,2}; // All tests passed ok
         
-        assertEquals(expResult,result);
+        assertArrayEquals(expResult,result);
     }
     
     @Test
@@ -123,9 +123,9 @@ public class QualityControlTest {
         List<LocationWeatherData> lwd = wd.getLocationWeatherData();
         Integer[] result = lwd.get(0).getQC();
         
-        Integer[] expResult = {2,32,64,2,2,2,64,2,2,2,2,32,2}; // All tests passed ok
+        Integer[] expResult = {32,2,64,32,64,2,64,2,2,2,2,32,2}; // All tests passed ok
         
-        assertEquals(expResult,result);
+        assertArrayEquals(expResult,result);
     }
 
     // ------------------------------------------------
