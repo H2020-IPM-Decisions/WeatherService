@@ -145,7 +145,8 @@ public class QualityControlTest {
         
         Integer[] expResult = {32,2,64,32,64,2,64,2,2,2,2,32,2}; // All tests passed ok
         
-        assertArrayEquals(expResult,result);
+        assertEquals(expResult,result); // shows all array cells, but fails on arrays being different instances - comment this out when arrays have same values
+        // assertArrayEquals(expResult,result); // uncomment when result and expResult have same cells
     }
 
     // ------------------------------------------------
