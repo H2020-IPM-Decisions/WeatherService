@@ -51,6 +51,26 @@ public class QualityControlTest {
     // ------------------------------------------------
     // COMPLEX OVERALL UNIT TESTS
     // ------------------------------------------------
+    
+    @Test
+    public void testQualityControl() throws Exception{
+        
+        QualityControlTest.printTestName();
+
+    	FileUtils fileUtils = new FileUtils();
+    	String weatherDataJson = fileUtils.getStringFromFileInApp("/weatherdata_no_errors.json");
+        ObjectMapper oMapper = new ObjectMapper();
+        WeatherData testData = oMapper.readValue(weatherDataJson, WeatherData.class);
+        
+        QualityControlMethods instance = new QualityControlMethods();
+        WeatherData wd = instance.getQC(testData);
+        List<LocationWeatherData> lwd = wd.getLocationWeatherData();
+        Integer[] result = lwd.get(0).getQC();
+        
+        Integer[] expResult = {2,2,2,2,2,2,2,2,2,2,2}; // All tests passed ok
+        
+        assertArrayEquals(expResult,result);
+    }
 
     @Test
     public void testRTQualityControl() throws Exception{
