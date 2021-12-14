@@ -121,7 +121,7 @@ public class QCNonRTTester {
                         case "absolute":
                             //Step test for absolute type where the threshold is + or - n units
                             //Immediate abort if the test fails
-                            if (abs(previousWeatherParameterValue-weatherParameterValue) > thresholdValue) {
+                            if (abs(previousWeatherParameterValue-weatherParameterValue) >= thresholdValue) {
                                 return QCType.FAILED_STEP_TEST;
                             }
                             break;
