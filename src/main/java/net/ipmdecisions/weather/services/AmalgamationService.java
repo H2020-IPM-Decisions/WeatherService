@@ -230,7 +230,7 @@ public class AmalgamationService {
 		}
 		
 		
-		BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+		BufferedReader in = new BufferedReader(new InputStreamReader(resultCode < 400 ? conn.getInputStream():conn.getErrorStream()));
 		String inputLine;
 		StringBuffer response = new StringBuffer();
 
