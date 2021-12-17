@@ -68,7 +68,7 @@ public class QCNonRTTester {
         JSONObject thresholdDataObject = thresholdData.getThresholdDataObject(String.valueOf(weatherParameter));
 
         //Run the test if the threshold data exists.
-        if (thresholdDataObject.has("step_test_threshold")) {
+        if (thresholdDataObject.has("step_test_threshold") && thresholdDataObject.has("step_test_threshold_type")) {
             //Threshold value from threshold data.
             double thresholdValue = thresholdDataObject.getDouble("step_test_threshold");
             //Variable for step test type. This is weather data parameter specific and
