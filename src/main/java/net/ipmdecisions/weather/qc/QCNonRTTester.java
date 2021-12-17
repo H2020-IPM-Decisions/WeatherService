@@ -74,7 +74,7 @@ public class QCNonRTTester {
             //Variable for step test type. This is weather data parameter specific and
             //is either absolute or relative.
             String thresholdType = thresholdDataObject.getString("step_test_threshold_type");
-            returnValue = getStepTestRun(weatherParameterValues, thresholdValue, thresholdType);
+            returnValue = getStepTestResult(weatherParameterValues, thresholdValue, thresholdType);
         }
         
         return returnValue;
@@ -92,7 +92,7 @@ public class QCNonRTTester {
      * - 0 if success
      * - 32 if fail
      */
-    public static int getStepTestRun(Double[] weatherParameterValues, double thresholdValue, String thresholdType) {
+    public static int getStepTestResult(Double[] weatherParameterValues, double thresholdValue, String thresholdType) {
 
         //Parameter value from iterator as String
         String weatherParameterValueAsString;
