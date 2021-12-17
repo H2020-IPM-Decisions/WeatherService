@@ -97,6 +97,7 @@
         "parameter":"Solar radiation",
         "id_array":["5001"],
         "lower_limit":-25,
-        "upper_limit":1500
+        "upper_limit":1500,
+        "freeze_test_threshold": 12
     }
 ]
