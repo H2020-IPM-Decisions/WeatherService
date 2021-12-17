@@ -701,6 +701,37 @@ public class QualityControlTest {
     }
 
     @Test
+    public void testNonRTQCFreezeLengthThreshold() throws Exception {
+        QualityControlTest.printTestName();
+
+        Integer[] weatherParameters = {5001, 5001};
+        // 5001: fail - minimal failing freeze (not starting from first cell)
+        // 5001: success - maximal non-failing freeze
+        Double[][] data = {
+            {60.0, 60.0}, // 1st freeze starts.
+            {60.0, 60.0}, // 2nd
+            {60.0, 60.0}, // 3rd
+            {60.0, 60.0}, // 4th
+            {60.0, 60.0}, // 5th
+            {60.0, 60.0}, // 6th
+            {60.0, 60.0}, // 7th
+            {60.0, 60.0}, // 8th
+            {60.0, 60.0}, // 9th
+            {60.0, 60.0}, // 10th
+            {60.0, 60.0}, // 11th
+            {60.0, 60.0}, // 12th - 2nd 5001 ends: does not fail.
+            {60.0, 60.1}, // 13th - 1st 5001 ends: fails.
+        };
+
+        WeatherData testData = QualityControlTest.getWeatherDataForTests(weatherParameters, data);
+        Integer[] result = QualityControlTest.getQCResultForTests(testData, "NONRT");
+
+        Integer[] expResult = {64, 2};
+
+        assertArrayEquals(expResult,result);
+    }
+    
+    @Test
     public void testNonRTQCFreezeFails() throws Exception {
         QualityControlTest.printTestName();
 

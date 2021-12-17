@@ -13,6 +13,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Stream;
 import net.ipmdecisions.weather.entity.WeatherParameter;
+import net.ipmdecisions.weather.qc.ThresholdData;
+import org.json.JSONObject;
 
 public class QCHelpers {
     
@@ -271,4 +273,27 @@ public class QCHelpers {
 
         return weatherParametersToHandle;
     }
+
+    /**
+     * Get a threshold value, given a weather parameter and a threshold value name. 
+     * 
+     * @param weatherParameter
+     * @param thresholdValueName
+     * @return a threshold value.
+     */
+    public static Double getThresholdValueForWeatherParameter(Integer weatherParameter, String thresholdValueName) {
+        Double thresholdValue = null;
+        
+        //ThresholdData object
+        ThresholdData thresholdData = new ThresholdData();
+        //Weather data parameter key specific threshold data object
+        JSONObject thresholdDataObject = thresholdData.getThresholdDataObject(String.valueOf(weatherParameter));
+
+        if (thresholdDataObject.has(thresholdValueName)) {
+            thresholdValue = thresholdDataObject.getDouble(thresholdValueName);
+        }
+        
+        return thresholdValue;
+    }
+
 }

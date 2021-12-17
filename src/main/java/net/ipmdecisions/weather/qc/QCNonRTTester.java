@@ -33,6 +33,8 @@ import org.json.JSONObject;
  * for non real time weather data.
  */
 public class QCNonRTTester {
+    
+    private static final Double defaultFreezeLengthThresholdValue = 5.0;
 
     public QCNonRTTester() { 
     }
@@ -226,10 +228,16 @@ public class QCNonRTTester {
         if (weatherParameterValues.length <= 1) {
             return QCType.NO_QC;
         }
-        
+
         Double value = null;
         Double previousValue = null;
         int count = 0;
+        Double thresholdValue = QCHelpers.getThresholdValueForWeatherParameter(weatherParameter, "freeze_test_threshold");
+
+        if (thresholdValue == null) {
+            thresholdValue = QCNonRTTester.defaultFreezeLengthThresholdValue;
+        }
+        
 
         // loop through and compare current value to its previous value
         for (int i=0; i < weatherParameterValues.length; i++) {
@@ -249,8 +257,10 @@ public class QCNonRTTester {
                 continue;
             }
 
-            // When the same value repeats more than 5 times, the data is possibly erroneous.
-            if (count > 5) return QCType.FAILED_FREEZE_TEST;
+            // When the same value repeats more than `thresholdValue` times 
+            // (by default that is 5 times), the data is possibly erroneous,
+            // and fails this QC test.
+            if (count > thresholdValue) return QCType.FAILED_FREEZE_TEST;
         }
 
         return QCType.NO_QC;
