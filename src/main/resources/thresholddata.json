@@ -12,7 +12,7 @@
         "id_array":["1021","1022","1023","1024"],
         "lower_limit":-40,
         "upper_limit":50,
-        "step_test_threshold": 2,
+        "step_test_threshold": 7.5,
         "step_test_threshold_type": "absolute"
     },
     {
@@ -85,26 +85,26 @@
     },
     {
         "parameter":"Wind speed",
-        "id_array":["4002"],
-        "lower_limit":0,
-        "upper_limit":76,
-        "step_test_threshold": 13,
+        "id_array":["4002, 4012"],
+        "lower_limit": 0,
+        "upper_limit": 76,
+        "step_test_threshold": 60,
         "step_test_threshold_type": "absolute"
     },
     {
         "parameter":"Wind speed",
         "id_array":["4003","4004","4005"],
-        "lower_limit":0,
-        "upper_limit":22,
+        "lower_limit": 0,
+        "upper_limit": 22,
         "step_test_threshold": 40,
         "step_test_threshold_type": "absolute"
     },
     {
         "parameter":"Wind speed",
-        "id_array":["4012","4013","4014","4015"],
-        "lower_limit":0,
-        "upper_limit":50,
-        "step_test_threshold": 13,
+        "id_array":["4013","4014","4015"],
+        "lower_limit": 0,
+        "upper_limit": 30,
+        "step_test_threshold": 40,
         "step_test_threshold_type": "absolute"
     },
     {
