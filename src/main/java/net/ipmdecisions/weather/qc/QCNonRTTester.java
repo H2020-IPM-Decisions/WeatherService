@@ -148,59 +148,6 @@ public class QCNonRTTester {
         //Return OK if test passes and reaches this point
         return QCType.NO_QC;
     }
-    
-    /**
-     * Step test for weather data parameter values.
-     * 
-     * @deprecated
-     * @param weatherParameterValuesAsList Weather data parameter values as List
-     * @param weatherParameters List of weather data parameter keys
-     * @return list of QC results as integers
-     * Returns values in list:
-     * - 16 if fails
-     * - 0 if success
-     */
-    public static Integer[] testForStepErrors(Double[][] weatherParameterValuesByTime, Integer[] weatherParameters, Integer[] qcResult) {
-        
-        Integer[] qcResults = new Integer[weatherParameters.length];
-        //QC result return variable. Default is set as no qc done.
-        //This way a single test won't qualify anything, but passing all tests qualifies.
-        Arrays.fill(qcResults, QCType.NO_QC);
-        
-        Double[][] valuesById = QCHelpers.switchRowsAndColumnsForLocationWeatherData(weatherParameterValuesByTime, weatherParameters.length);
-
-        // Find weather parameters that are checked by the logical QC test.
-        Integer[] weatherParametersToHandle = QCHelpers.filterWeatherParametersBasedOnQCType(weatherParameters, QCTestType.STEP);
-        
-        for (Integer i=0; i < weatherParametersToHandle.length; i++) {
-            Integer weatherParameter = weatherParametersToHandle[i];
-            Double[] values = valuesById[i];
-            boolean isCorrect = true;
-
-            //Threshold data Object
-            ThresholdData thresholdData = new ThresholdData();
-            //Threshold data as JSONObject
-            JSONObject thresholds = thresholdData.getThresholdDataObject(String.valueOf(weatherParameter));
-            // Lookup step test threshold for the weather parameter.
-            Double stepThreshold = thresholds.getDouble("step_test_threshold");
-            
-            if (stepThreshold == null) continue;
-
-            // Go through all values and check that the change between values is inside the step threshold.
-            for (Integer j=0; j < values.length; j++) {
-                if (j==0) continue;
-                
-                if (Math.abs(values[j] - values[j-1]) >= stepThreshold) {
-                    isCorrect = false;
-                    break;
-                }
-            }
-                    
-            if (!isCorrect) qcResults[i] = QCType.FAILED_STEP_TEST;
-        }
-
-        return qcResults;
-    }
 
     /**
      * Freeze test for weather data parameter values. 
