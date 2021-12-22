@@ -89,13 +89,6 @@ public class QCHelpers {
      * groups of mean, min and max values, and returns those groups as tuples 
      * (really just arrays).
      * 
-     * This function assumes that the last number of a parameter maps to its 
-     * aggregation type in the following manner:
-     * 
-     * - 2 - mean
-     * - 3 - min
-     * - 4 - max
-     * 
      * The returned tuples contain following values:
      * 
      * 1. index of mean value (in the list of weather parameters)

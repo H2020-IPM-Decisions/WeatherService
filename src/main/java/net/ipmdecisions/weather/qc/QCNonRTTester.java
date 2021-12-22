@@ -34,6 +34,13 @@ import org.json.JSONObject;
  */
 public class QCNonRTTester {
     
+    /**
+     * Default value for longest valid freeze (in hours) that a parameter is 
+     * allowed to have.
+     * 
+     * Used in Freeze QC test as a default value, when a weather parameter does 
+     * not have `freeze_test_threshold` defined in `threshoddata.json`.
+     */
     private static final Double defaultFreezeLengthThresholdValue = 5.0;
 
     public QCNonRTTester() { 

@@ -759,33 +759,4 @@ public class QualityControlTest {
 
         assertArrayEquals(expResult,result);
     }
-
-    /*
-    @Test
-    public void testNonRTQCFreezeFailsWithTwoHourDataInterval() throws Exception {
-        QualityControlTest.printTestName();
-
-        Integer[] weatherParameters = {1001, 1101, 3001, 3002};
-        // 1001: fail - all zeroes (only precipitation should allow 0.0 freezing).
-        // 1101: fail - all random number
-        // 3001: fail - minimal failing freeze
-        // 4001: success - maximal non-failing freeze
-        Double[][] data = {
-            {0.0, 60.0, 100.0, 100.0}, // 1st
-            {0.0, 60.0, 100.0, 100.0}, // 2nd - 3002 ends (does not fail) (4h freeze)
-            {0.0, 60.0, 100.0,  99.0}, // 3rd - 1001, 1101 and 3001 fail  (6h freeze)
-            {0.0, 60.0,  99.0,  99.0}, // 4th
-        };
-
-        Integer twoHoursInSeconds = 7200;
-
-        WeatherData testData = QualityControlTest.getWeatherDataForTests(weatherParameters, data);
-        testData.setInterval(twoHoursInSeconds);
-        Integer[] result = QualityControlTest.getQCResultForTests(testData, "NONRT");
-
-        Integer[] expResult = {64, 64, 64, 2};
-
-        assertArrayEquals(expResult,result);
-    }
-    */
 }
