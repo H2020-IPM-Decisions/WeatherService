@@ -143,9 +143,9 @@ public class QualityControlTest {
         List<LocationWeatherData> lwd = wd.getLocationWeatherData();
         Integer[] result = lwd.get(0).getQC();
         
-        Integer[] expResult = {32,2,64,32,64,2,64,2,2,2,2,32,2}; // All tests passed ok
+        Integer[] expResult = {32,2,64,32,96,64,2,2,32,2,2,96,2}; // All tests passed ok
         
-        assertEquals(expResult,result); // shows all array cells, but fails on arrays being different instances - comment this out when arrays have same values
+        assertArrayEquals(expResult,result); // shows all array cells, but fails on arrays being different instances - comment this out when arrays have same values
         // assertArrayEquals(expResult,result); // uncomment when result and expResult have same cells
     }
 
