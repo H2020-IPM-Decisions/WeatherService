@@ -1,0 +1,17 @@
+{
+  "timeStart": "2020-03-10T00:00:00Z",
+  "timeEnd": "2020-03-10T23:00:00Z",
+  "interval": 3600,
+  "weatherParameters": [],
+  "locationWeatherData": [
+    {
+      "longitude": 14.3711,
+      "latitude": 67.2828,
+      "altitude": 70,
+      "qc": [],
+      "data": [[]],
+      "length": 0,
+      "width": 0
+    }
+  ]
+}

@@ -11,20 +11,24 @@
         "parameter":"Temperature in canopy",
         "id_array":["1021","1022","1023","1024"],
         "lower_limit":-40,
-        "upper_limit":50
+        "upper_limit":50,
+        "step_test_threshold": 7.5,
+        "step_test_threshold_type": "absolute"
     },
     {
         "parameter":"Soil temperature -5 cm",
         "id_array":["1101","1102"],
         "lower_limit":-30,
-        "upper_limit":40
+        "upper_limit":40,
+        "step_test_threshold": 5,
+        "step_test_threshold_type": "absolute"
     },
     {
         "parameter":"Soil temperature -10 cm",
         "id_array":["1111","1112"],
         "lower_limit":-20,
         "upper_limit":40,
-        "step_test_threshold": 2,
+        "step_test_threshold": 5,
         "step_test_threshold_type": "absolute"
     },
     {
@@ -71,7 +75,7 @@
         "lower_limit":0,
         "upper_limit":103,
         "step_test_threshold": 30,
-        "step_test_threshold_type": "relative"
+        "step_test_threshold_type": "absolute"
     },
     {
         "parameter":"Leaf wetness",
@@ -81,10 +85,26 @@
     },
     {
         "parameter":"Wind speed",
-        "id_array":["4002","4003","4004","4005","4012","4013","4014","4015"],
-        "lower_limit":0,
-        "upper_limit":75,
-        "step_test_threshold": 13,
+        "id_array":["4002, 4012"],
+        "lower_limit": 0,
+        "upper_limit": 76,
+        "step_test_threshold": 60,
+        "step_test_threshold_type": "absolute"
+    },
+    {
+        "parameter":"Wind speed",
+        "id_array":["4003","4004","4005"],
+        "lower_limit": 0,
+        "upper_limit": 22,
+        "step_test_threshold": 40,
+        "step_test_threshold_type": "absolute"
+    },
+    {
+        "parameter":"Wind speed",
+        "id_array":["4013","4014","4015"],
+        "lower_limit": 0,
+        "upper_limit": 30,
+        "step_test_threshold": 40,
         "step_test_threshold_type": "absolute"
     },
     {
@@ -97,6 +117,7 @@
         "parameter":"Solar radiation",
         "id_array":["5001"],
         "lower_limit":-25,
-        "upper_limit":1500
+        "upper_limit":1500,
+        "freeze_test_threshold": 12
     }
 ]

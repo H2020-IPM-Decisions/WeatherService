@@ -28,7 +28,7 @@ public class ThresholdData {
      */
     public JSONObject getThresholdDataObject(String parameterID) {
         
-        return findFromJSONArray(getThresholdData("RESOURCE_READER", new JSONObject("{\"resource_path\":\"/thresholddata.json\"}")), parameterID);
+        return findFromJSONArray(getThresholdData("RESOURCE_READER", new JSONObject("{\"resource_path\":\"thresholddata.json\"}")), parameterID);
           
     }
     
