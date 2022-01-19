@@ -33,6 +33,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+
+import javax.ejb.EJB;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -44,6 +46,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
+import net.ipmdecisions.weather.controller.WeatherDataSourceBean;
 import net.ipmdecisions.weather.entity.WeatherDataSource;
 import net.ipmdecisions.weather.util.GISUtils;
 import org.locationtech.jts.geom.Geometry;
@@ -62,6 +65,9 @@ import org.wololo.jts2geojson.GeoJSONWriter;
  */
 @Path("rest")
 public class WeatherDataSourceService {
+	
+	@EJB
+	WeatherDataSourceBean weatherDataSourceBean;
 
     /**
      * Get a list of all the available weather data sources
@@ -74,7 +80,7 @@ public class WeatherDataSourceService {
     public Response listWeatherDataSources(){
         try
         {
-            return Response.ok().entity(this.getAllWeatherDataSources()).build();
+            return Response.ok().entity(weatherDataSourceBean.getAllWeatherDataSources()).build();
         }
         catch(IOException ex)
         {
@@ -133,7 +139,7 @@ public class WeatherDataSourceService {
         // Return only data sources with geometries intersecting with the client's
         // specified geometries
         GISUtils gisUtils = new GISUtils();
-        List<WeatherDataSource> retVal = this.getAllWeatherDataSources().stream().filter(dataSource->{
+        List<WeatherDataSource> retVal = weatherDataSourceBean.getAllWeatherDataSources().stream().filter(dataSource->{
             // Get all geometries in current weather data source
             String dataSourceGeoJsonStr = ""; 
             try
@@ -248,14 +254,9 @@ public class WeatherDataSourceService {
     {
     	try
     	{
-	    	for(WeatherDataSource candidate:this.getAllWeatherDataSources())
-	    	{
-	    		if(candidate.getId().equals(id))
-	    		{
-	    			return Response.ok().entity(candidate).build();
-	    		}
-	    	}
-	    	return Response.status(Status.NOT_FOUND).build();
+    		WeatherDataSource wds = weatherDataSourceBean.getWeatherDataSourceById(id);
+	    	return wds != null ? Response.ok().entity(wds).build() 
+	    			: Response.status(Status.NOT_FOUND).build();
     	}
     	catch(IOException ex)
     	{
@@ -263,20 +264,5 @@ public class WeatherDataSourceService {
     	}
     }
     
-    /**
-     * Util method to read the catalogue from a YAML file
-     * @return
-     * @throws IOException 
-     */
-    private List<WeatherDataSource> getAllWeatherDataSources() throws IOException{
-            File dsFile = new File(System.getProperty("net.ipmdecisions.weatherservice.DATASOURCE_LIST_FILE"));
-            ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
-            mapper.registerModule(new JavaTimeModule());
-            List<Map> prelim =  (List<Map>) mapper.readValue(dsFile, HashMap.class).get("datasources");
-            List<WeatherDataSource> retVal = new ArrayList<>();
-            prelim.forEach((m) -> {
-                retVal.add(mapper.convertValue(m, new TypeReference<WeatherDataSource>(){}));
-            });
-            return retVal;
-    }
+    
 }

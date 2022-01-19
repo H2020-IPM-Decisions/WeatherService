@@ -154,6 +154,73 @@ public class WeatherData {
     public void setWeatherParameters(Integer[] weatherParameters) {
         this.weatherParameters = weatherParameters;
     }
+    
+    @JsonIgnore
+    public boolean containsWeatherParameter(Integer weatherParameter)
+    {
+    	for(int i=0;i<this.getWeatherParameters().length;i++)
+    	{
+    		if(this.getWeatherParameters()[i].equals(weatherParameter))
+    		{
+    			return true;
+    		}
+    	}
+    	return false;
+    }
+    
+    /**
+     * Removes data for the specified parameter from the data set
+     * @param weatherParameter
+     */
+    @JsonIgnore
+    public void removeParameter(Integer weatherParameter)
+    {
+    	// Quick check
+    	if(! this.containsWeatherParameter(weatherParameter))
+    	{
+    		return;
+    	}
+    	Integer paramIndex = this.getParameterIndex(weatherParameter);
+    	
+    	// Loop through LocationWeatherData
+    	// Reduce dataset
+    	for(LocationWeatherData lwd: this.getLocationWeatherData())
+    	{
+    		Double[][] oldData = lwd.getData();
+			Double[][] newData = new Double[oldData.length][oldData[0].length - 1];
+			for(int row = 0; row < oldData.length; row++)
+			{
+				for(int col=0; col < oldData[0].length; col++)
+				{
+					// Old data are copied
+					if(col < paramIndex)
+					{
+						newData[row][col] = oldData[row][col];
+					}
+					else if(col > paramIndex) // Shifting data
+					{
+						newData[row][col -1] = oldData[row][col];
+					}
+				}
+			}
+			lwd.setData(newData);
+    	}
+    	// Remove the parameter from parameter list
+    	Integer[] newParameterList = new Integer[this.getWeatherParameters().length-1];
+    	for(int col=0; col < this.getWeatherParameters().length; col++)
+		{
+			// Old data are copied
+			if(col < paramIndex)
+			{
+				newParameterList[col] = this.getWeatherParameters()[col];
+			}
+			else if(col > paramIndex) // Shifting data
+			{
+				newParameterList[col -1] = this.getWeatherParameters()[col];
+			}
+		}
+    	this.setWeatherParameters(newParameterList);
+    }
 
     /**
      * @return the locationWeatherData

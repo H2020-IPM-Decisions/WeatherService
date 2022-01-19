@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 NIBIO <http://www.nibio.no/>. 
+ * Copyright (c) 2022 NIBIO <http://www.nibio.no/>. 
  * 
  * This file is part of IPM Decisions Weather Service.
  * IPM Decisions Weather Service is free software: you can redistribute it and/or modify
@@ -31,6 +31,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import javax.ejb.EJB;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -44,21 +45,142 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import net.ipmdecisions.weather.amalgamation.Interpolation;
+import net.ipmdecisions.weather.controller.AmalgamationBean;
 import net.ipmdecisions.weather.entity.LocationWeatherData;
 import net.ipmdecisions.weather.entity.LocationWeatherDataException;
 import net.ipmdecisions.weather.entity.WeatherDataSourceException;
 import net.ipmdecisions.weather.entity.WeatherData;
+import net.ipmdecisions.weather.entity.WeatherDataSource;
 
 /**
  * This is the amalgamation service, which takes the responsibility of fixing
  * weather data that needs fixing: QC failing data, missing data, data that
  * needs to be calculated, you name it
  * 
- * @copyright 2021 <a href="http://www.nibio.no/">NIBIO</a>
+ * @copyright 2021-2022 <a href="http://www.nibio.no/">NIBIO</a>
  * @author Tor-Einar Skog <tor-einar.skog@nibio.no>
  */
 @Path("rest/amalgamation")
 public class AmalgamationService {
+	
+	@EJB
+	AmalgamationBean amalgamationBean;
+	
+	/**
+	 * Attempts to give you all the requested parameters for the given location
+	 * in the specified period. It's a best effort.
+	 * @param longitude
+	 * @param latitude
+	 * @param timeStartStr
+	 * @param timeEndStr
+	 * @param parametersStr
+	 * @return
+	 */
+	@GET
+	@Path("amalgamate")
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response amalgamate(
+			@QueryParam("longitude") Double longitude,
+			@QueryParam("latitude") Double latitude,
+			@QueryParam("timeStart") String timeStartStr,
+			@QueryParam("timeEnd") String timeEndStr,
+			@QueryParam("interval") Integer interval,
+			@QueryParam("parameters") String parametersStr
+	) {
+		try
+		{
+			WeatherDataSource wds = amalgamationBean.getWeatherDataSourceBestEffort(longitude, latitude);
+			URL url = new URL(wds.getEndpoint() 
+					+ "?longitude=" + longitude 
+					+ "&latitude=" + latitude 
+					+ "&timeStart=" + timeStartStr
+					+ "&timeEnd=" + timeEndStr
+					+ "&interval=" + interval
+					// + "&parameters=" + parametersStr // Exclude this in order to collect all parameters from the source
+					);
+					
+			WeatherData dataFromSource = this.getWeatherDataFromSource(url);
+			// 1.  Data control
+			// 1.1 Are there missing parameters?
+			List<Integer> requestedParameters = Arrays.asList(parametersStr.split(",")).stream()
+					.map(p->Integer.valueOf(p))
+					.collect(Collectors.toList());
+			Set<Integer> missingParameters = requestedParameters != null && ! requestedParameters.isEmpty() ? 
+					this.getMissingParameters(requestedParameters, Arrays.asList(dataFromSource.getWeatherParameters()))
+					: new HashSet<>();
+			// First fix: Map interchangeable parameters (e.g. instantaneous and average temperatures)
+			if(missingParameters.size() > 0)
+			{
+				dataFromSource = amalgamationBean.addFallbackParameters(dataFromSource, missingParameters);
+				// Refresh the missing parameters
+				missingParameters = requestedParameters != null && ! requestedParameters.isEmpty() ? 
+						this.getMissingParameters(requestedParameters, Arrays.asList(dataFromSource.getWeatherParameters()))
+						: new HashSet<>();
+			}
+			// 1.2 QC check
+			// TODO: Perform QC checks
+			// Add failing Params to 
+			Set<Integer> failedParameters = new HashSet<>();
+			for(LocationWeatherData lwd:dataFromSource.getLocationWeatherData())
+			{
+				if(lwd.needsQC())
+				{
+					// TODO: Run the QC
+				}
+				
+				Integer[] QC = lwd.getQC();
+				if(QC != null)
+				{
+					for(int i=0;i<QC.length;i++)
+					{
+						if(QC[i] >= 4)
+						{
+							failedParameters.add(dataFromSource.getWeatherParameters()[i]);
+						}
+					}
+				}
+			}
+			
+			
+			// 2.  Data restoration/generation
+			for(Integer failedParam:failedParameters)
+			{
+				// 2.1 Interpolate
+				dataFromSource = new Interpolation().interpolate(dataFromSource, Set.of(1001,1002),1);
+				// 2.2 Calculate
+				
+				// 2.3 Fallback
+				
+				
+			}
+			
+			// Calculate entire missing parameters - now that we have the best available dataset 
+			// E.g. Leaf wetness
+			if(missingParameters.contains(3101))  // Leaf wetness
+			{
+				dataFromSource = amalgamationBean.calculateLeafWetnessBestEffort(dataFromSource);
+				missingParameters = requestedParameters != null && ! requestedParameters.isEmpty() ? 
+						this.getMissingParameters(requestedParameters, Arrays.asList(dataFromSource.getWeatherParameters()))
+						: new HashSet<>();
+			}
+			
+			// Finally: Remove any parameters not requested
+			List<Integer> parametersToRemove = Arrays.asList(dataFromSource.getWeatherParameters()).stream()
+					.filter(param->!requestedParameters.contains(param))
+					.collect(Collectors.toList());
+			for(Integer parameterToRemove:parametersToRemove)
+			{
+				dataFromSource.removeParameter(parameterToRemove);
+			}
+			
+			return Response.ok().entity(dataFromSource).build();
+		}
+		catch(IOException | WeatherDataSourceException | LocationWeatherDataException ex)
+		{
+			return Response.serverError().entity(ex.getMessage()).build();
+		}
+		
+	}
 
 	/**
 	 * Given that you can only provide one coordinate, the method handles single locations, not grids
@@ -72,9 +194,9 @@ public class AmalgamationService {
 	 * @return
 	 */
 	@GET
-	@Path("amalgamate/")
+	@Path("amalgamate/proxy")
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response amalgamate(
+	public Response amalgamateProxy(
 			@QueryParam("endpointURL") String endpointURL,
 			@QueryParam("endpointQueryStr") String endpointQueryStr,
 			@QueryParam("longitude") Double longitude,
@@ -90,26 +212,28 @@ public class AmalgamationService {
 			// 1. Are there missing parameters?
 			List<Integer> requestedParameters = this.getParametersFromQueryString(endpointQueryStr);
 			List<Integer> missingParameters = requestedParameters != null && ! requestedParameters.isEmpty() ? 
-					this.getMissingParameters(requestedParameters, Arrays.asList(dataFromSource.getWeatherParameters()))
+					new ArrayList<Integer>(this.getMissingParameters(requestedParameters, Arrays.asList(dataFromSource.getWeatherParameters())))
 					: new ArrayList<>();
 			
 			// 2. Parameters which failed QC tests?
 			// NB!! Only checking one of potentially many locationweatherdata sets!!!!!
-			LocationWeatherData lwd = dataFromSource.getLocationWeatherData().get(0);
-			
-			if(lwd.needsQC())
-			{
-				// TODO: Run the QC
-			}
 			Set<Integer> failedParameters = new HashSet<>();
-			Integer[] QC = lwd.getQC();
-			if(QC != null)
+			for(LocationWeatherData lwd:dataFromSource.getLocationWeatherData())
 			{
-				for(int i=0;i<QC.length;i++)
+				if(lwd.needsQC())
 				{
-					if(QC[i] >= 4)
+					// TODO: Run the QC
+				}
+				
+				Integer[] QC = lwd.getQC();
+				if(QC != null)
+				{
+					for(int i=0;i<QC.length;i++)
 					{
-						failedParameters.add(dataFromSource.getWeatherParameters()[i]);
+						if(QC[i] >= 4)
+						{
+							failedParameters.add(dataFromSource.getWeatherParameters()[i]);
+						}
 					}
 				}
 			}
@@ -150,6 +274,8 @@ public class AmalgamationService {
 		}
 	}
 	
+	
+	
 	/**
 	 * Linear interpolation. Send the weather data in the request body. Specify what to do with query parameters
 	 * @param maxMissingValues Don't interpolate if the number of contiguously missing values exceeds this number (default = 1)
@@ -182,12 +308,12 @@ public class AmalgamationService {
 	}
 	
 	
-	private List<Integer> getMissingParameters(List<Integer> requestedParameters, List<Integer> returnedParameters)
+	private Set<Integer> getMissingParameters(List<Integer> requestedParameters, List<Integer> returnedParameters)
 	{
 		// Using set relative complement (difference) operation 
 		Set<Integer> missingParameters = new HashSet<>(requestedParameters);
 		missingParameters.removeAll(new HashSet<Integer>(returnedParameters));
-		return new ArrayList<Integer>(missingParameters);
+		return missingParameters;
 	}
 	
 	/**

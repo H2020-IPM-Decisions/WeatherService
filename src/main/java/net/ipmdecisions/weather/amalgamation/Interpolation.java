@@ -36,6 +36,10 @@ public class Interpolation {
 		{
 			for(Integer param:parametersToInterpolate)
 			{
+				if(input.getParameterIndex(param) == null)
+				{
+					continue;
+				}
 				Double[] dataToInterpolate = l.getColumn(input.getParameterIndex(param));
 				// Now do the interpolation
 				for(int i=0;i<dataToInterpolate.length;i++)

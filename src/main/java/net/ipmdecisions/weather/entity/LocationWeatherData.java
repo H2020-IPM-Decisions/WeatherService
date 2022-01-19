@@ -253,7 +253,7 @@ public class LocationWeatherData {
     {
     	for(int i=0;i<this.getQC().length;i++)
     	{
-    		if(this.getQC()[i] == 0)
+    		if(this.getQC()[i].equals(0))
     		{
     			return true;
     		}
