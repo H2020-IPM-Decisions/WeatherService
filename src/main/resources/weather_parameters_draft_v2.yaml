@@ -160,23 +160,23 @@ parameters:
    unit: m/s
    aggregationType: MIN
  - id: 4011
-   name: Wind direction at 2m (degrees 0-360)
+   name: Wind direction at 10m (degrees 0-360)
    unit: degrees
    aggregationType: AVG
  - id: 4012
-   name: Instantaneous wind speed at 2m
+   name: Instantaneous wind speed at 10m
    unit: m/s
    aggregationType: AVG
  - id: 4013
-   name: Mean wind speed at 2m
+   name: Mean wind speed at 10m
    unit: m/s
    aggregationType: AVG
  - id: 4014
-   name: Max wind speed at 2m
+   name: Max wind speed at 10m
    unit: m/s
    aggregationType: MAX
  - id: 4015
-   name: Min wind speed at 2m
+   name: Min wind speed at 10m
    unit: m/s
    aggregationType: MIN
 
