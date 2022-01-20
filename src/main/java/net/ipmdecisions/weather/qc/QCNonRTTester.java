@@ -101,17 +101,13 @@ public class QCNonRTTester {
      */
     public static int getStepTestResult(Double[] weatherParameterValues, double thresholdValue, String thresholdType) {
 
-        //Parameter value from iterator as String
-        String weatherParameterValueAsString;
         //Weather data parameter value as double
-        double weatherParameterValue;
+        Double weatherParameterValue;
         //Previous weather data parameter value for comparison
-        double previousWeatherParameterValue = 0.0;
+        Double previousWeatherParameterValue = null;
         //Test values for relative model
-        double testValue_max;
-        double testValue_min;
-        //Counter for while loop
-        int counter = 0;
+        Double testValue_max;
+        Double testValue_min;
         
         // If there is only one weather data parameter value the step test cannor run
         //and returns 0 (no quality control performed)
@@ -123,9 +119,13 @@ public class QCNonRTTester {
             for(int i=0;i<weatherParameterValues.length;i++)
             {
                 weatherParameterValue = weatherParameterValues[i];
-                counter ++;
+                if(weatherParameterValue == null)
+                {
+                	continue;
+                }
+
                 //If counter > 1 the step test can be performed (we now have current value and previous value)
-                if (counter > 1) {
+                if (previousWeatherParameterValue != null) {
                     switch (thresholdType) {
                         case "absolute":
                             //Step test for absolute type where the threshold is + or - n units
@@ -196,7 +196,10 @@ public class QCNonRTTester {
         // loop through and compare current value to its previous value
         for (int i=0; i < weatherParameterValues.length; i++) {
             value = weatherParameterValues[i];
-
+            if(value == null)
+            {
+            	continue;
+            }
             // Treat the first value and the case of differing values the same way: reset comparison.
             if (previousValue == null || Double.compare(previousValue, value) != 0) {
                 previousValue = value;

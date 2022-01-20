@@ -135,7 +135,6 @@ public class AmalgamationBean {
 		if(rhParamsInDataset.size() > 0)
 		{
 			Integer rhParamIndex = weatherData.getParameterIndex(rhParamsInDataset.get(0));
-			System.out.println("rhParamIndex=" + rhParamIndex);
 			for(LocationWeatherData lwd: weatherData.getLocationWeatherData()) {
 				Double[][] oldData = lwd.getData();
 				Double[][] newData = new Double[oldData.length][oldData[0].length + 1];

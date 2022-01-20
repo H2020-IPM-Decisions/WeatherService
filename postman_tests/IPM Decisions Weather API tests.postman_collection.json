@@ -270,12 +270,12 @@
 								},
 								{
 									"key": "timeStart",
-									"value": "2021-02-01",
+									"value": "2022-01-02",
 									"type": "text"
 								},
 								{
 									"key": "timeEnd",
-									"value": "2021-03-01",
+									"value": "2022-01-10",
 									"type": "text"
 								},
 								{
@@ -318,12 +318,12 @@
 								},
 								{
 									"key": "timeStart",
-									"value": "2021-02-01",
+									"value": "2022-01-02",
 									"disabled": true
 								},
 								{
 									"key": "timeEnd",
-									"value": "2021-03-01",
+									"value": "2022-01-10",
 									"disabled": true
 								},
 								{
@@ -904,6 +904,78 @@
 						}
 					},
 					"response": []
+				},
+				{
+					"name": "SLU Lantmet (Sweden) GRID",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.sendRequest(pm.environment.get(\"wx_url\") + \"/rest/schema/weatherdata\",function(err,res){",
+									"    pm.test(\"Data is valid WeatherData\", function(){",
+									"        var schema = res.json();",
+									"        pm.expect(tv4.validate(pm.response.json(), schema)).to.be.true;",
+									"    });",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": []
+						},
+						"url": {
+							"raw": "{{wx_url}}/rest/weatheradapter/lantmet?latitude=55.752&longitude=13.039&parameters=2001,1002&timeStart=2021-10-01&timeEnd=2021-10-10&interval=3600",
+							"host": [
+								"{{wx_url}}"
+							],
+							"path": [
+								"rest",
+								"weatheradapter",
+								"lantmet"
+							],
+							"query": [
+								{
+									"key": "latitude",
+									"value": "55.752"
+								},
+								{
+									"key": "longitude",
+									"value": "13.039"
+								},
+								{
+									"key": "parameters",
+									"value": "2001,1002"
+								},
+								{
+									"key": "timeStart",
+									"value": "2021-10-01"
+								},
+								{
+									"key": "timeEnd",
+									"value": "2021-10-10"
+								},
+								{
+									"key": "interval",
+									"value": "3600"
+								}
+							]
+						}
+					},
+					"response": []
 				}
 			]
 		},
@@ -1047,8 +1119,9 @@
 									"    {",
 									"        var endpoint = dataSourceList[i].endpoint;",
 									"        ",
-									"        pm.sendRequest(endpoint, function (err, response2) {",
-									"            console.info(\"Investigating endpoint \" + endpoint)",
+									"        pm.sendRequest(endpoint, function (err, response2) { ",
+									"            console.info(\"Investigating endpoint \" + response2.headers)",
+									"            //console.info(\"Response=\" + JSON.stringify(response2));",
 									"            pm.expect(response2.code).to.not.equal(404);",
 									"        });",
 									"    }",
@@ -1305,7 +1378,7 @@
 			"name": "AmalgamationService",
 			"item": [
 				{
-					"name": "Amalgamate endpoint test",
+					"name": "Amalgamate proxy endpoint test",
 					"event": [
 						{
 							"listen": "test",
@@ -1340,7 +1413,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{wx_url}}/rest/amalgamation/amalgamate/?endpointURL=http%3A%2F%2Flocalhost:8080%2FWeatherService%2Frest%2Ftestdata%2Fweather%2Finterpolation%2Ftemperature&endpointQueryStr=longitude%3D14.3711%26latitude%3D67.2828%26altitude%3D70%26parameters%3D1001%2C3001",
+							"raw": "{{wx_url}}/rest/amalgamation/amalgamate/proxy?endpointURL=http%3A%2F%2Flocalhost:8080%2FWeatherService%2Frest%2Ftestdata%2Fweather%2Finterpolation%2Ftemperature&endpointQueryStr=longitude%3D14.3711%26latitude%3D67.2828%26altitude%3D70%26parameters%3D1001%2C3001",
 							"host": [
 								"{{wx_url}}"
 							],
@@ -1348,7 +1421,7 @@
 								"rest",
 								"amalgamation",
 								"amalgamate",
-								""
+								"proxy"
 							],
 							"query": [
 								{
@@ -1390,6 +1463,75 @@
 					"response": []
 				},
 				{
+					"name": "Amalgamate proxy Euroweather test",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 500\", function () {",
+									"    pm.response.to.have.status(500);",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{wx_url}}/rest/amalgamation/amalgamate/proxy?endpointURL=https%3A%2F%2Feuroweather.ipmdecisions.nibio.no%2Fweather_data&endpointQueryStr=longitude%3D10.961%26latitude%3D60.109%26interval%3D86400%26timeStart%3D2022-01-01%26timeEnd%3D2022-01-13%26ignoreErrors%3Dtrue%26parameters%3D1001%2C3002%2C2001%2C4012",
+							"host": [
+								"{{wx_url}}"
+							],
+							"path": [
+								"rest",
+								"amalgamation",
+								"amalgamate",
+								"proxy"
+							],
+							"query": [
+								{
+									"key": "longitude",
+									"value": "14.3711",
+									"disabled": true
+								},
+								{
+									"key": "latitude",
+									"value": "67.2828",
+									"disabled": true
+								},
+								{
+									"key": "altitude",
+									"value": "70",
+									"disabled": true
+								},
+								{
+									"key": "parameters",
+									"value": "1001, 3001",
+									"disabled": true
+								},
+								{
+									"key": "endpointURL",
+									"value": "https%3A%2F%2Feuroweather.ipmdecisions.nibio.no%2Fweather_data"
+								},
+								{
+									"key": "endpointQueryStr",
+									"value": "longitude%3D14.3711%26latitude%3D67.2828%26altitude%3D70%26parameters%3D1001%2C3001%2C3099",
+									"disabled": true
+								},
+								{
+									"key": "endpointQueryStr",
+									"value": "longitude%3D10.961%26latitude%3D60.109%26interval%3D86400%26timeStart%3D2022-01-01%26timeEnd%3D2022-01-13%26ignoreErrors%3Dtrue%26parameters%3D1001%2C3002%2C2001%2C4012"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
 					"name": "Interpolation test",
 					"protocolProfileBehavior": {
 						"disableBodyPruning": true
@@ -1424,6 +1566,191 @@
 								{
 									"key": "paramsToInterpolate",
 									"value": "1002"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Amalgamation test",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{wx_url}}/rest/amalgamation/amalgamate?longitude=10.961&latitude=56.109&timeStart=2022-01-01&timeEnd=2022-01-23&interval=3600&parameters=1001,2001",
+							"host": [
+								"{{wx_url}}"
+							],
+							"path": [
+								"rest",
+								"amalgamation",
+								"amalgamate"
+							],
+							"query": [
+								{
+									"key": "longitude",
+									"value": "10.961"
+								},
+								{
+									"key": "latitude",
+									"value": "56.109"
+								},
+								{
+									"key": "timeStart",
+									"value": "2022-01-01"
+								},
+								{
+									"key": "timeEnd",
+									"value": "2022-01-23"
+								},
+								{
+									"key": "interval",
+									"value": "3600"
+								},
+								{
+									"key": "parameters",
+									"value": "1001,2001"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Amalgamation test fallback parameter",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Only one parameter is returned\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.weatherParameters.length).to.equal(1);",
+									"});",
+									"",
+									"pm.test(\"Param 1002 is returned\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.weatherParameters.indexOf(1002)).greaterThan(-1);",
+									"});",
+									"",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{wx_url}}/rest/amalgamation/amalgamate?longitude=10.961&latitude=56.109&timeStart=2022-01-01&timeEnd=2022-01-23&interval=3600&parameters=1002",
+							"host": [
+								"{{wx_url}}"
+							],
+							"path": [
+								"rest",
+								"amalgamation",
+								"amalgamate"
+							],
+							"query": [
+								{
+									"key": "longitude",
+									"value": "10.961"
+								},
+								{
+									"key": "latitude",
+									"value": "56.109"
+								},
+								{
+									"key": "timeStart",
+									"value": "2022-01-01"
+								},
+								{
+									"key": "timeEnd",
+									"value": "2022-01-23"
+								},
+								{
+									"key": "interval",
+									"value": "3600"
+								},
+								{
+									"key": "parameters",
+									"value": "1002"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Amalgamation test LW calculation",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Only one parameter is returned\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.weatherParameters.length).to.equal(1);",
+									"});",
+									"",
+									"pm.test(\"Param 3101 is returned\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.weatherParameters.indexOf(3101)).greaterThan(-1);",
+									"});",
+									"",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{wx_url}}/rest/amalgamation/amalgamate?longitude=10.961&latitude=56.109&timeStart=2022-01-01&timeEnd=2022-01-23&interval=3600&parameters=3101",
+							"host": [
+								"{{wx_url}}"
+							],
+							"path": [
+								"rest",
+								"amalgamation",
+								"amalgamate"
+							],
+							"query": [
+								{
+									"key": "longitude",
+									"value": "10.961"
+								},
+								{
+									"key": "latitude",
+									"value": "56.109"
+								},
+								{
+									"key": "timeStart",
+									"value": "2022-01-01"
+								},
+								{
+									"key": "timeEnd",
+									"value": "2022-01-23"
+								},
+								{
+									"key": "interval",
+									"value": "3600"
+								},
+								{
+									"key": "parameters",
+									"value": "3101"
 								}
 							]
 						}

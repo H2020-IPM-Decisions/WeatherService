@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 NIBIO <http://www.nibio.no/>. 
+ * Copyright (c) 2022 NIBIO <http://www.nibio.no/>. 
  * 
  * This file is part of IPMDecisionsWeatherService.
  * IPMDecisionsWeatherService is free software: you can redistribute it and/or modify
@@ -47,7 +47,7 @@ import javax.validation.constraints.Size;
  * is a hard coded Json file at the root of the jar file. To get the schema for WeatherData,
  * use SchemaProvider.getWeatherDataSchema()
  * 
- * @copyright 2021 <a href="http://www.nibio.no/">NIBIO</a>
+ * @copyright 2021-2022 <a href="http://www.nibio.no/">NIBIO</a>
  * @author Tor-Einar Skog <tor-einar.skog@nibio.no>
  */
 @JsonSchemaInject(strings = {
@@ -180,14 +180,15 @@ public class WeatherData {
     	{
     		return;
     	}
+    	
     	Integer paramIndex = this.getParameterIndex(weatherParameter);
     	
-    	// Loop through LocationWeatherData
-    	// Reduce dataset
+    	// Loop through LocationWeatherData, reduce dataset
     	for(LocationWeatherData lwd: this.getLocationWeatherData())
     	{
     		Double[][] oldData = lwd.getData();
 			Double[][] newData = new Double[oldData.length][oldData[0].length - 1];
+			// Removing the data column
 			for(int row = 0; row < oldData.length; row++)
 			{
 				for(int col=0; col < oldData[0].length; col++)
@@ -202,6 +203,42 @@ public class WeatherData {
 						newData[row][col -1] = oldData[row][col];
 					}
 				}
+			}
+			// Remove the parameter from amalgamation list
+			if(lwd.getAmalgamation() != null)
+			{
+				Integer[] newAmalgamationList = new Integer[lwd.getAmalgamation().length-1]; 
+				for(int col=0; col < lwd.getAmalgamation().length; col++)
+				{
+					// Old data are copied
+					if(col < paramIndex)
+					{
+						newAmalgamationList[col] = lwd.getAmalgamation()[col];
+					}
+					else if(col > paramIndex) // Shifting data
+					{
+						newAmalgamationList[col -1] = lwd.getAmalgamation()[col];
+					}
+				}
+				lwd.setAmalgamation(newAmalgamationList);
+			}
+			// Remove the parameter from qc list
+			if(lwd.getQC() != null)
+			{
+				Integer[] newQCList = new Integer[lwd.getQC().length-1]; 
+				for(int col=0; col < lwd.getQC().length; col++)
+				{
+					// Old data are copied
+					if(col < paramIndex)
+					{
+						newQCList[col] = lwd.getQC()[col];
+					}
+					else if(col > paramIndex) // Shifting data
+					{
+						newQCList[col -1] = lwd.getQC()[col];
+					}
+				}
+				lwd.setQC(newQCList);
 			}
 			lwd.setData(newData);
     	}
@@ -244,6 +281,11 @@ public class WeatherData {
         this.locationWeatherData.add(locationWeatherData);
     }
 
+    /**
+     * Get data for the specified parameter - for all locations
+     * @param parameterCode
+     * @return
+     */
     @JsonIgnore
     public List<LocationWeatherData> getDataForParameter(Integer parameterCode)
     {

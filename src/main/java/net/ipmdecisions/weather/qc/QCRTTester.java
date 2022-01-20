@@ -71,7 +71,7 @@ public class QCRTTester {
      * upper and lower limits. The threshold data is accessed using ThresholdData class.
      * This release implements file based rules but builds foundation for getting the
      * rules form REST or other type external source.
-     * @param weatherParameterValuesAsList Weather data parameter values as List
+     * @param weatherParameterValues Weather data parameter values as List
      * @param weatherParameter Weather data parameter key
      * @return QC result as integer
      * Returns

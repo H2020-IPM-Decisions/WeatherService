@@ -73,6 +73,17 @@ public class LocationWeatherData {
         this.data = new Double[rows][columns];
     }
     
+    @JsonIgnore
+    public Double[] getDataForIndex(Integer index)
+    {
+    	Double[] retVal = new Double[this.getData().length];
+    	for(int row=0;row<retVal.length;row++)
+    	{
+    		retVal[row] = this.getData()[row][index];
+    	}
+    	return retVal;
+    }
+    
     /**
      * 
      * @return The number of rows in the dataset 
@@ -95,6 +106,8 @@ public class LocationWeatherData {
     {
         return this.data;
     }
+    
+    
     
     public void setData(Double[][] data)
     {

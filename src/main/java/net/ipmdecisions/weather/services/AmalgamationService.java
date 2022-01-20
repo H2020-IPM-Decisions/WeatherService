@@ -49,6 +49,7 @@ import net.ipmdecisions.weather.controller.AmalgamationBean;
 import net.ipmdecisions.weather.entity.LocationWeatherData;
 import net.ipmdecisions.weather.entity.LocationWeatherDataException;
 import net.ipmdecisions.weather.entity.WeatherDataSourceException;
+import net.ipmdecisions.weather.qc.QualityControlMethods;
 import net.ipmdecisions.weather.entity.WeatherData;
 import net.ipmdecisions.weather.entity.WeatherDataSource;
 
@@ -118,16 +119,27 @@ public class AmalgamationService {
 						: new HashSet<>();
 			}
 			// 1.2 QC check
-			// TODO: Perform QC checks
-			// Add failing Params to 
+			// Need to add QC info if missing from data source
+			for(LocationWeatherData lwd:dataFromSource.getLocationWeatherData())
+			{
+				if(lwd.getQC() == null || lwd.getQC().length < dataFromSource.getWeatherParameters().length)
+				{
+					Integer[] qc = new Integer[dataFromSource.getWeatherParameters().length];
+					for(int i=0;i<qc.length;i++)
+					{
+						qc[i] = (lwd.getQC() != null && i < lwd.getQC().length) ? lwd.getQC()[i] : 0;
+					}
+					lwd.setQC(qc);
+				}
+			}
+			
+			// Controlling the data
+			QualityControlMethods qcm = new QualityControlMethods();
+			dataFromSource = qcm.getQC(dataFromSource);
+			// Collecting failed parameters
 			Set<Integer> failedParameters = new HashSet<>();
 			for(LocationWeatherData lwd:dataFromSource.getLocationWeatherData())
 			{
-				if(lwd.needsQC())
-				{
-					// TODO: Run the QC
-				}
-				
 				Integer[] QC = lwd.getQC();
 				if(QC != null)
 				{
@@ -141,17 +153,11 @@ public class AmalgamationService {
 				}
 			}
 			
-			
-			// 2.  Data restoration/generation
+			// 2.  Data restoration/generation of failed parameters
 			for(Integer failedParam:failedParameters)
 			{
 				// 2.1 Interpolate
 				dataFromSource = new Interpolation().interpolate(dataFromSource, Set.of(1001,1002),1);
-				// 2.2 Calculate
-				
-				// 2.3 Fallback
-				
-				
 			}
 			
 			// Calculate entire missing parameters - now that we have the best available dataset 
@@ -269,7 +275,7 @@ public class AmalgamationService {
 			// this.dumpResponse(completeURL);
 			return Response.ok().entity(dataFromSource).build();
 		} catch (IOException | LocationWeatherDataException | WeatherDataSourceException ex) {
-			ex.printStackTrace();
+			//ex.printStackTrace();
 			return Response.serverError().entity(ex.getMessage()).build();
 		}
 	}
