@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -40,10 +41,15 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import java.time.Instant;
+import java.time.LocalDate;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
+import net.iakovlev.timeshape.TimeZoneEngine;
 import net.ipmdecisions.weather.amalgamation.Interpolation;
 import net.ipmdecisions.weather.controller.AmalgamationBean;
 import net.ipmdecisions.weather.entity.LocationWeatherData;
@@ -63,6 +69,10 @@ import net.ipmdecisions.weather.entity.WeatherDataSource;
  */
 @Path("rest/amalgamation")
 public class AmalgamationService {
+	
+	
+	
+	
 	
 	@EJB
 	AmalgamationBean amalgamationBean;
@@ -90,8 +100,24 @@ public class AmalgamationService {
 	) {
 		try
 		{
+			
+			List<Integer> requestedParameters = Arrays.asList(parametersStr.split(",")).stream()
+					.map(p->Integer.valueOf(p))
+					.collect(Collectors.toList());
+			ZoneId tzForLocation = amalgamationBean.getTimeZoneForLocation(longitude, latitude);
+			Instant timeStart = LocalDate.parse(timeStartStr).atStartOfDay(tzForLocation).toInstant();
+			Instant timeEnd = LocalDate.parse(timeEndStr).atStartOfDay(tzForLocation).toInstant();
 			WeatherDataSource wds = amalgamationBean.getWeatherDataSourceBestEffort(longitude, latitude);
-			URL url = new URL(wds.getEndpoint() 
+			List<WeatherDataSource> wdss = amalgamationBean.getWeatherDataSourcesInPriorityOrder(longitude, latitude, 
+					requestedParameters,
+					timeStart,
+					timeEnd);
+			//wdss.forEach(w->System.out.println(w.getName()));
+			
+			List<WeatherData> weatherDataFromSources = new ArrayList<>();
+			for(WeatherDataSource currentWDS:wdss)
+			{
+				URL url = new URL(currentWDS.getEndpoint() 
 					+ "?longitude=" + longitude 
 					+ "&latitude=" + latitude 
 					+ "&timeStart=" + timeStartStr
@@ -100,31 +126,43 @@ public class AmalgamationService {
 					// + "&parameters=" + parametersStr // Exclude this in order to collect all parameters from the source
 					);
 					
-			WeatherData dataFromSource = this.getWeatherDataFromSource(url);
+				weatherDataFromSources.add(this.getWeatherDataFromSource(url));
+			
+			}
+			WeatherData fusionedData = amalgamationBean.getFusionedWeatherData(
+					weatherDataFromSources,
+					timeStart,
+					timeEnd,
+					interval
+					);
+			/*ObjectMapper objectMapper = new ObjectMapper();
+			objectMapper.registerModule(new JavaTimeModule()); 
+			System.out.println(objectMapper.writeValueAsString(fusionedData));
+			*/
+			
 			// 1.  Data control
 			// 1.1 Are there missing parameters?
-			List<Integer> requestedParameters = Arrays.asList(parametersStr.split(",")).stream()
-					.map(p->Integer.valueOf(p))
-					.collect(Collectors.toList());
+			
 			Set<Integer> missingParameters = requestedParameters != null && ! requestedParameters.isEmpty() ? 
-					this.getMissingParameters(requestedParameters, Arrays.asList(dataFromSource.getWeatherParameters()))
+					this.getMissingParameters(requestedParameters, Arrays.asList(fusionedData.getWeatherParameters()))
 					: new HashSet<>();
 			// First fix: Map interchangeable parameters (e.g. instantaneous and average temperatures)
 			if(missingParameters.size() > 0)
 			{
-				dataFromSource = amalgamationBean.addFallbackParameters(dataFromSource, missingParameters);
+				fusionedData = amalgamationBean.addFallbackParameters(fusionedData, missingParameters);
 				// Refresh the missing parameters
 				missingParameters = requestedParameters != null && ! requestedParameters.isEmpty() ? 
-						this.getMissingParameters(requestedParameters, Arrays.asList(dataFromSource.getWeatherParameters()))
+						this.getMissingParameters(requestedParameters, Arrays.asList(fusionedData.getWeatherParameters()))
 						: new HashSet<>();
 			}
 			// 1.2 QC check
 			// Need to add QC info if missing from data source
-			for(LocationWeatherData lwd:dataFromSource.getLocationWeatherData())
+			// THIS WILL NEVER RUN - since the getQC() method always returns the correctly sized array
+			for(LocationWeatherData lwd:fusionedData.getLocationWeatherData())
 			{
-				if(lwd.getQC() == null || lwd.getQC().length < dataFromSource.getWeatherParameters().length)
+				if(lwd.getQC() == null || lwd.getQC().length < fusionedData.getWeatherParameters().length)
 				{
-					Integer[] qc = new Integer[dataFromSource.getWeatherParameters().length];
+					Integer[] qc = new Integer[fusionedData.getWeatherParameters().length];
 					for(int i=0;i<qc.length;i++)
 					{
 						qc[i] = (lwd.getQC() != null && i < lwd.getQC().length) ? lwd.getQC()[i] : 0;
@@ -135,10 +173,10 @@ public class AmalgamationService {
 			
 			// Controlling the data
 			QualityControlMethods qcm = new QualityControlMethods();
-			dataFromSource = qcm.getQC(dataFromSource);
+			fusionedData = qcm.getQC(fusionedData);
 			// Collecting failed parameters
 			Set<Integer> failedParameters = new HashSet<>();
-			for(LocationWeatherData lwd:dataFromSource.getLocationWeatherData())
+			for(LocationWeatherData lwd:fusionedData.getLocationWeatherData())
 			{
 				Integer[] QC = lwd.getQC();
 				if(QC != null)
@@ -147,39 +185,40 @@ public class AmalgamationService {
 					{
 						if(QC[i] >= 4)
 						{
-							failedParameters.add(dataFromSource.getWeatherParameters()[i]);
+							failedParameters.add(fusionedData.getWeatherParameters()[i]);
 						}
 					}
 				}
 			}
 			
+			
 			// 2.  Data restoration/generation of failed parameters
 			for(Integer failedParam:failedParameters)
 			{
 				// 2.1 Interpolate
-				dataFromSource = new Interpolation().interpolate(dataFromSource, Set.of(1001,1002),1);
+				fusionedData = new Interpolation().interpolate(fusionedData, Set.of(1001,1002),1);
 			}
 			
 			// Calculate entire missing parameters - now that we have the best available dataset 
 			// E.g. Leaf wetness
 			if(missingParameters.contains(3101))  // Leaf wetness
 			{
-				dataFromSource = amalgamationBean.calculateLeafWetnessBestEffort(dataFromSource);
+				fusionedData = amalgamationBean.calculateLeafWetnessBestEffort(fusionedData);
 				missingParameters = requestedParameters != null && ! requestedParameters.isEmpty() ? 
-						this.getMissingParameters(requestedParameters, Arrays.asList(dataFromSource.getWeatherParameters()))
+						this.getMissingParameters(requestedParameters, Arrays.asList(fusionedData.getWeatherParameters()))
 						: new HashSet<>();
 			}
 			
 			// Finally: Remove any parameters not requested
-			List<Integer> parametersToRemove = Arrays.asList(dataFromSource.getWeatherParameters()).stream()
+			List<Integer> parametersToRemove = Arrays.asList(fusionedData.getWeatherParameters()).stream()
 					.filter(param->!requestedParameters.contains(param))
 					.collect(Collectors.toList());
 			for(Integer parameterToRemove:parametersToRemove)
 			{
-				dataFromSource.removeParameter(parameterToRemove);
+				fusionedData.removeParameter(parameterToRemove);
 			}
 			
-			return Response.ok().entity(dataFromSource).build();
+			return Response.ok().entity(fusionedData).build();
 		}
 		catch(IOException | WeatherDataSourceException | LocationWeatherDataException ex)
 		{
@@ -351,6 +390,7 @@ public class AmalgamationService {
 	}
 
 	private String getResponseAsPlainText(URL theURL) throws IOException, WeatherDataSourceException {
+		//System.out.println(theURL.toString());
 		HttpURLConnection conn = (HttpURLConnection) theURL.openConnection();
 		int resultCode = conn.getResponseCode();
 		// Follow redirects, also https
@@ -385,4 +425,6 @@ public class AmalgamationService {
 	public Response heartbeat() {
 		return Response.ok().entity("Amalgamate service: Pulse detected!").build();
 	}
+	
+	
 }

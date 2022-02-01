@@ -19,9 +19,16 @@
 
 package net.ipmdecisions.weather.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.webcohesion.enunciate.metadata.DocumentationExample;
 import com.webcohesion.enunciate.metadata.rs.TypeHint;
+
+import net.ipmdecisions.weather.entity.serializers.WeatherDataSourceHistoricDeserializer;
+
+import java.time.Instant;
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -34,12 +41,14 @@ import java.util.stream.Stream;
  * @copyright 2021 <a href="http://www.nibio.no/">NIBIO</a>
  * @author Tor-Einar Skog <tor-einar.skog@nibio.no>
  */
-public class WeatherDataSource {
+public class WeatherDataSource implements Comparable {
     private String id, name, description, public_URL,endpoint, authentication_type, needs_data_control, access_type;
+    private Integer priority;
     private Temporal temporal;
     private Parameters parameters; 
     private Spatial spatial;
     private Organization organization;
+    
     
     /** No authentication required for the data source */
     public static String AUTHENTICATION_TYPE_NONE = "NONE";
@@ -63,6 +72,39 @@ public class WeatherDataSource {
     		WeatherDataSource.AUTHENTICATION_TYPE_CREDENTIALS,
     		WeatherDataSource.AUTHENTICATION_TYPE_BEARER_TOKEN
     		).collect(Collectors.toList());
+    
+    @JsonIgnore
+    public Instant getTemporalStart()
+    {
+    	
+    	if(this.getTemporal().getHistoric().getStart() != null)
+    	{
+    		// Search for {CURRENT_YEAR}, edit string
+    		return this.getTemporal().getHistoric().getStart().atStartOfDay(ZoneId.of("Z")).toInstant();
+    	}
+    	// No historic data. Assuming forecasts from "today at midnight"
+    	else
+    	{
+    		return LocalDate.now().atStartOfDay(ZoneId.of("Z")).toInstant();
+    	}
+    }
+    
+    @JsonIgnore
+    public Instant getTemporalEnd()
+    {
+    	// If we have the historic end set, it's a completed timeseries
+    	if(this.getTemporal().getHistoric().getEnd() != null)
+    	{
+    		return this.getTemporal().getHistoric().getEnd().atStartOfDay(ZoneId.of("Z")).toInstant();
+    	}
+    	// Otherwise it's either contemporary measured data or forecasts
+    	else 
+    	{
+    		Integer daysAhead = Math.max(0, this.getTemporal().getForecast());
+    		return LocalDate.now().plusDays(daysAhead + 1).atStartOfDay(ZoneId.of("Z")).toInstant();
+    		
+    	}
+    }
     
     /**
      * A data class for identifying the Organization behind/responsible for the Weather data source
@@ -240,15 +282,16 @@ public class WeatherDataSource {
      * Describes the period for which this data source can provide weather data
      * 
      */
-    static class Temporal {
-        private int forecast;
-        private Historic historic;
+    public static class Temporal {
+        public int forecast;
+        public Historic historic;
         
         /**
          * To what extent does this data source contain historic/measured data (as opposed to
          * forecasts)
          */
-        static class Historic {
+        @JsonDeserialize(using = WeatherDataSourceHistoricDeserializer.class)
+        public static class Historic {
             
             private LocalDate start, end;
 
@@ -325,7 +368,7 @@ public class WeatherDataSource {
      * The parameters are given by their id. For lookup, see: 
      * https://ipmdecisions.nibio.no/weather/rest/parameter/list
      */
-    static class Parameters {
+    public static class Parameters {
         private int[] common, optional;
 
         /**
@@ -536,4 +579,23 @@ public class WeatherDataSource {
     	}
     	this.authentication_type = authentication_type;
     }
+
+	/**
+	 * @return the priority
+	 */
+	public Integer getPriority() {
+		return priority;
+	}
+
+	/**
+	 * @param priority the priority to set
+	 */
+	public void setPriority(Integer priority) {
+		this.priority = priority;
+	}
+
+	@Override
+	public int compareTo(Object other) {
+		return this.getPriority().compareTo(((WeatherDataSource) other).getPriority());
+	}
 }

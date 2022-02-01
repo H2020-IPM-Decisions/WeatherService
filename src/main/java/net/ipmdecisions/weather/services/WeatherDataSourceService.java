@@ -126,85 +126,21 @@ public class WeatherDataSourceService {
         Double toleranceFinal = tolerance == null ? 0.0 : tolerance;
         try
         {
-        FeatureCollection clientFeatures = (FeatureCollection) GeoJSONFactory.create(geoJson);
-        GeoJSONReader reader = new GeoJSONReader();
-        // Get all geometries in request
-        List<Geometry> clientGeometries = new ArrayList<>();
-        for(Feature feature: clientFeatures.getFeatures())
-        {
-            Geometry geom = reader.read(feature.getGeometry());
-            clientGeometries.add(geom);
-        }
-        // Loop through all weather data sources
-        // Return only data sources with geometries intersecting with the client's
-        // specified geometries
-        GISUtils gisUtils = new GISUtils();
-        List<WeatherDataSource> retVal = weatherDataSourceBean.getAllWeatherDataSources().stream().filter(dataSource->{
-            // Get all geometries in current weather data source
-            String dataSourceGeoJsonStr = ""; 
-            try
-            {
-            	dataSourceGeoJsonStr = dataSource.getSpatial().getGeoJSON();
-
-            }
-            catch(NullPointerException ex)
-            { /* Pass */ }
-            
-            // We do a brute force search for the string "Sphere" in the geoJSON string
-            // to bypass any issues in deserialization of that custom type, which is 
-            // short for creating a polygon that covers the entire globe
-            if(dataSourceGeoJsonStr != null && dataSourceGeoJsonStr.contains("\"Sphere\""))
-            {
-                return true;
-            }
-            
-            // Get all geometries for current Weather data source
-            // Country boundaries
-            List<Feature> dataSourceFeatures = new ArrayList<>();
-            try
-            {
-            	dataSourceFeatures = Arrays.asList(gisUtils.getCountryBoundaries(new HashSet<>(Arrays.asList(
-	                    dataSource.getSpatial().getCountries()
-	            ))).getFeatures());
-            }
-            catch(NullPointerException ex)
-            { /* Pass */ }
-            
-            try
-            {
-            	if(!dataSourceGeoJsonStr.isBlank())
-            	{
-            		dataSourceFeatures.addAll(Arrays.asList(
-            				((FeatureCollection) GeoJSONFactory.create(dataSourceGeoJsonStr)).getFeatures()
-            				));
-            	}
-            }
-            catch(RuntimeException ex) {}
-            //FeatureCollection dataSourceFeatures = (FeatureCollection) GeoJSONFactory.create(dataSourceGeoJsonStr);
-            // Match with all geometries in request. If found, add data source to
-            // list of matching data sources
-            List<Geometry> dataSourceGeometries = dataSourceFeatures.stream()
-            .map(f->{ return reader.read(f.getGeometry()); })
-            .filter(dataSourceGeometry->{
-                Boolean matching = false;
-                for(Geometry clientGeometry: clientGeometries)
-                {
-                    if(dataSourceGeometry.intersects(clientGeometry) || gisUtils.getDistanceInMetersWGS84(dataSourceGeometry.distance(clientGeometry)) <= toleranceFinal)
-                    {
-                        //System.out.println("Distance: " + gisUtils.getDistanceInMetersWGS84(dataSourceGeometry.distance(clientGeometry)));
-                        matching = true;
-                    }
-                }
-                return matching;
-            })
-            .collect(Collectors.toList());
-            // The number of matching geometries for this weather data source
-            // Used as filter criteria
-            return dataSourceGeometries.size() > 0; 
-        })
-        .collect(Collectors.toList());
-        
-        return Response.ok().entity(retVal).build();
+	        FeatureCollection clientFeatures = (FeatureCollection) GeoJSONFactory.create(geoJson);
+	        GeoJSONReader reader = new GeoJSONReader();
+	        // Get all geometries in request
+	        List<Geometry> clientGeometries = new ArrayList<>();
+	        for(Feature feature: clientFeatures.getFeatures())
+	        {
+	            Geometry geom = reader.read(feature.getGeometry());
+	            clientGeometries.add(geom);
+	        }
+	        // Loop through all weather data sources
+	        // Return only data sources with geometries intersecting with the client's
+	        // specified geometries
+	        List<WeatherDataSource> retVal = weatherDataSourceBean.getWeatherDataSourcesForLocation(clientGeometries, toleranceFinal); 
+	        		
+	        return Response.ok().entity(retVal).build();
         }catch(IOException ex)
         {
             return Response.serverError().entity(ex.getMessage()).build();
@@ -231,17 +167,15 @@ public class WeatherDataSourceService {
             @QueryParam("tolerance") Double tolerance
             )
     {
-        tolerance = tolerance == null ? 0.0 : tolerance;
-        // Generate GeoJSON for a point and call the general method
-        double[] coordinate = new double[2];
-        coordinate[0] = longitude;
-        coordinate[1] = latitude;
-        Point point = new Point(coordinate);
-        List<Feature> features = new ArrayList<>();
-        Map<String, Object> properties = new HashMap<>();
-        features.add(new Feature(point,properties));
-        GeoJSONWriter writer = new GeoJSONWriter();
-        return this.listWeatherDataSourcesForLocation(tolerance, writer.write(features).toString());
+    	try
+    	{
+	        tolerance = tolerance == null ? 0.0 : tolerance;
+	        return Response.ok().entity(weatherDataSourceBean.getWeatherDataSourcesForLocation(longitude, latitude, tolerance)).build();
+    	}
+    	catch(IOException ex)
+    	{
+    		return Response.serverError().entity(ex.getMessage()).build();
+    	}
     }
     
     @GET

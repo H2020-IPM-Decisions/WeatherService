@@ -103,14 +103,12 @@ public class QualityControlMethods {
         //Location weather data array from inbound weather data
         List<LocationWeatherData> locationWeatherData = weatherData.getLocationWeatherData();
         //Location weather data object def
-        LocationWeatherData locationWeatherDataObject;
+        
         //Weather parameters as JSON array from inpound weather data
         Integer[] weatherParameters = weatherData.getWeatherParameters();
 
         //Iterate through location weather data array
-        for (int i=0; i<locationWeatherData.size(); i++) {
-            //Location weather data object into variable
-            locationWeatherDataObject = locationWeatherData.get(i);
+        for (LocationWeatherData locationWeatherDataObject: locationWeatherData) {
             
             Integer[] qc = locationWeatherDataObject.getQC();
             

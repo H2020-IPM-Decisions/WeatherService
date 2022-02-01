@@ -228,6 +228,12 @@ public class LocationWeatherData {
     		this.QC = new Integer[this.getWidth()];
     		Arrays.fill(this.QC, QCType.NO_QC);
     	}
+    	else if(this.QC.length < this.getWidth())
+		{
+			int oldLength = this.QC.length;
+			this.QC = Arrays.copyOf(this.QC, this.getWidth());
+			Arrays.fill(this.QC, oldLength, this.QC.length, QCType.NO_QC);
+		}
         return this.QC;
     }
 
@@ -246,6 +252,12 @@ public class LocationWeatherData {
 		{
 			this.amalgamation = new Integer[this.getWidth()];
 			Arrays.fill(this.amalgamation, AmalgamationType.NONE);
+		}
+		else if(this.amalgamation.length < this.getWidth())
+		{
+			int oldLength = this.amalgamation.length;
+			this.amalgamation = Arrays.copyOf(this.amalgamation, this.getWidth());
+			Arrays.fill(this.amalgamation, oldLength, this.amalgamation.length, AmalgamationType.NONE);
 		}
 		return this.amalgamation;
 	}
