@@ -30,6 +30,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.TimeZone;
 import java.util.stream.Collectors;
 
 import javax.ejb.EJB;
@@ -40,9 +41,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 import net.iakovlev.timeshape.TimeZoneEngine;
+import net.ipmdecisions.weather.amalgamation.WeatherDataAggregationException;
 import net.ipmdecisions.weather.entity.LocationWeatherData;
 import net.ipmdecisions.weather.entity.WeatherData;
 import net.ipmdecisions.weather.entity.WeatherDataSource;
+import net.ipmdecisions.weather.entity.WeatherParameter;
 import net.ipmdecisions.weather.services.WeatherDataSourceService;
 
 /**
@@ -56,7 +59,10 @@ public class AmalgamationBean {
 	TimeZoneEngine tzEngine;
 	
 	@EJB
-	WeatherDataSourceBean weatherDataSourceBean;
+	protected WeatherDataSourceBean weatherDataSourceBean;
+	
+	@EJB
+	protected MetaDataBean metaDataBean;
 	
 	// Interchangeable parameters (e.g. instantaneous and average temperatures)
 	// Temperature: 1001 (inst) - 1002 (avg) 
@@ -219,8 +225,9 @@ public class AmalgamationBean {
 			List<WeatherData> weatherData,
 			Instant timeStart,
 			Instant timeEnd,
-			Integer interval
-			)
+			Integer interval,
+			ZoneId zoneId
+			) throws IOException
 	{
 		ObjectMapper oMapper = new ObjectMapper();
 		oMapper.registerModule(new JavaTimeModule());
@@ -232,10 +239,12 @@ public class AmalgamationBean {
 		for(WeatherData currentWD:weatherData)
 		{
 			// Anything to work with here?
+			// Has to contain relevant weather parameters
+			// Has to have data with minimum the requested interval (hourly when requested daily are OK, the opposite is not)
 			Set<Integer> currentWDParams = currentWD.getWeatherParameters() != null ? 
 					Set.copyOf(Arrays.asList(currentWD.getWeatherParameters()))
 					:null;
-			if(currentWDParams == null)
+			if(currentWDParams == null || currentWD.getInterval() > interval)
 			{
 				continue;
 			}
@@ -250,12 +259,30 @@ public class AmalgamationBean {
 			
 			
 			
-			// From where to start putting data
-			// TODO - removed all logical holes in here! :-) 
-			Long startRow = (currentWD.getTimeStart().toEpochMilli() - timeStart.toEpochMilli()) / 1000 / interval; 
-			//System.out.println("startRow=" + startRow);
+			// Do we need to aggregate?
+			if(currentWD.getInterval() != interval)
+			{
+				try
+				{
+					currentWD = this.aggregate(currentWD, interval, zoneId);
+				}
+				catch(WeatherDataAggregationException ex)
+				{
+					continue;
+				}
+			}
+			
 			// Currently only one set of data!
 			LocationWeatherData currentLWD = currentWD.getLocationWeatherData().get(0);
+			
+			// From where to start putting data
+			Long startRowInDataMatrix = Math.max(0,(currentWD.getTimeStart().toEpochMilli() - timeStart.toEpochMilli()) / 1000 / interval);
+			// From where to start looking for data
+			// E.g. if currentWD starts the day before (-1), start at element 1 (zero based array)
+			Integer startRowInCurrentWD = (int) Math.abs((currentWD.getTimeStart().toEpochMilli() - timeStart.toEpochMilli()) / 1000 / interval);
+			//System.out.println("currentWD.getTimeStart()=" + currentWD.getTimeStart() + "(" + currentWD.getTimeStart().toEpochMilli()+"), timeStart = " + timeStart +  "(" + timeStart.toEpochMilli()+")");
+			//System.out.println("startRow=" + startRowInDataMatrix);
+			
 			if(fusionedWD.getLocationWeatherData() == null)
 			{
 				fusionedWD.addLocationWeatherData(new LocationWeatherData(
@@ -284,24 +311,40 @@ public class AmalgamationBean {
 			/*System.out.println("dataMatrix length=" + length + ", currentLWD.getData().length=" + currentLWD.getData().length);
 			System.out.println("dataMatrix width =" + (fusionedWDParams.size() + " + " + newParams.size()) + ", newParams = " 
 			+ newParams.stream().map(i->String.valueOf(i)).collect(Collectors.joining(",")));*/
-			for(int row = 0; row < currentLWD.getData().length && startRow.intValue() + row < dataMatrix.length; row++)
+			for(int row = 0; (row + startRowInCurrentWD) < currentLWD.getData().length && startRowInDataMatrix.intValue() + row < dataMatrix.length; row++)
 			{
 				int col = 0;
 				// Start with the existing
 				for(; col < fusionedWDParams.size();col++)
 				{
 					// Try to fill in holes from the first sets
-					if(dataMatrix[startRow.intValue() + row][col] == null)
+					if(dataMatrix[startRowInDataMatrix.intValue() + row][col] == null)
 					{
+						// We must also look for replacement parameter values
+						Double replacementValue = null;
+						
+						for(Integer interchangeableParameter: this.getInterchangeableParameters(fusionedWD.getWeatherParameters()[col]))
+						{
+							
+							if(currentWD.getParameterIndex(interchangeableParameter) != null)
+							{
+								replacementValue = currentLWD.getData()[row + startRowInCurrentWD][currentWD.getParameterIndex(interchangeableParameter)];
+							}
+							if(replacementValue != null)
+							{
+								break;
+							}
+						}
 						//System.out.println("Adding value (" + currentLWD.getData()[row][currentWD.getParameterIndex(fusionedWD.getWeatherParameters()[col])] + ") at [" + (startRow.intValue() + row )+ "]" + Instant.ofEpochMilli(timeStart.toEpochMilli() + (startRow.longValue() + row) * interval * 1000l));
-						dataMatrix[startRow.intValue() + row][col] = currentLWD.getData()[row][currentWD.getParameterIndex(fusionedWD.getWeatherParameters()[col])];
+						//dataMatrix[startRowInDataMatrix.intValue() + row][col] = currentLWD.getData()[row + startRowInCurrentWD][currentWD.getParameterIndex(fusionedWD.getWeatherParameters()[col])];
+						dataMatrix[startRowInDataMatrix.intValue() + row][col] = replacementValue;
 					}
 				}
 				// Add the new at the end of each row
 				for(Integer newParam:newParams)
 				{
 					Integer paramIndex = currentWD.getParameterIndex(newParam);
-					dataMatrix[startRow.intValue() + row][col++] = currentLWD.getData()[row][paramIndex];
+					dataMatrix[startRowInDataMatrix.intValue() + row][col++] = currentLWD.getData()[row][paramIndex];
 				}
 				
 			}
@@ -406,8 +449,11 @@ public class AmalgamationBean {
 	 */
 	public List<Integer> getInterchangeableParameters(Integer parameter)
 	{
-		List<Integer> retVal = List.of(parameter);
-		retVal.addAll(fallbackParams.get(parameter));
+		List<Integer> retVal = new ArrayList<>(List.of(parameter));
+		if(fallbackParams.get(parameter) != null)
+		{
+			retVal.addAll(fallbackParams.get(parameter));
+		}
 		return retVal;
 	}
 	
@@ -436,4 +482,119 @@ public class AmalgamationBean {
 	{
 		return this.getTimeZoneEngine().query(latitude, longitude).orElse(ZoneId.systemDefault());
 	}
+	
+	/**
+	 * 
+	 * @param source
+	 * @param requestedInterval
+	 * @param timeZone
+	 * @return
+	 * @throws WeatherDataAggregationException
+	 * @throws IOException 
+	 */
+	public WeatherData aggregate(WeatherData source, Integer requestedInterval, ZoneId timeZone) throws WeatherDataAggregationException, IOException
+	{
+		// Some basic input control
+		if(source.getInterval() > requestedInterval)
+		{
+			throw new WeatherDataAggregationException("ERROR: requestedInterval(" + requestedInterval + ") can't be smaller than the source interval (" + source.getInterval() + ")");
+		}
+		if(source.getInterval().equals(requestedInterval))
+		{
+			return source;
+		}
+		
+		// Bucket size
+		Integer sourceValuesPerAggregationValue = requestedInterval / source.getInterval();
+		//System.out.println("sourceValuesPerAggregationValue=" + sourceValuesPerAggregationValue);
+		// What's the start index, considering midnight for time zone? (Assuming hourly to daily)
+		Integer startIndex = source.getTimeStart().atZone(timeZone).getHour() == 0 ? 0 : 23 - source.getTimeStart().atZone(timeZone).getHour();
+		// TODO If the start index >= 15, consider creating a "day 1" using those values
+		
+		// Length of the aggregation array
+		Integer length = (int) Math.ceil((source.getLocationWeatherData().get(0).getLength().doubleValue() - startIndex) / sourceValuesPerAggregationValue);
+		//System.out.println("source data length=" + source.getLocationWeatherData().get(0).getLength());
+		//System.out.println("startIndex=" + startIndex);
+		//System.out.println("aggregation array length=" + length);
+		for(LocationWeatherData lwd:source.getLocationWeatherData())
+		{
+			Double[][] aggregatedData = new Double[length][source.getWeatherParameters().length];
+			Integer aggregatedRow = 0;
+			for(Integer aggregationStartRow = startIndex; aggregationStartRow < lwd.getLength(); aggregationStartRow += sourceValuesPerAggregationValue)
+			{
+				//System.out.println("aggregationStartRow=" + aggregationStartRow);
+				//System.out.println("aggregatedRow=" + aggregatedRow);
+				for(int col=0;col<source.getWeatherParameters().length;col++)
+				{
+					Double[] sourceValuesToAggregate = new Double[sourceValuesPerAggregationValue];
+					for(Integer subRow = 0; subRow < sourceValuesPerAggregationValue && (aggregationStartRow + subRow) < lwd.getLength() ;subRow++)
+					{
+						//System.out.println("subRow=" + subRow);
+						sourceValuesToAggregate[subRow] = lwd.getData()[aggregationStartRow + subRow][col];
+					}
+					Double aggregatedValue = this.aggregateValues(sourceValuesToAggregate, source.getWeatherParameters()[col]);
+					aggregatedData[aggregatedRow][col] = aggregatedValue;
+				}
+				aggregatedRow++;
+			}
+			lwd.setData(aggregatedData);
+		}
+
+		source.setTimeStart(source.getTimeStart().plusSeconds(startIndex * source.getInterval()));
+		source.setTimeEnd(source.getTimeStart().plusSeconds((length - 1) * requestedInterval));
+		//System.out.println("timeStart=" + source.getTimeStart());
+		//System.out.println("timeEnd=" + source.getTimeEnd());
+		source.setInterval(requestedInterval);
+		return source;
+	}
+	
+	/**
+	 * Factory method for aggregating an array of values
+	 * @param values
+	 * @param parameterId
+	 * @return
+	 * @throws IOException
+	 * @throws WeatherDataAggregationException
+	 */
+	public Double aggregateValues(Double[] values, Integer parameterId) throws IOException, WeatherDataAggregationException
+	{
+		if(values == null)
+		{
+			System.out.println("values==null");
+			return null;
+		}
+		switch(metaDataBean.getWeatherParameter(parameterId).getAggregationType()) {
+			case WeatherParameter.AGGREGATION_TYPE_AVERAGE:
+				return this.aggregateValuesAverage(values);
+			case WeatherParameter.AGGREGATION_TYPE_SUM:
+				return this.aggregateValuesSum(values);
+			case WeatherParameter.AGGREGATION_TYPE_MAXIMUM:
+				return this.aggregateValuesMaximum(values);
+			case WeatherParameter.AGGREGATION_TYPE_MINIMUM:
+				return this.aggregateValuesMinimum(values);
+			default:
+				throw new WeatherDataAggregationException("ERROR: Could not find method for aggregation type " + metaDataBean.getWeatherParameter(parameterId).getAggregationType());
+		}
+	}
+	
+	public Double aggregateValuesAverage(Double[] values)
+	{
+		return this.aggregateValuesSum(values) / values.length;
+	}
+	
+	public Double aggregateValuesSum(Double[] values)
+	{
+		return Arrays.asList(values).stream().filter(v -> v != null).reduce(0d, Double::sum);
+	}
+	
+	public Double aggregateValuesMinimum(Double[] values)
+	{
+		return Arrays.asList(values).stream().filter(v -> v != null).min(Double::compare).get();
+	}
+	
+	public Double aggregateValuesMaximum(Double[] values)
+	{
+		return Arrays.asList(values).stream().filter(v -> v != null).max(Double::compare).get();
+	}
+	
 }

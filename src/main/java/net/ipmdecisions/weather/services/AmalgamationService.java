@@ -27,6 +27,7 @@ import java.net.URL;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -117,15 +118,23 @@ public class AmalgamationService {
 			List<WeatherData> weatherDataFromSources = new ArrayList<>();
 			for(WeatherDataSource currentWDS:wdss)
 			{
+				// The data source might not provide the requested interval. 
+				// If so: Find the least fine-grained one that's still
+				// more fine-grained than the requested interval.
+				Integer bestAvailableInterval = Arrays.asList(currentWDS.getTemporal().getIntervals()).stream()
+						.filter(i -> i <= interval)
+						.max(Integer::compare).get();
+						
+				
 				URL url = new URL(currentWDS.getEndpoint() 
 					+ "?longitude=" + longitude 
 					+ "&latitude=" + latitude 
 					+ "&timeStart=" + timeStartStr
 					+ "&timeEnd=" + timeEndStr
-					+ "&interval=" + interval
+					+ "&interval=" + bestAvailableInterval
 					// + "&parameters=" + parametersStr // Exclude this in order to collect all parameters from the source
 					);
-					
+				//System.out.println(currentWDS.getName() + ":  " + url);
 				weatherDataFromSources.add(this.getWeatherDataFromSource(url));
 			
 			}
@@ -133,7 +142,8 @@ public class AmalgamationService {
 					weatherDataFromSources,
 					timeStart,
 					timeEnd,
-					interval
+					interval,
+					tzForLocation
 					);
 			/*ObjectMapper objectMapper = new ObjectMapper();
 			objectMapper.registerModule(new JavaTimeModule()); 
