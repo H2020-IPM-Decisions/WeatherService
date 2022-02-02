@@ -285,6 +285,7 @@ public class WeatherDataSource implements Comparable {
     public static class Temporal {
         public int forecast;
         public Historic historic;
+        private Integer[] intervals;
         
         /**
          * To what extent does this data source contain historic/measured data (as opposed to
@@ -361,6 +362,20 @@ public class WeatherDataSource implements Comparable {
         public void setHistoric(Historic historic) {
             this.historic = historic;
         }
+
+		/**
+		 * @return the intervals
+		 */
+		public Integer[] getIntervals() {
+			return intervals;
+		}
+
+		/**
+		 * @param intervals the intervals to set
+		 */
+		public void setIntervals(Integer[] intervals) {
+			this.intervals = intervals;
+		}
     }
     
     /**
