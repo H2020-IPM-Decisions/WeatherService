@@ -19,6 +19,7 @@
 
 package net.ipmdecisions.weather.amalgamation;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
@@ -32,6 +33,7 @@ public class Interpolation {
 
 	public WeatherData interpolate(WeatherData input, Set<Integer> parametersToInterpolate, Integer maxMissingSteps) throws LocationWeatherDataException
 	{
+		//System.out.println("[Interpolation.interpolate]: timeStart=" + input.getTimeStart() + ", timeEnd=" + input.getTimeEnd());
 		for(LocationWeatherData l : input.getLocationWeatherData())
 		{
 			for(Integer param:parametersToInterpolate)
@@ -41,6 +43,8 @@ public class Interpolation {
 					continue;
 				}
 				Double[] dataToInterpolate = l.getColumn(input.getParameterIndex(param));
+				//System.out.println("[Interpolation.interpolate]: Interpolating " + param);
+				//Arrays.asList(dataToInterpolate).forEach(v->System.out.println(v));
 				// Now do the interpolation
 				for(int i=0;i<dataToInterpolate.length;i++)
 				{

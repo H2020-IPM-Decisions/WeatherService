@@ -280,8 +280,9 @@ public class AmalgamationBean {
 			// From where to start looking for data
 			// E.g. if currentWD starts the day before (-1), start at element 1 (zero based array)
 			Integer startRowInCurrentWD = (int) Math.abs((currentWD.getTimeStart().toEpochMilli() - timeStart.toEpochMilli()) / 1000 / interval);
-			//System.out.println("currentWD.getTimeStart()=" + currentWD.getTimeStart() + "(" + currentWD.getTimeStart().toEpochMilli()+"), timeStart = " + timeStart +  "(" + timeStart.toEpochMilli()+")");
-			//System.out.println("startRow=" + startRowInDataMatrix);
+			//System.out.println("[AmalgamationBean.getFusionedWeatherData]currentWD.getTimeStart()=" + currentWD.getTimeStart() + "(" + currentWD.getTimeStart().toEpochMilli()+"), timeStart = " + timeStart +  "(" + timeStart.toEpochMilli()+")");
+			//System.out.println("[AmalgamationBean.getFusionedWeatherData]: startRowInDataMatrix=" + startRowInDataMatrix);
+			//System.out.println("[AmalgamationBean.getFusionedWeatherData]: startRowInCurrentWd=" + startRowInCurrentWD);
 			
 			if(fusionedWD.getLocationWeatherData() == null)
 			{
@@ -344,7 +345,7 @@ public class AmalgamationBean {
 				for(Integer newParam:newParams)
 				{
 					Integer paramIndex = currentWD.getParameterIndex(newParam);
-					dataMatrix[startRowInDataMatrix.intValue() + row][col++] = currentLWD.getData()[row][paramIndex];
+					dataMatrix[startRowInDataMatrix.intValue() + row][col++] = currentLWD.getData()[row + startRowInCurrentWD][paramIndex];
 				}
 				
 			}
@@ -513,17 +514,17 @@ public class AmalgamationBean {
 		
 		// Length of the aggregation array
 		Integer length = (int) Math.ceil((source.getLocationWeatherData().get(0).getLength().doubleValue() - startIndex) / sourceValuesPerAggregationValue);
-		//System.out.println("source data length=" + source.getLocationWeatherData().get(0).getLength());
-		//System.out.println("startIndex=" + startIndex);
-		//System.out.println("aggregation array length=" + length);
+		//System.out.println("[AmalgamationBean.aggregate]: source data length=" + source.getLocationWeatherData().get(0).getLength());
+		//System.out.println("[AmalgamationBean.aggregate]: startIndex=" + startIndex);
+		//System.out.println("[AmalgamationBean.aggregate]: aggregation array length=" + length);
 		for(LocationWeatherData lwd:source.getLocationWeatherData())
 		{
 			Double[][] aggregatedData = new Double[length][source.getWeatherParameters().length];
 			Integer aggregatedRow = 0;
 			for(Integer aggregationStartRow = startIndex; aggregationStartRow < lwd.getLength(); aggregationStartRow += sourceValuesPerAggregationValue)
 			{
-				//System.out.println("aggregationStartRow=" + aggregationStartRow);
-				//System.out.println("aggregatedRow=" + aggregatedRow);
+				//System.out.println("[AmalgamationBean.aggregate]: aggregationStartRow=" + aggregationStartRow);
+				//System.out.println("[AmalgamationBean.aggregate]: aggregatedRow=" + aggregatedRow);
 				for(int col=0;col<source.getWeatherParameters().length;col++)
 				{
 					Double[] sourceValuesToAggregate = new Double[sourceValuesPerAggregationValue];
@@ -542,8 +543,8 @@ public class AmalgamationBean {
 
 		source.setTimeStart(source.getTimeStart().plusSeconds(startIndex * source.getInterval()));
 		source.setTimeEnd(source.getTimeStart().plusSeconds((length - 1) * requestedInterval));
-		//System.out.println("timeStart=" + source.getTimeStart());
-		//System.out.println("timeEnd=" + source.getTimeEnd());
+		//System.out.println("[AmalgamationBean.aggregate]: timeStart=" + source.getTimeStart());
+		//System.out.println("[AmalgamationBean.aggregate]: timeEnd=" + source.getTimeEnd());
 		source.setInterval(requestedInterval);
 		return source;
 	}
