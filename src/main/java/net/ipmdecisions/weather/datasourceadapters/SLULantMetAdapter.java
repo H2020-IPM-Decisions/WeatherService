@@ -90,7 +90,7 @@ public class SLULantMetAdapter {
 			3003, // Min RH (%) at 2m
 			3004, // Max RH (%) at 2m
 			4003, // Mean wind speed (m/s) at 2m
-			3101, // Leaf wetness (min/hour)
+			//3101, // Leaf wetness (min/hour) // TODO reinstate this when you know that LantMet can handle it
 			1102, // Mean temperature (C) at -5cm
 			1112 // Mean temperature (C) at -10cm
 			};
@@ -150,7 +150,7 @@ public class SLULantMetAdapter {
 				timeEnd.atZone(swedishNormalTime).format(format),
 				parameters.stream().map(i->weatherUtils.getVIPSParameterId(i)).collect(Collectors.joining(","))
 				));
-		//System.out.println(sluURL);
+		System.out.println(sluURL);
 		WeatherData result = weatherUtils.getWeatherDataFromVIPSWeatherObservations(sluURL, longitude, latitude, 0);
 		return result;
     }
