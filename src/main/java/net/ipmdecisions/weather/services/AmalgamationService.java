@@ -41,6 +41,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
 
 import java.time.Instant;
 import java.time.LocalDate;
@@ -114,7 +115,10 @@ public class AmalgamationService {
 					timeStart,
 					timeEnd);
 			//wdss.forEach(w->System.out.println(w.getName()));
-			
+			if(wdss.size() == 0)
+			{
+				return Response.status(Status.NOT_FOUND).entity("No weather data found for given location and period").build();
+			}
 			List<WeatherData> weatherDataFromSources = new ArrayList<>();
 			for(WeatherDataSource currentWDS:wdss)
 			{
@@ -152,8 +156,7 @@ public class AmalgamationService {
 			
 			// 1.  Data control
 			// 1.1 Are there missing parameters?
-			
-			Set<Integer> missingParameters = requestedParameters != null && ! requestedParameters.isEmpty() ? 
+			Set<Integer> missingParameters = requestedParameters != null && ! requestedParameters.isEmpty() && fusionedData.getWeatherParameters() != null ? 
 					this.getMissingParameters(requestedParameters, Arrays.asList(fusionedData.getWeatherParameters()))
 					: new HashSet<>();
 			// First fix: Map interchangeable parameters (e.g. instantaneous and average temperatures)
