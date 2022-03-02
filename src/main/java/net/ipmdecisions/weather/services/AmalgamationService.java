@@ -58,6 +58,7 @@ import net.ipmdecisions.weather.entity.LocationWeatherData;
 import net.ipmdecisions.weather.entity.LocationWeatherDataException;
 import net.ipmdecisions.weather.entity.WeatherDataSourceException;
 import net.ipmdecisions.weather.qc.QualityControlMethods;
+import net.ipmdecisions.weather.util.WeatherDataUtil;
 import net.ipmdecisions.weather.entity.WeatherData;
 import net.ipmdecisions.weather.entity.WeatherDataSource;
 
@@ -222,7 +223,7 @@ public class AmalgamationService {
 						: new HashSet<>();
 			}
 			
-			// Finally: Remove any parameters not requested
+			// Remove any parameters not requested
 			List<Integer> parametersToRemove = Arrays.asList(fusionedData.getWeatherParameters()).stream()
 					.filter(param->!requestedParameters.contains(param))
 					.collect(Collectors.toList());
@@ -230,6 +231,10 @@ public class AmalgamationService {
 			{
 				fusionedData.removeParameter(parameterToRemove);
 			}
+			
+			// TODO: Chop away any missing data at the beginning and end of the data set
+			WeatherDataUtil wdUtil = new WeatherDataUtil();
+			fusionedData = wdUtil.trimDataSet(fusionedData);
 			
 			return Response.ok().entity(fusionedData).build();
 		}

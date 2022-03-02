@@ -74,7 +74,7 @@ public class LocationWeatherData {
     }
     
     @JsonIgnore
-    public Double[] getDataForIndex(Integer index)
+    public Double[] getDataForColumn(Integer index)
     {
     	Double[] retVal = new Double[this.getData().length];
     	for(int row=0;row<retVal.length;row++)

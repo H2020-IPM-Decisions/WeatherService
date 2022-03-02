@@ -19,6 +19,7 @@
 
 package net.ipmdecisions.weather.util;
 
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -76,5 +77,78 @@ public class WeatherDataUtil {
         return source;
         
     }
+    
+    public WeatherData trimDataSet(WeatherData source)
+	{
+    	//System.out.println(source.getLocationWeatherData().get(0).toString());
+		// Find min and max index with data
+		Integer min=source.getLocationWeatherData().get(0).getLength(), max=0;
+		for(LocationWeatherData lwd:source.getLocationWeatherData())
+		{
+			// Minimum
+			OUTER1:
+			for(int i=0;i<lwd.getLength();i++)
+			{
+				Double[] row = lwd.getData()[i];
+				for(int col=0;col<row.length;col++)
+				{
+					if(row[col] != null)
+					{
+						min = Math.min(i, min);
+						break OUTER1;
+					}
+				}
+			}
+			// Maximum
+			OUTER2:
+			for(int i=lwd.getLength()-1; i>=0; i--)
+			{
+				//System.out.println("i=" + i);
+				Double[] row = lwd.getData()[i];
+				for(int col=0;col<row.length;col++)
+				{
+					if(row[col] != null)
+					{
+						
+						max = Math.max(i, max);
+						break OUTER2;
+					}
+				}
+			}
+		}
+		
+		Integer rowsToChopAtEnd = source.getLocationWeatherData().get(0).getLength() - max;
+		/*
+		System.out.println("Min=" + min + ", max=" + max);
+		System.out.println("missing at end=" + rowsToChopAtEnd);
+		System.out.println("Chopping off this amount of seconds: " + (rowsToChopAtEnd * source.getInterval()));
+		System.out.println("Original timeEnd=" + source.getTimeEnd());
+		System.out.println("Calculated timeEnd=" + source.getTimeEnd().minus(rowsToChopAtEnd * source.getInterval(), ChronoUnit.SECONDS));
+		*/
+		// Adjust timeStart and timeEnd
+		source.setTimeStart(source.getTimeStart().plus(min * source.getInterval(), ChronoUnit.SECONDS));
+		source.setTimeEnd(source.getTimeEnd().minus(rowsToChopAtEnd * source.getInterval(), ChronoUnit.SECONDS));
+		
+		
+		Integer newLength = 1 + max - min;
+		Integer cols = source.getWeatherParameters().length;
+		for(LocationWeatherData lwd:source.getLocationWeatherData())
+		{
+			Double[][] newData = new Double[newLength][cols];
+			Integer newRowIndex = 0;
+			for(int row = min; row <= max; row++)
+			{
+				for(int col=0;col<cols;col++)
+				{
+					newData[newRowIndex][col] = lwd.getData()[row][col];
+				}
+				newRowIndex++;
+			}
+			lwd.setData(newData);
+		}
+		
+
+		return source;
+	}
 
 }
