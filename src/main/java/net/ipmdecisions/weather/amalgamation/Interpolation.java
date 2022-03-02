@@ -62,6 +62,7 @@ public class Interpolation {
 						if(i >= dataToInterpolate.length -1) // <- Do we ever get there?
 						{
 							// ERROR: Can't interpolate without ending value
+							continue;
 						}
 						Integer firstIndexAfterHole = i;
 						// If there are too many missing steps, do nothing
