@@ -131,15 +131,19 @@ public class WeatherDataSourceBean {
             // Get all geometries for current Weather data source
             // Country boundaries
             List<Feature> dataSourceFeatures = new ArrayList<>();
-            try
-            {
-            	dataSourceFeatures = Arrays.asList(gisUtils.getCountryBoundaries(new HashSet<>(Arrays.asList(
-	                    dataSource.getSpatial().getCountries()
-	            ))).getFeatures());
-            }
-            catch(NullPointerException ex)
-            { /* Pass */ }
             
+            // Skip country geometries if stations are used
+            if(! dataSource.getAccess_type().equals("stations"))
+            {
+	            try
+	            {
+	            	dataSourceFeatures = Arrays.asList(gisUtils.getCountryBoundaries(new HashSet<>(Arrays.asList(
+		                    dataSource.getSpatial().getCountries()
+		            ))).getFeatures());
+	            }
+	            catch(NullPointerException ex)
+	            { /* Pass */ }
+            }
             try
             {
             	if(!dataSourceGeoJsonStr.isBlank())
