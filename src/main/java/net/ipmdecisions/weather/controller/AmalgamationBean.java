@@ -400,9 +400,9 @@ public class AmalgamationBean {
 			Instant timeEnd
 			) throws IOException
 	{
-		
+		Double tolerance = 2000.0; // Tolerance in meters for stations
 		// Location
-		List<WeatherDataSource> candidates = weatherDataSourceBean.getWeatherDataSourcesForLocation(longitude, latitude, latitude);
+		List<WeatherDataSource> candidates = weatherDataSourceBean.getWeatherDataSourcesForLocation(longitude, latitude, tolerance);
 		// Must have at least one of the requested parameters (including fallbacks) 
 		// OR (a) parameter(s) that can be used to calculate one of the requested parameters
 		// Must (according to meta data) contain data for the given period

@@ -25,13 +25,25 @@ import com.webcohesion.enunciate.metadata.DocumentationExample;
 import com.webcohesion.enunciate.metadata.rs.TypeHint;
 
 import net.ipmdecisions.weather.entity.serializers.WeatherDataSourceHistoricDeserializer;
+import net.ipmdecisions.weather.util.GISUtils;
 
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.Geometry;
+import org.locationtech.jts.geom.GeometryFactory;
+import org.locationtech.jts.geom.Point;
+import org.locationtech.jts.geom.PrecisionModel;
+import org.wololo.geojson.Feature;
+import org.wololo.geojson.FeatureCollection;
+import org.wololo.geojson.GeoJSONFactory;
+import org.wololo.jts2geojson.GeoJSONReader;
 
 /**
  * A weather data source is an online service that provides weather data to the
@@ -48,6 +60,9 @@ public class WeatherDataSource implements Comparable {
     private Parameters parameters; 
     private Spatial spatial;
     private Organization organization;
+    
+    public final static String ACCESS_TYPE_STATIONS="stations";
+    public final static String ACCESS_TYPE_LOCATION="location";
     
     
     /** No authentication required for the data source */
@@ -612,5 +627,41 @@ public class WeatherDataSource implements Comparable {
 	@Override
 	public int compareTo(Object other) {
 		return this.getPriority().compareTo(((WeatherDataSource) other).getPriority());
+	}
+	
+	/**
+	 * 
+	 * @return the station id of the weather station closest to the given location (WGS84 decimal degrees)
+	 */
+	@JsonIgnore
+	public String getIdOfClosestStation(Double longitude, Double latitude)
+	{
+		if(!this.getAccess_type().equals(WeatherDataSource.ACCESS_TYPE_STATIONS))
+		{
+			return null;
+		}
+		
+		GeoJSONReader reader = new GeoJSONReader();
+    	GISUtils gisUtils = new GISUtils();
+		
+		try
+        {
+			Feature closestFeature = null;
+			Point p = new GeometryFactory(new PrecisionModel(), 4326).createPoint(new Coordinate(longitude,latitude));
+        	List<Feature> dataSourceFeatures = Arrays.asList(
+    				((FeatureCollection) GeoJSONFactory.create(this.getSpatial().getGeoJSON())).getFeatures()
+    			);
+        	for(Feature currentFeature:dataSourceFeatures)
+        	{
+        		if(closestFeature == null || gisUtils.getDistanceInMetersWGS84(reader.read(currentFeature.getGeometry()).distance(p)) < gisUtils.getDistanceInMetersWGS84(reader.read(closestFeature.getGeometry()).distance(p)))
+        		{
+        			closestFeature = currentFeature;
+        		}
+        	}
+        	//System.out.println("Found closest station: " + (String) closestFeature.getProperties().get("name"));
+        	return (String) closestFeature.getProperties().get("id");
+        }
+        catch(NullPointerException ex)
+        { return null; }
 	}
 }

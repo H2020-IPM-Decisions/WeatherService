@@ -130,18 +130,39 @@ public class AmalgamationService {
 						.filter(i -> i <= interval)
 						.max(Integer::compare).get();
 						
-				
-				URL url = new URL(currentWDS.getEndpoint() 
-					+ "?longitude=" + longitude 
-					+ "&latitude=" + latitude 
-					+ "&timeStart=" + timeStartStr
-					+ "&timeEnd=" + timeEndStr
-					+ "&interval=" + bestAvailableInterval
-					// + "&parameters=" + parametersStr // Exclude this in order to collect all parameters from the source
-					);
-				//System.out.println(currentWDS.getName() + ":  " + url);
+				// Is the data source location or station based?
+				URL url;
+				if(currentWDS.getAccess_type().equals(WeatherDataSource.ACCESS_TYPE_STATIONS))
+				{
+					// Is it close enough??
+					String weatherStationId = currentWDS.getIdOfClosestStation(longitude, latitude);
+					url = new URL(currentWDS.getEndpoint() 
+							+ "?weatherStationId=" +  weatherStationId
+							+ "&timeStart=" + timeStartStr
+							+ "&timeEnd=" + timeEndStr
+							+ "&interval=" + bestAvailableInterval
+							// + "&parameters=" + parametersStr // Exclude this in order to collect all parameters from the source
+							);
+				}
+				else
+				{
+					url = new URL(currentWDS.getEndpoint() 
+						+ "?longitude=" + longitude 
+						+ "&latitude=" + latitude 
+						+ "&timeStart=" + timeStartStr
+						+ "&timeEnd=" + timeEndStr
+						+ "&interval=" + bestAvailableInterval
+						// + "&parameters=" + parametersStr // Exclude this in order to collect all parameters from the source
+						);
+					
+				}
+				/*
+				System.out.println(currentWDS.getName() + ":  " + url);
+				if(currentWDS.getName().equals("Euroweather seasonal gridded weather data and forecasts  by IPM Decisions"))
+				{
+					continue;
+				}*/
 				weatherDataFromSources.add(this.getWeatherDataFromSource(url));
-			
 			}
 			WeatherData fusionedData = amalgamationBean.getFusionedWeatherData(
 					weatherDataFromSources,
