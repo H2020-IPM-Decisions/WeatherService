@@ -73,6 +73,7 @@ public class AmalgamationBean {
 			1001, List.of(1002),
 			1002, List.of(1001),
 			3001, List.of(3002),
+			3002, List.of(3001),
 			4002, List.of(4003,4012,4013),
 			4003, List.of(4002,4013,4012),
 			4012, List.of(4013,4002,4003),
