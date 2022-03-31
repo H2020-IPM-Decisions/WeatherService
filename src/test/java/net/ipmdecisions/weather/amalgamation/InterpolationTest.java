@@ -63,7 +63,8 @@ public class InterpolationTest {
     	assertNotEquals(result.getLocationWeatherData().size(), 0);
     	// Check that the temperature arrays have no nulls
     	
-    	result.getLocationWeatherData().forEach(lwd->{
+    	for(LocationWeatherData lwd:result.getLocationWeatherData())
+    	{
     		try
         	{
 	    		Double[] temps = lwd.getColumn(result.getParameterIndex(1002));
@@ -85,7 +86,7 @@ public class InterpolationTest {
         	{
         		fail(ex.getMessage());
         	}
-    	});
+    	}
     	
     	// Check for QC updates???
     	
@@ -123,5 +124,11 @@ public class InterpolationTest {
 	    	}
     	).sum();
     	assertNotEquals(0, numberOfNullValuesFound);
+    	
+    	// The method should handle that all values are NULL for the first row
+    	weatherDataJson = fileUtils.getStringFromFileInApp("/weather_data_first_row_only_NULLS.json");
+    	testData = oMapper.readValue(weatherDataJson, WeatherData.class);
+    	paramsToInterpolate = new HashSet<>(Arrays.asList(1001));
+    	result = instance.interpolate(testData, paramsToInterpolate, 1);
     }
 }

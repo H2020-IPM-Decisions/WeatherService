@@ -53,6 +53,7 @@ public class Interpolation {
 						if(i == 0)
 						{
 							// ERROR: Can't interpolate without starting value
+							continue;
 						}
 						Integer lastIndexBeforeHole = i-1;
 						while(i<dataToInterpolate.length && dataToInterpolate[i] == null)

@@ -171,10 +171,13 @@ public class AmalgamationService {
 					interval,
 					tzForLocation
 					);
-			/*ObjectMapper objectMapper = new ObjectMapper();
+			/*
+			// Dumping current weather data to console
+			ObjectMapper objectMapper = new ObjectMapper();
 			objectMapper.registerModule(new JavaTimeModule()); 
 			System.out.println(objectMapper.writeValueAsString(fusionedData));
 			*/
+			
 			
 			// 1.  Data control
 			// 1.1 Are there missing parameters?
