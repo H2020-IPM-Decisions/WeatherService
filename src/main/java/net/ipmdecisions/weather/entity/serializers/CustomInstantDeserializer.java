@@ -26,7 +26,17 @@ public class CustomInstantDeserializer extends JsonDeserializer<Instant>{
 		}
 		catch(ParseException ex)
 		{
-			throw new IOException(ex.getMessage());
+			try
+			{
+				// Check if this is an epoch number
+				Long possibleEpochSecond = ((Double)Double.parseDouble(arg0.getText())).longValue();
+				return Instant.ofEpochSecond(possibleEpochSecond);
+			}
+			catch(NumberFormatException ex2)
+			{
+				throw new IOException(ex.getMessage());				
+			}
+			
 		}
 	}
 	
