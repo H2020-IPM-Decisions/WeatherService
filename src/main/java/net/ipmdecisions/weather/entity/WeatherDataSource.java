@@ -60,6 +60,7 @@ public class WeatherDataSource implements Comparable {
     private Parameters parameters; 
     private Spatial spatial;
     private Organization organization;
+    private Boolean active;
     
     public final static String ACCESS_TYPE_STATIONS="stations";
     public final static String ACCESS_TYPE_LOCATION="location";
@@ -663,5 +664,19 @@ public class WeatherDataSource implements Comparable {
         }
         catch(NullPointerException ex)
         { return null; }
+	}
+
+	/**
+	 * @return the active
+	 */
+	public Boolean getActive() {
+		return this.active != null ? this.active : Boolean.TRUE;
+	}
+
+	/**
+	 * @param active the active to set
+	 */
+	public void setActive(Boolean active) {
+		this.active = active;
 	}
 }

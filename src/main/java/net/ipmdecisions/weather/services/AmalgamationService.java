@@ -121,6 +121,7 @@ public class AmalgamationService {
 				return Response.status(Status.NOT_FOUND).entity("No weather data found for given location and period").build();
 			}
 			List<WeatherData> weatherDataFromSources = new ArrayList<>();
+			List<String> errorLog = new ArrayList<>();
 			for(WeatherDataSource currentWDS:wdss)
 			{
 				// The data source might not provide the requested interval. 
@@ -156,14 +157,33 @@ public class AmalgamationService {
 						);
 					
 				}
-				/*
-				System.out.println(currentWDS.getName() + ":  " + url);
-				if(currentWDS.getName().equals("Euroweather seasonal gridded weather data and forecasts  by IPM Decisions"))
+				
+				//System.out.println(currentWDS.getName() + ":  " + url);
+				/*if(currentWDS.getName().equals("Euroweather seasonal gridded weather data and forecasts  by IPM Decisions"))
 				{
 					continue;
 				}*/
-				weatherDataFromSources.add(this.getWeatherDataFromSource(url));
+				try
+				{
+					weatherDataFromSources.add(this.getWeatherDataFromSource(url));
+					//System.out.println("Successfully added " + currentWDS.getName());
+				}
+				catch(WeatherDataSourceException ex)
+				{
+					errorLog.add("ERROR with weather data source " + currentWDS.getName() + ": " + ex.getMessage());
+				}
 			}
+			
+			// Fail or success?
+			// Error on all data sources -> safe to say that we've failed
+			if(weatherDataFromSources.size() == 0)
+			{
+				throw new WeatherDataSourceException(String.join("\n",errorLog));
+			}
+			
+			// TODO: Catch that some sources have not failed, but no or almost no data has been fetched
+			
+			
 			WeatherData fusionedData = amalgamationBean.getFusionedWeatherData(
 					weatherDataFromSources,
 					timeStart,
@@ -255,8 +275,12 @@ public class AmalgamationService {
 			{
 				fusionedData.removeParameter(parameterToRemove);
 			}
-			
-			// TODO: Chop away any missing data at the beginning and end of the data set
+			/*
+			ObjectMapper objectMapper = new ObjectMapper();
+			objectMapper.registerModule(new JavaTimeModule()); 
+			System.out.println(objectMapper.writeValueAsString(fusionedData));
+			*/
+			// Chop away any missing data at the beginning and end of the data set
 			WeatherDataUtil wdUtil = new WeatherDataUtil();
 			fusionedData = wdUtil.trimDataSet(fusionedData);
 			

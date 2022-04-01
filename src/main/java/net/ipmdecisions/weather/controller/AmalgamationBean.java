@@ -280,11 +280,12 @@ public class AmalgamationBean {
 			Long startRowInDataMatrix = Math.max(0,(currentWD.getTimeStart().toEpochMilli() - timeStart.toEpochMilli()) / 1000 / interval);
 			// From where to start looking for data
 			// E.g. if currentWD starts the day before (-1), start at element 1 (zero based array)
-			Integer startRowInCurrentWD = (int) Math.abs((currentWD.getTimeStart().toEpochMilli() - timeStart.toEpochMilli()) / 1000 / interval);
-			//System.out.println("[AmalgamationBean.getFusionedWeatherData]currentWD.getTimeStart()=" + currentWD.getTimeStart() + "(" + currentWD.getTimeStart().toEpochMilli()+"), timeStart = " + timeStart +  "(" + timeStart.toEpochMilli()+")");
-			//System.out.println("[AmalgamationBean.getFusionedWeatherData]: startRowInDataMatrix=" + startRowInDataMatrix);
-			//System.out.println("[AmalgamationBean.getFusionedWeatherData]: startRowInCurrentWd=" + startRowInCurrentWD);
-			
+			Integer startRowInCurrentWD = (int) Math.max(0,(timeStart.toEpochMilli()- currentWD.getTimeStart().toEpochMilli()) / 1000 / interval);
+			/*
+			System.out.println("[AmalgamationBean.getFusionedWeatherData]currentWD.getTimeStart()=" + currentWD.getTimeStart() + "(" + currentWD.getTimeStart().toEpochMilli()+"), timeStart = " + timeStart +  "(" + timeStart.toEpochMilli()+")");
+			System.out.println("[AmalgamationBean.getFusionedWeatherData]: startRowInDataMatrix=" + startRowInDataMatrix);
+			System.out.println("[AmalgamationBean.getFusionedWeatherData]: startRowInCurrentWd=" + startRowInCurrentWD);
+			*/
 			if(fusionedWD.getLocationWeatherData() == null)
 			{
 				fusionedWD.addLocationWeatherData(new LocationWeatherData(
@@ -309,10 +310,11 @@ public class AmalgamationBean {
 					}
 				}
 			}
-			
-			/*System.out.println("dataMatrix length=" + length + ", currentLWD.getData().length=" + currentLWD.getData().length);
+			/*
+			System.out.println("dataMatrix length=" + length + ", currentLWD.getData().length=" + currentLWD.getData().length);
 			System.out.println("dataMatrix width =" + (fusionedWDParams.size() + " + " + newParams.size()) + ", newParams = " 
-			+ newParams.stream().map(i->String.valueOf(i)).collect(Collectors.joining(",")));*/
+			+ newParams.stream().map(i->String.valueOf(i)).collect(Collectors.joining(",")));
+			*/
 			for(int row = 0; (row + startRowInCurrentWD) < currentLWD.getData().length && startRowInDataMatrix.intValue() + row < dataMatrix.length; row++)
 			{
 				int col = 0;
@@ -337,7 +339,7 @@ public class AmalgamationBean {
 								break;
 							}
 						}
-						//System.out.println("Adding value (" + currentLWD.getData()[row][currentWD.getParameterIndex(fusionedWD.getWeatherParameters()[col])] + ") at [" + (startRow.intValue() + row )+ "]" + Instant.ofEpochMilli(timeStart.toEpochMilli() + (startRow.longValue() + row) * interval * 1000l));
+						//System.out.println("Adding value (" + replacementValue + ") at [" + (startRowInDataMatrix.intValue() + row )+ "]" + Instant.ofEpochMilli(timeStart.toEpochMilli() + (startRowInDataMatrix.intValue() + row) * interval * 1000l));
 						//dataMatrix[startRowInDataMatrix.intValue() + row][col] = currentLWD.getData()[row + startRowInCurrentWD][currentWD.getParameterIndex(fusionedWD.getWeatherParameters()[col])];
 						dataMatrix[startRowInDataMatrix.intValue() + row][col] = replacementValue;
 					}
@@ -347,6 +349,7 @@ public class AmalgamationBean {
 				{
 					Integer paramIndex = currentWD.getParameterIndex(newParam);
 					dataMatrix[startRowInDataMatrix.intValue() + row][col++] = currentLWD.getData()[row + startRowInCurrentWD][paramIndex];
+					//System.out.println("Adding value (" + currentLWD.getData()[row + startRowInCurrentWD][paramIndex] + ") at [" + (startRowInDataMatrix.intValue() + row )+ "]" + Instant.ofEpochMilli(timeStart.toEpochMilli() + (startRowInDataMatrix.intValue() + row) * interval * 1000l));
 				}
 				
 			}
@@ -562,7 +565,7 @@ public class AmalgamationBean {
 	{
 		if(values == null)
 		{
-			System.out.println("values==null");
+			//System.out.println("values==null");
 			return null;
 		}
 		switch(metaDataBean.getWeatherParameter(parameterId).getAggregationType()) {

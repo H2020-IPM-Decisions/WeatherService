@@ -109,72 +109,77 @@ public class WeatherDataSourceBean {
     	final Double tolerance = toleranceInput == null ? 0.0 : toleranceInput; // Have to do this to make it work in the streaming API
     	GeoJSONReader reader = new GeoJSONReader();
     	GISUtils gisUtils = new GISUtils();
-        List<WeatherDataSource> retVal = this.getAllWeatherDataSources().stream().filter(dataSource->{
-            // Get all geometries in current weather data source
-            String dataSourceGeoJsonStr = ""; 
-            try
-            {
-            	dataSourceGeoJsonStr = dataSource.getSpatial().getGeoJSON();
-
-            }
-            catch(NullPointerException ex)
-            { /* Pass */ }
-            
-            // We do a brute force search for the string "Sphere" in the geoJSON string
-            // to bypass any issues in deserialization of that custom type, which is 
-            // short for creating a polygon that covers the entire globe
-            if(dataSourceGeoJsonStr != null && dataSourceGeoJsonStr.contains("\"Sphere\""))
-            {
-                return true;
-            }
-            
-            // Get all geometries for current Weather data source
-            // Country boundaries
-            List<Feature> dataSourceFeatures = new ArrayList<>();
-            
-            // Skip country geometries if stations are used
-            if(! dataSource.getAccess_type().equals("stations"))
-            {
+        List<WeatherDataSource> retVal = this.getAllWeatherDataSources().stream()
+        	.filter(dataSource->{
+        		if(!dataSource.getActive())
+        		{
+        			return false;
+        		}
+	            // Get all geometries in current weather data source
+	            String dataSourceGeoJsonStr = ""; 
 	            try
 	            {
-	            	dataSourceFeatures = Arrays.asList(gisUtils.getCountryBoundaries(new HashSet<>(Arrays.asList(
-		                    dataSource.getSpatial().getCountries()
-		            ))).getFeatures());
+	            	dataSourceGeoJsonStr = dataSource.getSpatial().getGeoJSON();
+	
 	            }
 	            catch(NullPointerException ex)
 	            { /* Pass */ }
-            }
-            try
-            {
-            	if(!dataSourceGeoJsonStr.isBlank())
-            	{
-            		dataSourceFeatures.addAll(Arrays.asList(
-            				((FeatureCollection) GeoJSONFactory.create(dataSourceGeoJsonStr)).getFeatures()
-            				));
-            	}
-            }
-            catch(RuntimeException ex) {}
-            //FeatureCollection dataSourceFeatures = (FeatureCollection) GeoJSONFactory.create(dataSourceGeoJsonStr);
-            // Match with all geometries in request. If found, add data source to
-            // list of matching data sources
-            List<Geometry> dataSourceGeometries = dataSourceFeatures.stream()
-            .map(f->{ return reader.read(f.getGeometry()); })
-            .filter(dataSourceGeometry->{
-                Boolean matching = false;
-                for(Geometry clientGeometry: clientGeometries)
-                {
-                    if(dataSourceGeometry.intersects(clientGeometry) || gisUtils.getDistanceInMetersWGS84(dataSourceGeometry.distance(clientGeometry)) <= tolerance)
-                    {
-                        //System.out.println("Distance: " + gisUtils.getDistanceInMetersWGS84(dataSourceGeometry.distance(clientGeometry)));
-                        matching = true;
-                    }
-                }
-                return matching;
-            })
-            .collect(Collectors.toList());
-            // The number of matching geometries for this weather data source
-            // Used as filter criteria
-            return dataSourceGeometries.size() > 0; 
+	            
+	            // We do a brute force search for the string "Sphere" in the geoJSON string
+	            // to bypass any issues in deserialization of that custom type, which is 
+	            // short for creating a polygon that covers the entire globe
+	            if(dataSourceGeoJsonStr != null && dataSourceGeoJsonStr.contains("\"Sphere\""))
+	            {
+	                return true;
+	            }
+	            
+	            // Get all geometries for current Weather data source
+	            // Country boundaries
+	            List<Feature> dataSourceFeatures = new ArrayList<>();
+	            
+	            // Skip country geometries if stations are used
+	            if(! dataSource.getAccess_type().equals("stations"))
+	            {
+		            try
+		            {
+		            	dataSourceFeatures = Arrays.asList(gisUtils.getCountryBoundaries(new HashSet<>(Arrays.asList(
+			                    dataSource.getSpatial().getCountries()
+			            ))).getFeatures());
+		            }
+		            catch(NullPointerException ex)
+		            { /* Pass */ }
+	            }
+	            try
+	            {
+	            	if(!dataSourceGeoJsonStr.isBlank())
+	            	{
+	            		dataSourceFeatures.addAll(Arrays.asList(
+	            				((FeatureCollection) GeoJSONFactory.create(dataSourceGeoJsonStr)).getFeatures()
+	            				));
+	            	}
+	            }
+	            catch(RuntimeException ex) {}
+	            //FeatureCollection dataSourceFeatures = (FeatureCollection) GeoJSONFactory.create(dataSourceGeoJsonStr);
+	            // Match with all geometries in request. If found, add data source to
+	            // list of matching data sources
+	            List<Geometry> dataSourceGeometries = dataSourceFeatures.stream()
+	            .map(f->{ return reader.read(f.getGeometry()); })
+	            .filter(dataSourceGeometry->{
+	                Boolean matching = false;
+	                for(Geometry clientGeometry: clientGeometries)
+	                {
+	                    if(dataSourceGeometry.intersects(clientGeometry) || gisUtils.getDistanceInMetersWGS84(dataSourceGeometry.distance(clientGeometry)) <= tolerance)
+	                    {
+	                        //System.out.println("Distance: " + gisUtils.getDistanceInMetersWGS84(dataSourceGeometry.distance(clientGeometry)));
+	                        matching = true;
+	                    }
+	                }
+	                return matching;
+	            })
+	            .collect(Collectors.toList());
+	            // The number of matching geometries for this weather data source
+	            // Used as filter criteria
+	            return dataSourceGeometries.size() > 0; 
         })
         .collect(Collectors.toList());
         
