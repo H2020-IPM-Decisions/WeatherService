@@ -150,7 +150,7 @@ public class SLULantMetAdapter {
 				timeEnd.atZone(swedishNormalTime).format(format),
 				parameters.stream().map(i->weatherUtils.getVIPSParameterId(i)).collect(Collectors.joining(","))
 				));
-		System.out.println(sluURL);
+		//System.out.println(sluURL);
 		WeatherData result = weatherUtils.getWeatherDataFromVIPSWeatherObservations(sluURL, longitude, latitude, 0);
 		return result;
     }
