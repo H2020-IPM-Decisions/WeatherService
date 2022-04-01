@@ -78,7 +78,7 @@ public class DMIPointWebDataParser {
     public WeatherData getData(Double longitude, Double latitude, Date dateFrom, Date dateTo, Integer interval) throws DatatypeConfigurationException
     {
 
-
+    		
             IWeatherService proxy = new WeatherService().getSslOffloadedBasicHttpBindingIWeatherService();
             UseableArrayOfWeatherDataSource wdsource = new UseableArrayOfWeatherDataSource();
             wdsource.add(WeatherDataSource.OBS);
@@ -98,7 +98,7 @@ public class DMIPointWebDataParser {
             DMIPointWebDataParser.PARAM_MAP.values().stream().forEach(
                     listedParam -> wdparam.add(listedParam)
             );
-            
+            //System.out.println("Starting request to DMI at " + new Date());
             WeatherResponse result = proxy.getWeatherDataExtended(
                 String.valueOf(latitude).replace(".", ","), // Latitude ("X") Decimal separator is comma!
                 String.valueOf(longitude).replace(".", ","), // Longitude ("Y") Decimal separator is comma!
@@ -115,6 +115,8 @@ public class DMIPointWebDataParser {
                 "IPMDecisions", // Client info for the service
                 "IPMDecisions" // Identification
             );
+            
+            //System.out.println("Ending request to DMI at " + new Date());
             
             ArrayOfWeatherDataModel value = result.getWeahterDataList().getValue();
             

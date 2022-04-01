@@ -456,7 +456,7 @@ public class AmalgamationService {
 	}
 
 	private String getResponseAsPlainText(URL theURL) throws IOException, WeatherDataSourceException {
-		//System.out.println(theURL.toString());
+		System.out.println(theURL.toString());
 		HttpURLConnection conn = (HttpURLConnection) theURL.openConnection();
 		int resultCode = conn.getResponseCode();
 		// Follow redirects, also https
