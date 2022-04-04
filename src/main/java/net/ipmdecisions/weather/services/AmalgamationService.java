@@ -103,9 +103,12 @@ public class AmalgamationService {
 	) {
 		try
 		{
-			
+			if(parametersStr == null)
+			{
+				return Response.status(Status.BAD_REQUEST).entity("No weather parameters requested").build();
+			}
 			List<Integer> requestedParameters = Arrays.asList(parametersStr.split(",")).stream()
-					.map(p->Integer.valueOf(p))
+					.map(p->Integer.valueOf(p.trim()))
 					.collect(Collectors.toList());
 			ZoneId tzForLocation = amalgamationBean.getTimeZoneForLocation(longitude, latitude);
 			Instant timeStart = LocalDate.parse(timeStartStr).atStartOfDay(tzForLocation).toInstant();
