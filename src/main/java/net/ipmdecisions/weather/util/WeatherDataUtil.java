@@ -120,6 +120,7 @@ public class WeatherDataUtil {
 		}
 		
 		Integer rowsToChopAtEnd = source.getLocationWeatherData().get(0).getLength() - max;
+		
 		/*
 		System.out.println("Min=" + min + ", max=" + max);
 		System.out.println("missing at end=" + rowsToChopAtEnd);
@@ -127,12 +128,13 @@ public class WeatherDataUtil {
 		System.out.println("Original timeEnd=" + source.getTimeEnd());
 		System.out.println("Calculated timeEnd=" + source.getTimeEnd().minus(rowsToChopAtEnd * source.getInterval(), ChronoUnit.SECONDS));
 		*/
+		
 		// Adjust timeStart and timeEnd
 		source.setTimeStart(source.getTimeStart().plus(min * source.getInterval(), ChronoUnit.SECONDS));
 		source.setTimeEnd(source.getTimeEnd().minus(rowsToChopAtEnd * source.getInterval(), ChronoUnit.SECONDS));
 		
 		
-		Integer newLength = 1 + max - min;
+		Integer newLength = min < source.getLocationWeatherData().get(0).getLength() ?  1 + max - min : 0;
 		Integer cols = source.getWeatherParameters().length;
 		for(LocationWeatherData lwd:source.getLocationWeatherData())
 		{
