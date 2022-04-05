@@ -865,7 +865,7 @@
 							"urlencoded": []
 						},
 						"url": {
-							"raw": "{{wx_url}}/rest/weatheradapter/dmipoint?latitude=56.488&longitude=9.583&timeStart=2021-10-13&timeEnd=2021-10-20&interval=3600",
+							"raw": "{{wx_url}}/rest/weatheradapter/dmipoint?longitude=9.201049804687502&latitude=55.32670304556049&interval=3600&ignoreErrors=true&timeStart=2022-03-01&timeEnd=2022-04-06&parameters=2001,3002,3101",
 							"host": [
 								"{{wx_url}}"
 							],
@@ -876,29 +876,32 @@
 							],
 							"query": [
 								{
-									"key": "latitude",
-									"value": "56.488"
-								},
-								{
 									"key": "longitude",
-									"value": "9.583"
+									"value": "9.201049804687502"
 								},
 								{
-									"key": "parameters",
-									"value": "2001",
-									"disabled": true
-								},
-								{
-									"key": "timeStart",
-									"value": "2021-10-13"
-								},
-								{
-									"key": "timeEnd",
-									"value": "2021-10-20"
+									"key": "latitude",
+									"value": "55.32670304556049"
 								},
 								{
 									"key": "interval",
 									"value": "3600"
+								},
+								{
+									"key": "ignoreErrors",
+									"value": "true"
+								},
+								{
+									"key": "timeStart",
+									"value": "2022-03-01"
+								},
+								{
+									"key": "timeEnd",
+									"value": "2022-04-06"
+								},
+								{
+									"key": "parameters",
+									"value": "2001,3002,3101"
 								}
 							]
 						}
@@ -1578,7 +1581,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{wx_url}}/rest/amalgamation/amalgamate?longitude=10.961&latitude=56.109&timeStart=2022-01-01&timeEnd=2022-01-23&interval=3600&parameters=1001,2001",
+							"raw": "{{wx_url}}/rest/amalgamation/amalgamate?longitude=8.8769&latitude=56.2677&timeStart=2021-12-31&timeEnd=2022-01-30&interval=3600&parameters=2001,1002,3102",
 							"host": [
 								"{{wx_url}}"
 							],
@@ -1590,19 +1593,19 @@
 							"query": [
 								{
 									"key": "longitude",
-									"value": "10.961"
+									"value": "8.8769"
 								},
 								{
 									"key": "latitude",
-									"value": "56.109"
+									"value": "56.2677"
 								},
 								{
 									"key": "timeStart",
-									"value": "2022-01-01"
+									"value": "2021-12-31"
 								},
 								{
 									"key": "timeEnd",
-									"value": "2022-01-23"
+									"value": "2022-01-30"
 								},
 								{
 									"key": "interval",
@@ -1610,7 +1613,7 @@
 								},
 								{
 									"key": "parameters",
-									"value": "1001,2001"
+									"value": "2001,1002,3102"
 								}
 							]
 						}
@@ -1688,6 +1691,146 @@
 					"response": []
 				},
 				{
+					"name": "Amalgamation test Euroweather max min dailies",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Three parameters are returned\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.weatherParameters.length).to.equal(3);",
+									"});",
+									"",
+									"pm.test(\"Param 1003 is returned\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.weatherParameters.indexOf(1002)).greaterThan(-1);",
+									"});",
+									"",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{wx_url}}/rest/amalgamation/amalgamate?longitude=-2.12296&latitude=52.58547&timeStart=2022-01-01&timeEnd=2022-01-23&interval=86400&parameters=1002,1003,1004",
+							"host": [
+								"{{wx_url}}"
+							],
+							"path": [
+								"rest",
+								"amalgamation",
+								"amalgamate"
+							],
+							"query": [
+								{
+									"key": "longitude",
+									"value": "-2.12296"
+								},
+								{
+									"key": "latitude",
+									"value": "52.58547"
+								},
+								{
+									"key": "timeStart",
+									"value": "2022-01-01"
+								},
+								{
+									"key": "timeEnd",
+									"value": "2022-01-23"
+								},
+								{
+									"key": "interval",
+									"value": "86400"
+								},
+								{
+									"key": "parameters",
+									"value": "1002,1003,1004"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Amalgamation test Euroweather max min hourly should fail",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"One parameter returned\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.weatherParameters.length).to.equal(1);",
+									"});",
+									"",
+									"pm.test(\"Param 1003 is returned\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.weatherParameters.indexOf(1002)).greaterThan(-1);",
+									"});",
+									"",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{wx_url}}/rest/amalgamation/amalgamate?longitude=-2.12296&latitude=52.58547&timeStart=2022-01-01&timeEnd=2022-01-23&interval=3600&parameters=1002,1003,1004",
+							"host": [
+								"{{wx_url}}"
+							],
+							"path": [
+								"rest",
+								"amalgamation",
+								"amalgamate"
+							],
+							"query": [
+								{
+									"key": "longitude",
+									"value": "-2.12296"
+								},
+								{
+									"key": "latitude",
+									"value": "52.58547"
+								},
+								{
+									"key": "timeStart",
+									"value": "2022-01-01"
+								},
+								{
+									"key": "timeEnd",
+									"value": "2022-01-23"
+								},
+								{
+									"key": "interval",
+									"value": "3600"
+								},
+								{
+									"key": "parameters",
+									"value": "1002,1003,1004"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
 					"name": "Amalgamation test LW calculation",
 					"event": [
 						{
@@ -1751,6 +1894,51 @@
 								{
 									"key": "parameters",
 									"value": "3101"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Daily values",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{wx_url}}/rest/amalgamation/amalgamate?longitude=-2.12296&latitude=52.58547&interval=86400&timeStart=2022-01-01&timeEnd=2022-02-01&parameters=1002",
+							"host": [
+								"{{wx_url}}"
+							],
+							"path": [
+								"rest",
+								"amalgamation",
+								"amalgamate"
+							],
+							"query": [
+								{
+									"key": "longitude",
+									"value": "-2.12296"
+								},
+								{
+									"key": "latitude",
+									"value": "52.58547"
+								},
+								{
+									"key": "interval",
+									"value": "86400"
+								},
+								{
+									"key": "timeStart",
+									"value": "2022-01-01"
+								},
+								{
+									"key": "timeEnd",
+									"value": "2022-02-01"
+								},
+								{
+									"key": "parameters",
+									"value": "1002"
 								}
 							]
 						}
