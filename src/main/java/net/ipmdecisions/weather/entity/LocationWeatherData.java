@@ -99,7 +99,7 @@ public class LocationWeatherData {
      */
     public Integer getWidth()
     {
-        return this.data[0].length;
+        return this.data.length > 0 ? this.data[0].length : 0;
     }
     
     public Double[][] getData()
