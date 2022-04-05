@@ -278,11 +278,11 @@ public class AmalgamationService {
 			{
 				fusionedData.removeParameter(parameterToRemove);
 			}
-			/*
+			
 			ObjectMapper objectMapper = new ObjectMapper();
 			objectMapper.registerModule(new JavaTimeModule()); 
-			System.out.println(objectMapper.writeValueAsString(fusionedData));
-			*/
+			//System.out.println(objectMapper.writeValueAsString(fusionedData));
+			
 			// Chop away any missing data at the beginning and end of the data set
 			WeatherDataUtil wdUtil = new WeatherDataUtil();
 			fusionedData = wdUtil.trimDataSet(fusionedData);
@@ -459,7 +459,7 @@ public class AmalgamationService {
 	}
 
 	private String getResponseAsPlainText(URL theURL) throws IOException, WeatherDataSourceException {
-		System.out.println(theURL.toString());
+		//System.out.println(theURL.toString());
 		HttpURLConnection conn = (HttpURLConnection) theURL.openConnection();
 		int resultCode = conn.getResponseCode();
 		// Follow redirects, also https
