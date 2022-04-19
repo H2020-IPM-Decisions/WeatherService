@@ -34,9 +34,15 @@ public class WeatherDataSourceHistoricDeserializer extends JsonDeserializer<Hist
 			return null;
 		}
 		String txtVal = property.asText();
-		if(txtVal.contains("{CURRENT_YEAR}"))
+		if(txtVal.contains("CURRENT_YEAR"))
 		{
-			txtVal = txtVal.replace("{CURRENT_YEAR}", String.valueOf(LocalDate.now().getYear()));
+			// Check if there is arithmetic involved
+			String expression = txtVal.substring(txtVal.indexOf("{")+1,txtVal.indexOf("}"));
+			String arithmetic = expression.contains("+") ? "+" : expression.contains("-") ? "-" : "";
+			Integer number = !arithmetic.isBlank() ? Integer.valueOf(expression.substring(expression.indexOf(arithmetic)).trim()) : 0;
+			
+			
+			txtVal = txtVal.replace(txtVal.substring(txtVal.indexOf("{"),txtVal.indexOf("}")+1), String.valueOf(LocalDate.now().getYear() + number));
 		}
 		return LocalDate.parse(txtVal);
 	}
