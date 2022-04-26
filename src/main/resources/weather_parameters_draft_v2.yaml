@@ -84,6 +84,12 @@ parameters:
    unit: Celcius
    aggregationType: AVG
 
+# Misc temperatures
+ - id: 1901
+   name: Dew point temperature
+   unit: Celcius
+   aggregationType: AVG
+
 ## 2000-series = precipitation (mm)
  - id: 2001
    name: Precipitation

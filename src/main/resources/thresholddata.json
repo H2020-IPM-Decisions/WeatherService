@@ -64,6 +64,14 @@
         "step_test_threshold_type": "absolute"
     },
     {
+        "parameter":"Dew point temperature",
+        "id_array":["1901"],
+        "lower_limit":0,
+        "upper_limit":40,
+        "step_test_threshold": 7.5,
+        "step_test_threshold_type": "absolute"
+    },
+    {
         "parameter":"Precipitation",
         "id_array":["2001"],
         "lower_limit":-0.5,
