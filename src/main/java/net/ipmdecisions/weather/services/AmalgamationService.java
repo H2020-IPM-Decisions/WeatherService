@@ -459,7 +459,6 @@ public class AmalgamationService {
 	}
 
 	private String getResponseAsPlainText(URL theURL) throws IOException, WeatherDataSourceException {
-		//System.out.println(theURL.toString());
 		HttpURLConnection conn = (HttpURLConnection) theURL.openConnection();
 		int resultCode = conn.getResponseCode();
 		// Follow redirects, also https
@@ -470,15 +469,21 @@ public class AmalgamationService {
 			conn = (HttpURLConnection)  new URL(location).openConnection();
 		}
 		
-		
-		BufferedReader in = new BufferedReader(new InputStreamReader(resultCode < 400 ? conn.getInputStream():conn.getErrorStream()));
-		String inputLine;
 		StringBuffer response = new StringBuffer();
-
-		while ((inputLine = in.readLine()) != null) {
-			response.append(inputLine);
+		try
+		{
+			BufferedReader in = new BufferedReader(new InputStreamReader(resultCode < 400 ? conn.getInputStream():conn.getErrorStream()));
+			String inputLine;
+			while ((inputLine = in.readLine()) != null) {
+				response.append(inputLine);
+			}
+			in.close();
 		}
-		in.close();
+		catch(NullPointerException ex)
+		{
+			throw new WeatherDataSourceException("ERROR: No data returned from data source. The request was: " + theURL.toString());
+		}
+		
 		// Are we getting anything else but 200? Raise error
 		if(conn.getResponseCode() != HttpURLConnection.HTTP_OK)
 		{
