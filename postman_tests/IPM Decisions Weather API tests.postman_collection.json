@@ -1944,6 +1944,51 @@
 						}
 					},
 					"response": []
+				},
+				{
+					"name": "Only data from last year",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{wx_url}}/rest/amalgamation/amalgamate?longitude=-2.12296&latitude=29.58547&interval=86400&timeStart=2021-11-27&timeEnd=2021-12-01&parameters=1002",
+							"host": [
+								"{{wx_url}}"
+							],
+							"path": [
+								"rest",
+								"amalgamation",
+								"amalgamate"
+							],
+							"query": [
+								{
+									"key": "longitude",
+									"value": "-2.12296"
+								},
+								{
+									"key": "latitude",
+									"value": "29.58547"
+								},
+								{
+									"key": "interval",
+									"value": "86400"
+								},
+								{
+									"key": "timeStart",
+									"value": "2021-11-27"
+								},
+								{
+									"key": "timeEnd",
+									"value": "2021-12-01"
+								},
+								{
+									"key": "parameters",
+									"value": "1002"
+								}
+							]
+						}
+					},
+					"response": []
 				}
 			]
 		}
