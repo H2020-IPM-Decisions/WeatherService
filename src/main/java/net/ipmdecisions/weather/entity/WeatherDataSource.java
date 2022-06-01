@@ -397,7 +397,7 @@ public class WeatherDataSource implements Comparable {
     /**
      * A list of weather parameters that this weather data source provides.
      * The parameters are given by their id. For lookup, see: 
-     * https://ipmdecisions.nibio.no/weather/rest/parameter/list
+     * https://platform.ipmdecisions.net/weather/rest/parameter/list
      */
     public static class Parameters {
         private int[] common, optional;
@@ -493,7 +493,7 @@ public class WeatherDataSource implements Comparable {
     /**
      * @return the endpoint
      */
-    @DocumentationExample("https://ipmdecisions.nibio.no/lmtservices/rest/ipmdecisions/getdata/")
+    @DocumentationExample("https://platform.ipmdecisions.net/lmtservices/rest/ipmdecisions/getdata/")
     public String getEndpoint() {
         return endpoint;
     }

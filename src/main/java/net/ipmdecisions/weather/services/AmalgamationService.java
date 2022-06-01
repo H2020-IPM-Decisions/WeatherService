@@ -303,7 +303,7 @@ public class AmalgamationService {
 	 * @param longitude Location Weather data location longitude (Decimal degrees) for amalgamation purposes
 	 * @param latitude Location Weather data location latitude (Decimal degrees) for amalgamation purposes
 	 * 
-	 * @pathExample /rest/amalgamation/amalgamate/?endpointURL=https%3A%2F%2Fipmdecisions.nibio.no%2Fapi%2Fwx%2Frest%2Fweatheradapter%2Fyr%2F&endpointQueryStr=longitude%3D14.3711%26latitude%3D67.2828%26altitude%3D70%26parameters%3D1001%2C3001
+	 * @pathExample /rest/amalgamation/amalgamate/?endpointURL=https%3A%2F%2Fplatform.ipmdecisions.net%2Fapi%2Fwx%2Frest%2Fweatheradapter%2Fyr%2F&endpointQueryStr=longitude%3D14.3711%26latitude%3D67.2828%26altitude%3D70%26parameters%3D1001%2C3001
 	 * 
 	 * @return
 	 */
