@@ -4,8 +4,8 @@
   "title": "Weather Data",
   "type": "object",
   "additionalProperties": false,
-  "description": "Version 0.1. The schema describes the weather data format for the IPM Decisions platform. See an example here: https://ipmdecisions.nibio.no/api/wx/rest/weatheradapter/yr/?longitude=14.3711&latitude=67.2828&altitude=70",
-  "$id": "https://ipmdecisions.nibio.no/api/wx/rest/schema/weatherdata",
+  "description": "Version 0.1. The schema describes the weather data format for the IPM Decisions platform. See an example here: https://platform.ipmdecisions.net/api/wx/rest/weatheradapter/yr/?longitude=14.3711&latitude=67.2828&altitude=70",
+  "$id": "https://platform.ipmdecisions.net/api/wx/rest/schema/weatherdata",
   "properties": {
     "timeStart": {
       "type": "string",
@@ -31,7 +31,7 @@
       "items": {
         "type": "integer"
       },
-      "description": "The weather parameters. For reference, see https://ipmdecisions.nibio.no/api/wx/rest/parameter",
+      "description": "The weather parameters. For reference, see https://platform.ipmdecisions.net/api/wx/rest/parameter",
       "title": "Weather parameters"
     },
     "locationWeatherData": {
