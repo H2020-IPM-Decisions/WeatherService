@@ -53,6 +53,7 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 import net.iakovlev.timeshape.TimeZoneEngine;
 import net.ipmdecisions.weather.amalgamation.Interpolation;
+import net.ipmdecisions.weather.amalgamation.indices.IndicesBean;
 import net.ipmdecisions.weather.controller.AmalgamationBean;
 import net.ipmdecisions.weather.entity.LocationWeatherData;
 import net.ipmdecisions.weather.entity.LocationWeatherDataException;
@@ -79,6 +80,9 @@ public class AmalgamationService {
 	
 	@EJB
 	AmalgamationBean amalgamationBean;
+	
+	@EJB
+	IndicesBean indicesBean;
 	
 	/**
 	 * Attempts to give you all the requested parameters for the given location
@@ -262,13 +266,10 @@ public class AmalgamationService {
 			
 			// Calculate entire missing parameters - now that we have the best available dataset 
 			// E.g. Leaf wetness
-			if(missingParameters.contains(3101))  // Leaf wetness
-			{
-				fusionedData = amalgamationBean.calculateLeafWetnessBestEffort(fusionedData);
-				missingParameters = requestedParameters != null && ! requestedParameters.isEmpty() ? 
-						this.getMissingParameters(requestedParameters, Arrays.asList(fusionedData.getWeatherParameters()))
-						: new HashSet<>();
-			}
+			fusionedData = indicesBean.calculateIndicesBestEffort(fusionedData, missingParameters);
+			missingParameters = requestedParameters != null && ! requestedParameters.isEmpty() ? 
+					this.getMissingParameters(requestedParameters, Arrays.asList(fusionedData.getWeatherParameters()))
+					: new HashSet<>();
 			
 			// Remove any parameters not requested
 			List<Integer> parametersToRemove = Arrays.asList(fusionedData.getWeatherParameters()).stream()
