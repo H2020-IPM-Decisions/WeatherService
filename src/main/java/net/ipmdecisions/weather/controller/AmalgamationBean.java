@@ -143,57 +143,8 @@ public class AmalgamationBean {
 		return weatherData;
 	}
 	
-	/**
-	 * Given the available parameters, attempts to calculate LW using 
-	 * the most relevant LW calculation algorithm. Status 2022-01-19: Only the 
-	 * RH >= 87% method is available
-	 * 
-	 * @param weatherData
-	 * @return
-	 */
-	public WeatherData calculateLeafWetnessBestEffort(WeatherData weatherData)
-	{
-		// Currently, we only have the RH >= 87% method available.
-		// Look for RH (3001, 3002)
-		List<Integer> rhParams = List.of(3001,3002);
-		List<Integer> rhParamsInDataset = Arrays.asList(weatherData.getWeatherParameters()).stream() 
-				.distinct()
-				.filter(p->rhParams.contains(p))
-				.collect(Collectors.toList());
-		if(rhParamsInDataset != null && rhParamsInDataset.size() > 0)
-		{
-			Integer rhParamIndex = weatherData.getParameterIndex(rhParamsInDataset.get(0));
-			for(LocationWeatherData lwd: weatherData.getLocationWeatherData()) {
-				Double[][] oldData = lwd.getData();
-				Double[][] newData = new Double[oldData.length][oldData[0].length + 1];
-				for(int row = 0; row < oldData.length; row++)
-				{
-					for(int col=0; col < newData[0].length; col++)
-					{
-						// Old data are copied
-						if(col < oldData[0].length)
-						{
-							newData[row][col] = oldData[row][col];
-						}
-						else // Column for LW based on RH
-						{
-							if(oldData[row][rhParamIndex] != null)
-							{
-								newData[row][col] = oldData[row][rhParamIndex] >= 87.0 ? 60.0 : 0.0;
-							}
-						}
-					}
-				}
-				lwd.setData(newData);
-			}
-			// Add the missing parameter to end of parameter list in weather data
-			List<Integer> wpList = new ArrayList<Integer>(Arrays.asList(weatherData.getWeatherParameters())); 
-			wpList.add(3101);
-			weatherData.setWeatherParameters(wpList.toArray(new Integer[wpList.size()]));
-		}
-		return weatherData;
-	}
 
+	
 	/**
 	 * Based on the provided location: Attempts to pick the best weather data source
 	 * As of 2022-01-18 it returns a URL for the Euroweather service () by default

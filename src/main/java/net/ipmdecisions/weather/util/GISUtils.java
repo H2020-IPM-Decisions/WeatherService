@@ -22,9 +22,17 @@ package net.ipmdecisions.weather.util;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.RandomAccessFile;
+import java.nio.ByteBuffer;
+import java.nio.channels.FileChannel;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.wololo.geojson.Feature;
 import org.wololo.geojson.FeatureCollection;
@@ -53,16 +61,15 @@ public class GISUtils {
         if(this.allCountryBoundaries == null)
         {
             try {
-                FileReader in = new FileReader(System.getProperty("net.ipmdecisions.weatherservice.COUNTRY_BOUNDARIES_FILE"));
-                BufferedReader br = new BufferedReader(in);
-                String all = "";
-                String line;
-                while((line = br.readLine()) != null)
-                {
-                    all += line;
-                }
+            	Path path = Paths.get(System.getProperty("net.ipmdecisions.weatherservice.COUNTRY_BOUNDARIES_FILE"));
+            	
 
+            	Stream<String> lines = Files.lines(path);
+                String all = lines.collect(Collectors.joining("\n"));
+                lines.close();
+                
                 this.allCountryBoundaries = (FeatureCollection) GeoJSONFactory.create(all);
+            	
             } catch (IOException | NullPointerException ex) {
                 ex.printStackTrace();
             }

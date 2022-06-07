@@ -53,6 +53,7 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 import net.iakovlev.timeshape.TimeZoneEngine;
 import net.ipmdecisions.weather.amalgamation.Interpolation;
+import net.ipmdecisions.weather.amalgamation.indices.IndicesBean;
 import net.ipmdecisions.weather.controller.AmalgamationBean;
 import net.ipmdecisions.weather.entity.LocationWeatherData;
 import net.ipmdecisions.weather.entity.LocationWeatherDataException;
@@ -79,6 +80,9 @@ public class AmalgamationService {
 	
 	@EJB
 	AmalgamationBean amalgamationBean;
+	
+	@EJB
+	IndicesBean indicesBean;
 	
 	/**
 	 * Attempts to give you all the requested parameters for the given location
@@ -262,13 +266,10 @@ public class AmalgamationService {
 			
 			// Calculate entire missing parameters - now that we have the best available dataset 
 			// E.g. Leaf wetness
-			if(missingParameters.contains(3101))  // Leaf wetness
-			{
-				fusionedData = amalgamationBean.calculateLeafWetnessBestEffort(fusionedData);
-				missingParameters = requestedParameters != null && ! requestedParameters.isEmpty() ? 
-						this.getMissingParameters(requestedParameters, Arrays.asList(fusionedData.getWeatherParameters()))
-						: new HashSet<>();
-			}
+			fusionedData = indicesBean.calculateIndicesBestEffort(fusionedData, missingParameters);
+			missingParameters = requestedParameters != null && ! requestedParameters.isEmpty() ? 
+					this.getMissingParameters(requestedParameters, Arrays.asList(fusionedData.getWeatherParameters()))
+					: new HashSet<>();
 			
 			// Remove any parameters not requested
 			List<Integer> parametersToRemove = Arrays.asList(fusionedData.getWeatherParameters()).stream()
@@ -303,7 +304,7 @@ public class AmalgamationService {
 	 * @param longitude Location Weather data location longitude (Decimal degrees) for amalgamation purposes
 	 * @param latitude Location Weather data location latitude (Decimal degrees) for amalgamation purposes
 	 * 
-	 * @pathExample /rest/amalgamation/amalgamate/?endpointURL=https%3A%2F%2Fipmdecisions.nibio.no%2Fapi%2Fwx%2Frest%2Fweatheradapter%2Fyr%2F&endpointQueryStr=longitude%3D14.3711%26latitude%3D67.2828%26altitude%3D70%26parameters%3D1001%2C3001
+	 * @pathExample /rest/amalgamation/amalgamate/?endpointURL=https%3A%2F%2Fplatform.ipmdecisions.net%2Fapi%2Fwx%2Frest%2Fweatheradapter%2Fyr%2F&endpointQueryStr=longitude%3D14.3711%26latitude%3D67.2828%26altitude%3D70%26parameters%3D1001%2C3001
 	 * 
 	 * @return
 	 */

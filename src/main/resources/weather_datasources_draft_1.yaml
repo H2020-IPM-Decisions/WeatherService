@@ -6,7 +6,7 @@ Datasources:
     Datasource_name: "Met Norway Locationforecast"
     Description: "9-day forecasts for the entire planet. 2.5 km resolution in the Nordic-Baltic region, 9km elsewhere"
     Public_URL: "https://api.met.no/weatherapi/locationforecast/1.9/documentation"
-    Endpoint: "https://ipmdecisions.nibio.no/WeatherService/rest/forecasts/yr/"
+    Endpoint: "https://platform.ipmdecisions.net/WeatherService/rest/forecasts/yr/"
     Temporal:
       - 0 # 0 = no historical. 1 = historical (TODO: Need more detail, like "only current year/growing season"?)
       - 9 # 0 = no forecast. All other positive integers indicate the number of days ahead
