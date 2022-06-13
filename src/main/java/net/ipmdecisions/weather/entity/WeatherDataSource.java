@@ -26,6 +26,7 @@ import com.webcohesion.enunciate.metadata.rs.TypeHint;
 
 import net.ipmdecisions.weather.entity.serializers.WeatherDataSourceHistoricDeserializer;
 import net.ipmdecisions.weather.util.GISUtils;
+import net.ipmdecisions.weather.util.SystemUtil;
 
 import java.time.Instant;
 import java.time.LocalDate;
@@ -493,9 +494,19 @@ public class WeatherDataSource implements Comparable {
     /**
      * @return the endpoint
      */
-    @DocumentationExample("https://platform.ipmdecisions.net/lmtservices/rest/ipmdecisions/getdata/")
+    @DocumentationExample("https://lmt.nibio.no/services/rest/ipmdecisions/getdata/ OR {WEATHER_API_URL}/api/wx/rest/weatheradapter/yr/")
     public String getEndpoint() {
         return endpoint;
+    }
+    
+    /**
+     * Returns the enpoint, always with a full path
+     * @return
+     */
+    public String getEndpointFullPath() {
+    	return this.getEndpoint().indexOf("{WEATHER_API_URL}") < 0 ?
+    			this.getEndpoint()
+    			: this.getEndpoint().replace("{WEATHER_API_URL}", SystemUtil.getWeatherAPIURL());
     }
 
     /**

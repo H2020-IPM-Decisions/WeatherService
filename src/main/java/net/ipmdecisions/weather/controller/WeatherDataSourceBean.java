@@ -82,6 +82,8 @@ public class WeatherDataSourceBean {
     	return null;
     }
     
+    
+    
     public List<WeatherDataSource> getWeatherDataSourcesForLocation(Double longitude, Double latitude, Double tolerance) throws IOException
     {
     	tolerance = tolerance == null ? 0.0 : tolerance;

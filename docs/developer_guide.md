@@ -7,11 +7,19 @@ To see your current images, run `sudo docker images`
 ###Build the image
 
 The Dockerfile inside the repo root folder is the build description. To build it, run e.g.:
-`sudo docker build --tag ipmdecisions/weather_api:ALPHA-04 .`
+
+``` bash
+sudo docker build --tag ipmdecisions/weather_api:ALPHA-04 .
+```
 
 ###Run/test the image
-To run it locally:
-`sudo docker run --publish 18081:8080 --detach --name ipmweather ipmdecisions/weather_api:ALPHA-04`
+To run it locally (assuming that you've set up your web server locally with ipmdlocaldocker as hostname):
+
+``` bash
+sudo docker run --publish 18081:8080 --detach -e WEATHER_API_URL=http://ipmdlocaldocker --name ipmweather ipmdecisions/weather_api:ALPHA-04
+```
+
+If you skip the `WEATHER_API_URL` config parameter, it will be set to the default (`https://platform.ipmdecisions.net`)
 
 Test it with Postman (url = [http://localhost:18081/WeatherService](http://localhost:18081/WeatherService)). If the tests run OK, then you can proceed to push the image. If not, you need to rebuild the image:
 
