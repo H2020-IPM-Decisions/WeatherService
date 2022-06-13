@@ -117,7 +117,7 @@ public class AmalgamationService {
 			ZoneId tzForLocation = amalgamationBean.getTimeZoneForLocation(longitude, latitude);
 			Instant timeStart = LocalDate.parse(timeStartStr).atStartOfDay(tzForLocation).toInstant();
 			Instant timeEnd = LocalDate.parse(timeEndStr).atStartOfDay(tzForLocation).toInstant();
-			WeatherDataSource wds = amalgamationBean.getWeatherDataSourceBestEffort(longitude, latitude);
+
 			List<WeatherDataSource> wdss = amalgamationBean.getWeatherDataSourcesInPriorityOrder(longitude, latitude, 
 					requestedParameters,
 					timeStart,
@@ -144,7 +144,7 @@ public class AmalgamationService {
 				{
 					// Is it close enough??
 					String weatherStationId = currentWDS.getIdOfClosestStation(longitude, latitude);
-					url = new URL(currentWDS.getEndpoint() 
+					url = new URL(currentWDS.getEndpointFullPath() 
 							+ "?weatherStationId=" +  weatherStationId
 							+ "&timeStart=" + timeStartStr
 							+ "&timeEnd=" + timeEndStr
@@ -154,7 +154,7 @@ public class AmalgamationService {
 				}
 				else
 				{
-					url = new URL(currentWDS.getEndpoint() 
+					url = new URL(currentWDS.getEndpointFullPath() 
 						+ "?longitude=" + longitude 
 						+ "&latitude=" + latitude 
 						+ "&timeStart=" + timeStartStr
