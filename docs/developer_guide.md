@@ -1,10 +1,10 @@
 # Developer guide
 
-##Building and deploying with Docker
+## Building and deploying with Docker
 
 To see your current images, run `sudo docker images`
 
-###Build the image
+### Build the image
 
 The Dockerfile inside the repo root folder is the build description. To build it, run e.g.:
 
@@ -12,7 +12,7 @@ The Dockerfile inside the repo root folder is the build description. To build it
 sudo docker build --tag ipmdecisions/weather_api:ALPHA-04 .
 ```
 
-###Run/test the image
+### Run/test the image
 To run it locally (assuming that you've set up your web server locally with ipmdlocaldocker as hostname):
 
 ``` bash
@@ -49,12 +49,12 @@ sudo docker rmi ipmdecisions/weather_api:ALPHA-04
 5. Also, make sure you remove any ancestors as well, use sudo docker images to reveal them (check for recent ones)
 6. Then you can rebuild the image (see above). Consider adding the `--no-cache` tag if you need a complete rebuild
 
-###Login to the container’s console (e.g. for troubleshooting)
+### Login to the container’s console (e.g. for troubleshooting)
 ```
 Sudo docker exec -it <containername> bash
 ```
 
-###Push the image
+### Push the image
 ```
 sudo docker push ipmdecisions/weather_api:ALPHA-04
 ```
