@@ -32,6 +32,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import javax.ejb.EJB;
@@ -48,6 +49,7 @@ import javax.ws.rs.core.Response.Status;
 
 import net.ipmdecisions.weather.controller.WeatherDataSourceBean;
 import net.ipmdecisions.weather.entity.WeatherDataSource;
+import net.ipmdecisions.weather.entity.WeatherParameter;
 import net.ipmdecisions.weather.util.GISUtils;
 import org.locationtech.jts.geom.Geometry;
 import org.wololo.geojson.Feature;
@@ -121,30 +123,41 @@ public class WeatherDataSourceService {
     @Consumes("application/json")
     @Produces("application/json")
     @TypeHint(WeatherDataSource[].class)
-    public Response listWeatherDataSourcesForLocation(@QueryParam("tolerance") Double tolerance, String geoJson)
+    public Response listWeatherDataSourcesForLocationEndpoint(@QueryParam("tolerance") Double tolerance, String geoJson)
     {
         Double toleranceFinal = tolerance == null ? 0.0 : tolerance;
         try
-        {
-	        FeatureCollection clientFeatures = (FeatureCollection) GeoJSONFactory.create(geoJson);
-	        GeoJSONReader reader = new GeoJSONReader();
-	        // Get all geometries in request
-	        List<Geometry> clientGeometries = new ArrayList<>();
-	        for(Feature feature: clientFeatures.getFeatures())
-	        {
-	            Geometry geom = reader.read(feature.getGeometry());
-	            clientGeometries.add(geom);
-	        }
-	        // Loop through all weather data sources
-	        // Return only data sources with geometries intersecting with the client's
-	        // specified geometries
-	        List<WeatherDataSource> retVal = weatherDataSourceBean.getWeatherDataSourcesForLocation(clientGeometries, toleranceFinal); 
-	        		
-	        return Response.ok().entity(retVal).build();
+        {	
+	        return Response.ok().entity(this.listWeatherDataSourcesForLocation(toleranceFinal, geoJson)).build();
         }catch(IOException ex)
         {
             return Response.serverError().entity(ex.getMessage()).build();
         }
+    }
+    
+    /**
+     * 
+     * @param tolerance
+     * @param geoJson
+     * @return
+     * @throws IOException
+     */
+    private List<WeatherDataSource> listWeatherDataSourcesForLocation(Double tolerance, String geoJson) throws IOException
+    {
+    	FeatureCollection clientFeatures = (FeatureCollection) GeoJSONFactory.create(geoJson);
+        GeoJSONReader reader = new GeoJSONReader();
+        // Get all geometries in request
+        List<Geometry> clientGeometries = new ArrayList<>();
+        for(Feature feature: clientFeatures.getFeatures())
+        {
+            Geometry geom = reader.read(feature.getGeometry());
+            clientGeometries.add(geom);
+        }
+        // Loop through all weather data sources
+        // Return only data sources with geometries intersecting with the client's
+        // specified geometries
+        List<WeatherDataSource> retVal = weatherDataSourceBean.getWeatherDataSourcesForLocation(clientGeometries, tolerance);
+        return retVal;
     }
     
     /**
@@ -161,7 +174,7 @@ public class WeatherDataSourceService {
     @Path("weatherdatasource/location/point")
     @Produces("application/json")
     @TypeHint(WeatherDataSource[].class)
-    public Response listWeatherDataSourcesForPoint(
+    public Response listWeatherDataSourcesForPointEnd(
             @QueryParam("latitude") Double latitude, 
             @QueryParam("longitude") Double longitude,
             @QueryParam("tolerance") Double tolerance
@@ -177,6 +190,58 @@ public class WeatherDataSourceService {
     		return Response.serverError().entity(ex.getMessage()).build();
     	}
     }
+    
+    
+    
+    @POST
+    @Path("weatherparameter/location")
+    @Produces("application/json")
+    @TypeHint(WeatherParameter[].class)
+    public Response listWeatherParametersForLocation(@QueryParam("tolerance") Double tolerance, String geoJson) {
+    	Double toleranceFinal = tolerance == null ? 0.0 : tolerance;
+        try
+        {	
+        	List<WeatherDataSource> dataSourcesForLocation = this.listWeatherDataSourcesForLocation(toleranceFinal, geoJson);
+        	Set<Integer> retVal = new HashSet<>();
+        	for(WeatherDataSource ds: dataSourcesForLocation)
+        	{
+        		retVal.addAll(Arrays.stream(ds.getParameters().getCommon()).boxed().collect(Collectors.toList()));
+        	}
+
+	        return Response.ok().entity(retVal).build();
+        }catch(IOException ex)
+        {
+            return Response.serverError().entity(ex.getMessage()).build();
+        }
+    }
+    
+    @GET
+    @Path("weatherparameter/location/point")
+    @Produces("application/json")
+    @TypeHint(WeatherParameter[].class)
+    public Response listWeatherParametersForPoint(
+    		@QueryParam("latitude") Double latitude, 
+            @QueryParam("longitude") Double longitude,
+            @QueryParam("tolerance") Double tolerance
+            ) {
+    	try
+    	{
+	        tolerance = tolerance == null ? 0.0 : tolerance;
+	        List<WeatherDataSource> dataSourcesForLocation = weatherDataSourceBean.getWeatherDataSourcesForLocation(longitude, latitude, tolerance); 
+	        Set<Integer> retVal = new HashSet<>();
+        	for(WeatherDataSource ds: dataSourcesForLocation)
+        	{
+        		retVal.addAll(Arrays.stream(ds.getParameters().getCommon()).boxed().collect(Collectors.toList()));
+        	}
+	        return Response.ok().entity(retVal).build();
+    	}
+    	catch(IOException ex)
+    	{
+    		return Response.serverError().entity(ex.getMessage()).build();
+    	}
+    }
+    
+    
     
     @GET
     @Path("weatherdatasource/{id}")
