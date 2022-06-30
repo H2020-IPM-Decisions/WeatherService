@@ -76,6 +76,11 @@ public class AmalgamationService {
 	
 	
 	
+	private Response returnError(Integer statusCode, String message)
+	{
+		
+		return Response.status(statusCode)
+	}
 	
 	
 	@EJB
