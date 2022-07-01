@@ -19,6 +19,8 @@
 package net.ipmdecisions.weather.datasourceadapters;
 
 import net.ipmdecisions.weather.entity.WeatherData;
+import net.ipmdecisions.weather.entity.WeatherDataSourceException;
+
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -63,9 +65,10 @@ public class SLULantMetAdapterTest {
 
     /**
      * Test of getWeatherForecasts method, of class SLULantMetAdapter.
+     * @throws WeatherDataSourceException 
      */
     @Test
-    public void testGetWeatherForecasts() throws Exception {
+    public void testGetWeatherForecasts() throws Exception, WeatherDataSourceException {
         
         System.out.println("getWeatherForecasts");
         
