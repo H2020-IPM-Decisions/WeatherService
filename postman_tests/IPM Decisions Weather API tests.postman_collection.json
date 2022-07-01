@@ -3,7 +3,8 @@
 		"_postman_id": "3febfc92-66df-4e6f-9626-609621038503",
 		"name": "IPM Decisions Weather API tests",
 		"description": "This is the test suite for the IPM Decisions Weather API",
-		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "5789128"
 	},
 	"item": [
 		{
@@ -865,7 +866,7 @@
 							"urlencoded": []
 						},
 						"url": {
-							"raw": "{{wx_url}}/rest/weatheradapter/dmipoint?longitude=9.201049804687502&latitude=55.32670304556049&interval=3600&ignoreErrors=true&timeStart=2022-03-01&timeEnd=2022-04-06&parameters=2001,3002,3101",
+							"raw": "{{wx_url}}/rest/weatheradapter/dmipoint?longitude=9.201049804687502&latitude=56.32670304556049&interval=3600&ignoreErrors=true&timeStart=2021-03-01&timeEnd=2022-04-06&parameters=2001,3002,3101",
 							"host": [
 								"{{wx_url}}"
 							],
@@ -881,7 +882,7 @@
 								},
 								{
 									"key": "latitude",
-									"value": "55.32670304556049"
+									"value": "56.32670304556049"
 								},
 								{
 									"key": "interval",
@@ -893,7 +894,7 @@
 								},
 								{
 									"key": "timeStart",
-									"value": "2022-03-01"
+									"value": "2021-03-01"
 								},
 								{
 									"key": "timeEnd",
@@ -941,7 +942,7 @@
 							"urlencoded": []
 						},
 						"url": {
-							"raw": "{{wx_url}}/rest/weatheradapter/lantmet?latitude=55.752&longitude=13.039&parameters=2001,1002&timeStart=2021-10-01&timeEnd=2021-10-10&interval=3600",
+							"raw": "{{wx_url}}/rest/weatheradapter/lantmet?latitude=55.752&longitude=13.039&parameters=2001,1002,3002,3101&timeStart=2021-10-01&timeEnd=2021-10-10&interval=3600",
 							"host": [
 								"{{wx_url}}"
 							],
@@ -961,7 +962,7 @@
 								},
 								{
 									"key": "parameters",
-									"value": "2001,1002"
+									"value": "2001,1002,3002,3101"
 								},
 								{
 									"key": "timeStart",
@@ -1201,6 +1202,63 @@
 								{
 									"key": "longitude",
 									"value": "12.01629638671875"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get weather parameters for simple point in Norway Copy",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Locationforecast can be found\", function(){",
+									"    var dataSourceList = pm.response.json();",
+									"    var locationForecastFound = false;",
+									"    for(var i=0;i<dataSourceList.length;i++)",
+									"    {",
+									"        if(dataSourceList[i].name == \"Met Norway Locationforecast\")",
+									"        {",
+									"            locationForecastFound = true;",
+									"        }",
+									"    }",
+									"    pm.expect(locationForecastFound).to.be.true;",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{wx_url}}/rest/weatherparameter/location/point/?latitude=59.660468&longitude=10.781989",
+							"host": [
+								"{{wx_url}}"
+							],
+							"path": [
+								"rest",
+								"weatherparameter",
+								"location",
+								"point",
+								""
+							],
+							"query": [
+								{
+									"key": "latitude",
+									"value": "59.660468"
+								},
+								{
+									"key": "longitude",
+									"value": "10.781989"
 								}
 							]
 						}
@@ -1581,7 +1639,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{wx_url}}/rest/amalgamation/amalgamate?longitude=8.8769&latitude=56.2677&timeStart=2021-12-31&timeEnd=2022-01-30&interval=3600&parameters=2001,1002,3102",
+							"raw": "{{wx_url}}/rest/amalgamation/amalgamate?longitude=13.039&latitude=55.752&timeStart=2021-12-31&timeEnd=2022-01-30&interval=3600&parameters=2001,1002,3002,3101",
 							"host": [
 								"{{wx_url}}"
 							],
@@ -1593,11 +1651,11 @@
 							"query": [
 								{
 									"key": "longitude",
-									"value": "8.8769"
+									"value": "13.039"
 								},
 								{
 									"key": "latitude",
-									"value": "56.2677"
+									"value": "55.752"
 								},
 								{
 									"key": "timeStart",
@@ -1613,7 +1671,56 @@
 								},
 								{
 									"key": "parameters",
-									"value": "2001,1002,3102"
+									"value": "2001,1002,3002,3101"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Amalgamation date logic",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{wx_url}}/rest/amalgamation/amalgamate?longitude=8.4629&latitude=60.472&interval=3600&ignoreErrors=true&timeStart=2021-10-23&timeEnd=2022-05-01&parameters=1001",
+							"host": [
+								"{{wx_url}}"
+							],
+							"path": [
+								"rest",
+								"amalgamation",
+								"amalgamate"
+							],
+							"query": [
+								{
+									"key": "longitude",
+									"value": "8.4629"
+								},
+								{
+									"key": "latitude",
+									"value": "60.472"
+								},
+								{
+									"key": "interval",
+									"value": "3600"
+								},
+								{
+									"key": "ignoreErrors",
+									"value": "true"
+								},
+								{
+									"key": "timeStart",
+									"value": "2021-10-23"
+								},
+								{
+									"key": "timeEnd",
+									"value": "2022-05-01"
+								},
+								{
+									"key": "parameters",
+									"value": "1001"
 								}
 							]
 						}
