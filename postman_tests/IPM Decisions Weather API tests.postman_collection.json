@@ -1209,7 +1209,7 @@
 					"response": []
 				},
 				{
-					"name": "Get weather parameters for simple point in Norway Copy",
+					"name": "Get weather parameters for simple point in Norway",
 					"event": [
 						{
 							"listen": "test",
@@ -1219,17 +1219,9 @@
 									"    pm.response.to.have.status(200);",
 									"});",
 									"",
-									"pm.test(\"Locationforecast can be found\", function(){",
-									"    var dataSourceList = pm.response.json();",
-									"    var locationForecastFound = false;",
-									"    for(var i=0;i<dataSourceList.length;i++)",
-									"    {",
-									"        if(dataSourceList[i].name == \"Met Norway Locationforecast\")",
-									"        {",
-									"            locationForecastFound = true;",
-									"        }",
-									"    }",
-									"    pm.expect(locationForecastFound).to.be.true;",
+									"pm.test(\"At least one parameter was found\", function(){",
+									"    var parameterList = pm.response.json();",
+									"    pm.expect(parameterList.length).to.be.above(0);",
 									"});"
 								],
 								"type": "text/javascript"
@@ -1664,6 +1656,64 @@
 								{
 									"key": "timeEnd",
 									"value": "2022-01-30"
+								},
+								{
+									"key": "interval",
+									"value": "3600"
+								},
+								{
+									"key": "parameters",
+									"value": "2001,1002,3002,3101"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Amalgamation test MeteoConcept (with bearer token)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{wx_url}}/rest/amalgamation/amalgamate?longitude=-3.11369&latitude=48.3939&timeStart=2022-01-01&timeEnd=2022-01-31&interval=3600&parameters=2001,1002,3002,3101",
+							"host": [
+								"{{wx_url}}"
+							],
+							"path": [
+								"rest",
+								"amalgamation",
+								"amalgamate"
+							],
+							"query": [
+								{
+									"key": "longitude",
+									"value": "-3.11369"
+								},
+								{
+									"key": "latitude",
+									"value": "48.3939"
+								},
+								{
+									"key": "timeStart",
+									"value": "2022-01-01"
+								},
+								{
+									"key": "timeEnd",
+									"value": "2022-01-31"
 								},
 								{
 									"key": "interval",
