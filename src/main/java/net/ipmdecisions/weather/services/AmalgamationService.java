@@ -52,6 +52,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 import net.iakovlev.timeshape.TimeZoneEngine;
+import net.ipmdecisions.weather.amalgamation.AmalgamationServiceErrorMessage;
 import net.ipmdecisions.weather.amalgamation.Interpolation;
 import net.ipmdecisions.weather.amalgamation.indices.IndicesBean;
 import net.ipmdecisions.weather.controller.AmalgamationBean;
@@ -78,8 +79,8 @@ public class AmalgamationService {
 	
 	private Response returnError(Integer statusCode, String message)
 	{
-		
-		return Response.status(statusCode)
+		// TODO: Create errormessage object - return it
+		return Response.status(statusCode).entity(message).build();
 	}
 	
 	
@@ -114,7 +115,9 @@ public class AmalgamationService {
 		{
 			if(parametersStr == null)
 			{
-				return Response.status(Status.BAD_REQUEST).entity("No weather parameters requested").build();
+				return Response.status(Status.BAD_REQUEST).entity(
+						List.of(new AmalgamationServiceErrorMessage(null,"No weather parameters requested", Status.BAD_REQUEST.getStatusCode()))
+						).build();
 			}
 			List<Integer> requestedParameters = Arrays.asList(parametersStr.split(",")).stream()
 					.map(p->Integer.valueOf(p.trim()))
@@ -130,10 +133,12 @@ public class AmalgamationService {
 			//wdss.forEach(w->System.out.println(w.getName()));
 			if(wdss.size() == 0)
 			{
-				return Response.status(Status.NOT_FOUND).entity("No weather data found for given location and period").build();
+				return Response.status(Status.NOT_FOUND).entity(
+						List.of(new AmalgamationServiceErrorMessage(null,"No weather data found for given location and period", Status.NOT_FOUND.getStatusCode()))
+						).build();
 			}
 			List<WeatherData> weatherDataFromSources = new ArrayList<>();
-			List<String> errorLog = new ArrayList<>();
+			List<AmalgamationServiceErrorMessage> errorLog = new ArrayList<>();
 			for(WeatherDataSource currentWDS:wdss)
 			{
 				// The data source might not provide the requested interval. 
@@ -182,7 +187,13 @@ public class AmalgamationService {
 				}
 				catch(WeatherDataSourceException ex)
 				{
-					errorLog.add("ERROR with weather data source " + currentWDS.getName() + ": " + ex.getMessage());
+					errorLog.add( new AmalgamationServiceErrorMessage(
+								ex.getDataSourceURL(),
+								ex.getMessage(), 
+								ex.getHttpErrorCode()
+								)
+							);
+
 				}
 			}
 			
@@ -190,7 +201,7 @@ public class AmalgamationService {
 			// Error on all data sources -> safe to say that we've failed
 			if(weatherDataFromSources.size() == 0)
 			{
-				throw new WeatherDataSourceException(String.join("\n",errorLog));
+				return Response.status(Status.SERVICE_UNAVAILABLE).entity(errorLog).build();
 			}
 			
 			// TODO: Catch that some sources have not failed, but no or almost no data has been fetched
@@ -295,10 +306,14 @@ public class AmalgamationService {
 			
 			return Response.ok().entity(fusionedData).build();
 		}
-		catch(IOException | WeatherDataSourceException | LocationWeatherDataException ex)
+		catch(IOException | LocationWeatherDataException ex)
 		{
-			return Response.serverError().entity(ex.getMessage()).build();
+
+				return Response.status(Status.SERVICE_UNAVAILABLE).entity(
+						new AmalgamationServiceErrorMessage(null, ex.getMessage(), Status.SERVICE_UNAVAILABLE.getStatusCode())
+						).build();
 		}
+		
 		
 	}
 
@@ -490,10 +505,15 @@ public class AmalgamationService {
 			throw new WeatherDataSourceException("ERROR: No data returned from data source. The request was: " + theURL.toString());
 		}
 		
-		// Are we getting anything else but 200? Raise error
-		if(conn.getResponseCode() != HttpURLConnection.HTTP_OK)
+		// Are we getting anything else but 200? Throw Exception
+		resultCode = conn.getResponseCode();
+		if(resultCode != HttpURLConnection.HTTP_OK)
 		{
-			throw new WeatherDataSourceException("ERROR: Got Http response code " + conn.getResponseCode() + " from data source. Message from server was: " + response.toString());
+			throw new WeatherDataSourceException(
+					theURL.toString(),
+					response.toString(),
+					resultCode
+					);
 		}
 		//System.out.println(response.toString());
 		return response.toString();
