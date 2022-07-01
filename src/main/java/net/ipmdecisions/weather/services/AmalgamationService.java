@@ -324,10 +324,11 @@ public class AmalgamationService {
 		}
 		catch(IOException | LocationWeatherDataException ex)
 		{
-
+			LOGGER.error(ex.getMessage(), ex);
 				return Response.status(Status.SERVICE_UNAVAILABLE).entity(
 						new AmalgamationServiceErrorMessage(null, ex.getMessage(), Status.SERVICE_UNAVAILABLE.getStatusCode())
 						).build();
+				
 		}
 		
 		
@@ -497,14 +498,11 @@ public class AmalgamationService {
 
 	private String getResponseAsPlainText(URL theURL, String authenticationType, Map<String,String> authentication) throws IOException, WeatherDataSourceException {
 		HttpURLConnection conn = (HttpURLConnection) theURL.openConnection();
-		LOGGER.debug("this conn follows redirects? " + conn.getInstanceFollowRedirects());
-		LOGGER.debug("URL = " + theURL.toString());
-		conn.setInstanceFollowRedirects(true);
-		if(! authenticationType.equals(WeatherDataSource.AUTHENTICATION_TYPE_NONE))
+
+		if(authenticationType != null && ! authenticationType.equals(WeatherDataSource.AUTHENTICATION_TYPE_NONE))
 		{
 			if(authenticationType.equals(WeatherDataSource.AUTHENTICATION_TYPE_BEARER_TOKEN))
 			{
-				LOGGER.debug("Setting authorization: " + authentication.get(WeatherDataSource.AUTHENTICATION_TYPE_BEARER_TOKEN));
 				conn.setRequestProperty("Authorization",authentication.get(WeatherDataSource.AUTHENTICATION_TYPE_BEARER_TOKEN));
 			}
 		}
@@ -542,7 +540,7 @@ public class AmalgamationService {
 					resultCode
 					);
 		}
-		//System.out.println(response.toString());
+		//LOGGER.debug(response.toString());
 		return response.toString();
 	}
 
