@@ -24,14 +24,19 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.net.URLEncoder;
 import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import javax.ejb.EJB;
 import javax.ws.rs.Consumes;
@@ -42,6 +47,9 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.time.Instant;
 import java.time.LocalDate;
@@ -74,7 +82,7 @@ import net.ipmdecisions.weather.entity.WeatherDataSource;
 @Path("rest/amalgamation")
 public class AmalgamationService {
 	
-	
+	private static Logger LOGGER = LoggerFactory.getLogger(AmalgamationService.class);
 	
 	
 	
@@ -89,8 +97,8 @@ public class AmalgamationService {
 	 * in the specified period. It's a best effort.
 	 * @param longitude
 	 * @param latitude
-	 * @param timeStartStr
-	 * @param timeEndStr
+	 * @param timeStartStr ISO Date (e.g. 2021-03-01) 
+	 * @param timeEndStr ISO Date (e.g. 2021-09-01) 
 	 * @param parametersStr
 	 * @return
 	 */
@@ -117,7 +125,7 @@ public class AmalgamationService {
 			ZoneId tzForLocation = amalgamationBean.getTimeZoneForLocation(longitude, latitude);
 			Instant timeStart = LocalDate.parse(timeStartStr).atStartOfDay(tzForLocation).toInstant();
 			Instant timeEnd = LocalDate.parse(timeEndStr).atStartOfDay(tzForLocation).toInstant();
-
+			DateTimeFormatter format = DateTimeFormatter.ISO_OFFSET_DATE_TIME.withZone(tzForLocation);
 			List<WeatherDataSource> wdss = amalgamationBean.getWeatherDataSourcesInPriorityOrder(longitude, latitude, 
 					requestedParameters,
 					timeStart,
@@ -140,15 +148,17 @@ public class AmalgamationService {
 						
 				// Is the data source location or station based?
 				URL url;
+				//URLEncoder urlEncoder = URLEncoder.
 				if(currentWDS.getAccess_type().equals(WeatherDataSource.ACCESS_TYPE_STATIONS))
 				{
 					// Is it close enough??
 					String weatherStationId = currentWDS.getIdOfClosestStation(longitude, latitude);
 					url = new URL(currentWDS.getEndpointFullPath() 
 							+ "?weatherStationId=" +  weatherStationId
-							+ "&timeStart=" + timeStartStr
-							+ "&timeEnd=" + timeEndStr
+							+ "&timeStart=" + URLEncoder.encode(format.format(timeStart), "UTF-8")
+							+ "&timeEnd=" + URLEncoder.encode(format.format(timeEnd), "UTF-8")
 							+ "&interval=" + bestAvailableInterval
+							+ "&parameters=" + IntStream.of(currentWDS.getParameters().getCommon()).mapToObj(Integer::toString).collect(Collectors.joining(","))
 							// + "&parameters=" + parametersStr // Exclude this in order to collect all parameters from the source
 							);
 				}
@@ -157,8 +167,8 @@ public class AmalgamationService {
 					url = new URL(currentWDS.getEndpointFullPath() 
 						+ "?longitude=" + longitude 
 						+ "&latitude=" + latitude 
-						+ "&timeStart=" + timeStartStr
-						+ "&timeEnd=" + timeEndStr
+						+ "&timeStart=" + format.format(timeStart)
+						+ "&timeEnd=" + format.format(timeEnd)
 						+ "&interval=" + bestAvailableInterval
 						// + "&parameters=" + parametersStr // Exclude this in order to collect all parameters from the source
 						);
@@ -172,7 +182,13 @@ public class AmalgamationService {
 				}*/
 				try
 				{
-					weatherDataFromSources.add(this.getWeatherDataFromSource(url));
+					Map<String, String> authentication = null;
+					if(currentWDS.getAuthentication_type().equals(WeatherDataSource.AUTHENTICATION_TYPE_BEARER_TOKEN))
+					{
+						authentication = new HashMap<>();
+						authentication.put(WeatherDataSource.AUTHENTICATION_TYPE_BEARER_TOKEN, this.getWeatherDataSourceBearerToken(currentWDS.getId()));
+					}
+					weatherDataFromSources.add(this.getWeatherDataFromSource(url, currentWDS.getAuthentication_type(),authentication));
 					//System.out.println("Successfully added " + currentWDS.getName());
 				}
 				catch(WeatherDataSourceException ex)
@@ -321,7 +337,7 @@ public class AmalgamationService {
 			//System.out.println(endpointURL);
 			//System.out.println(endpointQueryStr);
 			URL completeURL = new URL(endpointURL + (endpointQueryStr.indexOf("?") == 0 ? "" : "?") + endpointQueryStr);
-			WeatherData dataFromSource = this.getWeatherDataFromSource(completeURL); 
+			WeatherData dataFromSource = this.getWeatherDataFromSource(completeURL, null, null); 
 			// Checks!
 			
 			// 1. Are there missing parameters?
@@ -451,16 +467,27 @@ public class AmalgamationService {
 		return null;
 	}
 	
-	private WeatherData getWeatherDataFromSource(URL theURL) throws JsonMappingException, JsonProcessingException, IOException, WeatherDataSourceException
+	private WeatherData getWeatherDataFromSource(URL theURL, String authenticationType, Map<String,String> authentication) throws JsonMappingException, JsonProcessingException, IOException, WeatherDataSourceException
 	{
 		ObjectMapper objectMapper = new ObjectMapper();
-		WeatherData weatherData = objectMapper.readValue(this.getResponseAsPlainText(theURL),
+		WeatherData weatherData = objectMapper.readValue(this.getResponseAsPlainText(theURL, authenticationType, authentication),
 				WeatherData.class);
 		return weatherData;
 	}
 
-	private String getResponseAsPlainText(URL theURL) throws IOException, WeatherDataSourceException {
+	private String getResponseAsPlainText(URL theURL, String authenticationType, Map<String,String> authentication) throws IOException, WeatherDataSourceException {
 		HttpURLConnection conn = (HttpURLConnection) theURL.openConnection();
+		LOGGER.debug("this conn follows redirects? " + conn.getInstanceFollowRedirects());
+		LOGGER.debug("URL = " + theURL.toString());
+		conn.setInstanceFollowRedirects(true);
+		if(! authenticationType.equals(WeatherDataSource.AUTHENTICATION_TYPE_NONE))
+		{
+			if(authenticationType.equals(WeatherDataSource.AUTHENTICATION_TYPE_BEARER_TOKEN))
+			{
+				LOGGER.debug("Setting authorization: " + authentication.get(WeatherDataSource.AUTHENTICATION_TYPE_BEARER_TOKEN));
+				conn.setRequestProperty("Authorization",authentication.get(WeatherDataSource.AUTHENTICATION_TYPE_BEARER_TOKEN));
+			}
+		}
 		int resultCode = conn.getResponseCode();
 		// Follow redirects, also https
 		if(resultCode == HttpURLConnection.HTTP_MOVED_PERM || resultCode == HttpURLConnection.HTTP_MOVED_TEMP)
@@ -501,5 +528,10 @@ public class AmalgamationService {
 		return Response.ok().entity("Amalgamate service: Pulse detected!").build();
 	}
 	
+	
+	private String getWeatherDataSourceBearerToken(String weatherDataSourceId)
+	{
+		return "Bearer " + System.getProperty("net.ipmdecisions.weatherservice.BEARER_TOKEN_" + weatherDataSourceId);
+	}
 	
 }

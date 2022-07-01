@@ -69,6 +69,7 @@ public class WeatherDataSource implements Comparable {
     
     /** No authentication required for the data source */
     public static String AUTHENTICATION_TYPE_NONE = "NONE";
+
     
     /** 
      * <p>
