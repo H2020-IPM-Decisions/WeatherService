@@ -47,6 +47,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
+import net.ipmdecisions.weather.controller.AmalgamationBean;
 import net.ipmdecisions.weather.controller.WeatherDataSourceBean;
 import net.ipmdecisions.weather.entity.WeatherDataSource;
 import net.ipmdecisions.weather.entity.WeatherParameter;
@@ -70,6 +71,9 @@ public class WeatherDataSourceService {
 	
 	@EJB
 	WeatherDataSourceBean weatherDataSourceBean;
+	
+	@EJB
+	AmalgamationBean amalgamationBean;
 
     /**
      * Get a list of all the available weather data sources
@@ -137,7 +141,8 @@ public class WeatherDataSourceService {
     
     /**
      * 
-     * @param tolerance
+     * @param tolerance Add some tolerance (in meters) to allow for e.g. a point to match
+     * the location of a weather station. The default is 0 meters (no tolerance)
      * @param geoJson
      * @return
      * @throws IOException
@@ -192,13 +197,25 @@ public class WeatherDataSourceService {
     }
     
     
-    
+    /**
+     * 
+     * @param tolerance toleranceInput Add some tolerance (in meters) to allow for e.g. a point to match
+     * the location of a weather station. The default is 0 meters (no tolerance)
+     * @param includeFallbackParamsStr If true, all fallback parameters will be added.The default value is false
+     * @param geoJson
+     * @return
+     */
     @POST
     @Path("weatherparameter/location")
     @Produces("application/json")
     @TypeHint(WeatherParameter[].class)
-    public Response listWeatherParametersForLocation(@QueryParam("tolerance") Double tolerance, String geoJson) {
+    public Response listWeatherParametersForLocation(
+    		@QueryParam("tolerance") Double tolerance,
+    		@QueryParam("includeFallbackParams") String includeFallbackParamsStr,
+    		String geoJson
+    		) {
     	Double toleranceFinal = tolerance == null ? 0.0 : tolerance;
+    	Boolean includeFallbackParams = includeFallbackParamsStr == null ? false : includeFallbackParamsStr.equals("true");
         try
         {	
         	List<WeatherDataSource> dataSourcesForLocation = this.listWeatherDataSourcesForLocation(toleranceFinal, geoJson);
@@ -206,6 +223,16 @@ public class WeatherDataSourceService {
         	for(WeatherDataSource ds: dataSourcesForLocation)
         	{
         		retVal.addAll(Arrays.stream(ds.getParameters().getCommon()).boxed().collect(Collectors.toList()));
+        	}
+        	
+        	if(includeFallbackParams)
+        	{
+        		Set<Integer> fallbackParams = new HashSet<>();
+        		for(Integer original:retVal)
+        		{
+        			fallbackParams.addAll(amalgamationBean.getInterchangeableParameters(original));
+        		}
+        		retVal.addAll(fallbackParams);
         	}
 
 	        return Response.ok().entity(retVal).build();
@@ -222,17 +249,29 @@ public class WeatherDataSourceService {
     public Response listWeatherParametersForPoint(
     		@QueryParam("latitude") Double latitude, 
             @QueryParam("longitude") Double longitude,
+            @QueryParam("includeFallbackParams") String includeFallbackParamsStr,
             @QueryParam("tolerance") Double tolerance
             ) {
     	try
     	{
 	        tolerance = tolerance == null ? 0.0 : tolerance;
+	        Boolean includeFallbackParams = includeFallbackParamsStr == null ? false : includeFallbackParamsStr.equals("true");
 	        List<WeatherDataSource> dataSourcesForLocation = weatherDataSourceBean.getWeatherDataSourcesForLocation(longitude, latitude, tolerance); 
 	        Set<Integer> retVal = new HashSet<>();
         	for(WeatherDataSource ds: dataSourcesForLocation)
         	{
         		retVal.addAll(Arrays.stream(ds.getParameters().getCommon()).boxed().collect(Collectors.toList()));
         	}
+        	if(includeFallbackParams)
+        	{
+        		Set<Integer> fallbackParams = new HashSet<>();
+        		for(Integer original:retVal)
+        		{
+        			fallbackParams.addAll(amalgamationBean.getInterchangeableParameters(original));
+        		}
+        		retVal.addAll(fallbackParams);
+        	}
+        	
 	        return Response.ok().entity(retVal).build();
     	}
     	catch(IOException ex)
