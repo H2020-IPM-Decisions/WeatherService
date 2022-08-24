@@ -52,7 +52,11 @@ import net.ipmdecisions.weather.controller.WeatherDataSourceBean;
 import net.ipmdecisions.weather.entity.WeatherDataSource;
 import net.ipmdecisions.weather.entity.WeatherParameter;
 import net.ipmdecisions.weather.util.GISUtils;
+
+import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Geometry;
+import org.locationtech.jts.geom.GeometryFactory;
+import org.locationtech.jts.geom.PrecisionModel;
 import org.wololo.geojson.Feature;
 import org.wololo.geojson.FeatureCollection;
 import org.wololo.geojson.GeoJSONFactory;
@@ -149,20 +153,26 @@ public class WeatherDataSourceService {
      */
     private List<WeatherDataSource> listWeatherDataSourcesForLocation(Double tolerance, String geoJson) throws IOException
     {
-    	FeatureCollection clientFeatures = (FeatureCollection) GeoJSONFactory.create(geoJson);
-        GeoJSONReader reader = new GeoJSONReader();
-        // Get all geometries in request
-        List<Geometry> clientGeometries = new ArrayList<>();
-        for(Feature feature: clientFeatures.getFeatures())
-        {
-            Geometry geom = reader.read(feature.getGeometry());
-            clientGeometries.add(geom);
-        }
+    	List<Geometry> clientGeometries = this.getGeometries(geoJson);
         // Loop through all weather data sources
         // Return only data sources with geometries intersecting with the client's
         // specified geometries
         List<WeatherDataSource> retVal = weatherDataSourceBean.getWeatherDataSourcesForLocation(clientGeometries, tolerance);
         return retVal;
+    }
+    
+    private List<Geometry> getGeometries(String geoJson)
+    {
+    	FeatureCollection clientFeatures = (FeatureCollection) GeoJSONFactory.create(geoJson);
+        GeoJSONReader reader = new GeoJSONReader();
+        // Get all geometries in request
+        List<Geometry> geometries = new ArrayList<>();
+        for(Feature feature: clientFeatures.getFeatures())
+        {
+            Geometry geom = reader.read(feature.getGeometry());
+            geometries.add(geom);
+        }
+        return geometries;
     }
     
     /**
@@ -212,17 +222,27 @@ public class WeatherDataSourceService {
     public Response listWeatherParametersForLocation(
     		@QueryParam("tolerance") Double tolerance,
     		@QueryParam("includeFallbackParams") String includeFallbackParamsStr,
+    		@QueryParam("includeCalculatableParams") String includeCalculatableParamsStr,
     		String geoJson
     		) {
     	Double toleranceFinal = tolerance == null ? 0.0 : tolerance;
     	Boolean includeFallbackParams = includeFallbackParamsStr == null ? false : includeFallbackParamsStr.equals("true");
+    	Boolean includeCalculatableParams = includeCalculatableParamsStr == null ? false : includeCalculatableParamsStr.equals("true");
+    	List<Geometry> clientGeometries = this.getGeometries(geoJson);
         try
         {	
         	List<WeatherDataSource> dataSourcesForLocation = this.listWeatherDataSourcesForLocation(toleranceFinal, geoJson);
         	Set<Integer> retVal = new HashSet<>();
         	for(WeatherDataSource ds: dataSourcesForLocation)
         	{
+        		// Get common weather parameters for this datasource
         		retVal.addAll(Arrays.stream(ds.getParameters().getCommon()).boxed().collect(Collectors.toList()));
+        		// Get additional parameters for this location
+        		List<Integer> additionalParameters = ds.getAdditionalParametersForLocation(clientGeometries, tolerance);
+        		if(additionalParameters != null)
+        		{
+        			retVal.addAll(additionalParameters);
+        		}
         	}
         	
         	if(includeFallbackParams)
@@ -233,6 +253,11 @@ public class WeatherDataSourceService {
         			fallbackParams.addAll(amalgamationBean.getInterchangeableParameters(original));
         		}
         		retVal.addAll(fallbackParams);
+        	}
+        	
+        	if(includeCalculatableParams)
+        	{
+        		retVal.addAll(amalgamationBean.getCalculatableParameters(new HashSet<Integer>(retVal)));
         	}
 
 	        return Response.ok().entity(retVal).build();
@@ -250,17 +275,34 @@ public class WeatherDataSourceService {
     		@QueryParam("latitude") Double latitude, 
             @QueryParam("longitude") Double longitude,
             @QueryParam("includeFallbackParams") String includeFallbackParamsStr,
+            @QueryParam("includeCalculatableParams") String includeCalculatableParamsStr,
             @QueryParam("tolerance") Double tolerance
             ) {
     	try
     	{
 	        tolerance = tolerance == null ? 0.0 : tolerance;
 	        Boolean includeFallbackParams = includeFallbackParamsStr == null ? false : includeFallbackParamsStr.equals("true");
+	        Boolean includeCalculatableParams = includeCalculatableParamsStr == null ? false : includeCalculatableParamsStr.equals("true");
 	        List<WeatherDataSource> dataSourcesForLocation = weatherDataSourceBean.getWeatherDataSourcesForLocation(longitude, latitude, tolerance); 
 	        Set<Integer> retVal = new HashSet<>();
+	        List<Geometry> clientGeometries = new ArrayList<>();
+	        double[] coordinate = new double[2];
+	        coordinate[0] = longitude;
+	        coordinate[1] = latitude;
+	        Coordinate c = new Coordinate(longitude, latitude);
+	        GeometryFactory gf = new GeometryFactory(new PrecisionModel(), 4326);
+	        org.locationtech.jts.geom.Point point = gf.createPoint(c);
+	        clientGeometries.add(point);
         	for(WeatherDataSource ds: dataSourcesForLocation)
         	{
+        		// Get common weather parameters for this datasource
         		retVal.addAll(Arrays.stream(ds.getParameters().getCommon()).boxed().collect(Collectors.toList()));
+        		// Get additional parameters for this location
+        		List<Integer> additionalParameters = ds.getAdditionalParametersForLocation(clientGeometries, tolerance);
+        		if(additionalParameters != null)
+        		{
+        			retVal.addAll(additionalParameters);
+        		}
         	}
         	if(includeFallbackParams)
         	{
@@ -270,6 +312,11 @@ public class WeatherDataSourceService {
         			fallbackParams.addAll(amalgamationBean.getInterchangeableParameters(original));
         		}
         		retVal.addAll(fallbackParams);
+        	}
+        	
+        	if(includeCalculatableParams)
+        	{
+        		retVal.addAll(amalgamationBean.getCalculatableParameters(new HashSet<Integer>(retVal)));
         	}
         	
 	        return Response.ok().entity(retVal).build();

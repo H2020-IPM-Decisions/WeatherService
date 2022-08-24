@@ -414,6 +414,23 @@ public class AmalgamationBean {
 	}
 	
 	/**
+	 * TODO Make more streamlined
+	 * @param inputParameters
+	 * @return all parameters that the API can calculate based on the provided parameters
+	 */
+	public List<Integer> getCalculatableParameters(Set<Integer> inputParameters)
+	{
+		List<Integer> retVal = new ArrayList<>();
+		// If we have relative humidity, we can calculate Leaf wetness
+		Set<Integer> rhParams = Set.of(3001,3002,3003);
+		if(inputParameters.retainAll(rhParams))
+		{
+			retVal.add(3101);
+		}
+		return retVal;
+	}
+	
+	/**
 	 * Using this API: https://github.com/RomanIakovlev/timeshape
 	 * @return
 	 */

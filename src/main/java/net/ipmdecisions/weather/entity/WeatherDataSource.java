@@ -41,6 +41,8 @@ import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.Point;
 import org.locationtech.jts.geom.PrecisionModel;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.wololo.geojson.Feature;
 import org.wololo.geojson.FeatureCollection;
 import org.wololo.geojson.GeoJSONFactory;
@@ -55,6 +57,9 @@ import org.wololo.jts2geojson.GeoJSONReader;
  * @author Tor-Einar Skog <tor-einar.skog@nibio.no>
  */
 public class WeatherDataSource implements Comparable {
+	
+	private static Logger LOGGER = LoggerFactory.getLogger(WeatherDataSource.class);
+	
     private String id, name, description, public_URL,endpoint, authentication_type, needs_data_control, access_type;
     private Integer priority;
     private Temporal temporal;
@@ -676,6 +681,59 @@ public class WeatherDataSource implements Comparable {
         }
         catch(NullPointerException ex)
         { return null; }
+	}
+	
+	
+	/**
+	 * Currently only applicable to station based data sources
+	 * @return List of parameter codes that this location provides in addition to the "common" ones
+	 */
+	@JsonIgnore
+	public List<Integer> getAdditionalParametersForLocation(List<Geometry> clientGeometries, Double toleranceInput)
+	{
+		if(this.getAccess_type().equals("stations") && !this.getSpatial().getGeoJSON().isBlank())
+		{
+			LOGGER.debug("This data source(" + this.getName() + ") is station based.");
+			GeoJSONReader reader = new GeoJSONReader();
+			GISUtils gisUtils = new GISUtils();
+			return this.getStationsGeometries().stream()
+		            .filter(stationFeature->{
+		            	Geometry stationGeometry = reader.read(stationFeature.getGeometry());
+		                Boolean matching = false;
+		                for(Geometry clientGeometry: clientGeometries)
+		                {
+		                    if(stationGeometry.intersects(clientGeometry) || gisUtils.getDistanceInMetersWGS84(stationGeometry.distance(clientGeometry)) <= toleranceInput)
+		                    {
+		                        //System.out.println("Distance: " + gisUtils.getDistanceInMetersWGS84(dataSourceGeometry.distance(clientGeometry)));
+		                        matching = true;
+		                    }
+		                }
+		                LOGGER.debug("This station(" + stationFeature.getId() + ") matches the provided location.");
+		                return matching;
+		            })
+		            .flatMap(matchingStationFeature-> ((List<Integer>)matchingStationFeature.getProperties().get("additionalParameters")).stream())
+		            .collect(Collectors.toList());
+		}
+		else
+		{
+			LOGGER.debug("This data source(" + this.getName() + ") is not station based, so no additional parameters can be added.");
+			return null;
+		}
+	}
+	
+	@JsonIgnore
+	public List<Feature> getStationsGeometries()
+	{
+		if(this.getAccess_type().equals("stations") && !this.getSpatial().getGeoJSON().isBlank())
+		{
+			return Arrays.asList(
+			((FeatureCollection) GeoJSONFactory.create(this.getSpatial().getGeoJSON())).getFeatures()
+			);
+		}
+		else
+		{
+			return null;
+		}
 	}
 
 	/**
