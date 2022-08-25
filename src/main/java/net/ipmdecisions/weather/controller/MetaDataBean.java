@@ -55,7 +55,7 @@ public class MetaDataBean {
     {
     	if(this.weatherParameterList == null)
     	{
-	    	BufferedInputStream inputStream = new BufferedInputStream(this.getClass().getResourceAsStream("/weather_parameters_draft_v2.yaml"));
+	    	BufferedInputStream inputStream = new BufferedInputStream(this.getClass().getResourceAsStream("/weather_parameters_1_0.yaml"));
 	        ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
 	        Map prelimResult = mapper.readValue(inputStream, HashMap.class);
 	        List<Map> parameters = (List<Map>) prelimResult.get("parameters");
