@@ -177,8 +177,8 @@ public class AmalgamationService {
 					url = new URL(currentWDS.getEndpointFullPath() 
 						+ "?longitude=" + longitude 
 						+ "&latitude=" + latitude 
-						+ "&timeStart=" + format.format(timeStart)
-						+ "&timeEnd=" + format.format(timeEnd)
+						+ "&timeStart=" + URLEncoder.encode(format.format(timeStart), "UTF-8")
+						+ "&timeEnd=" + URLEncoder.encode(format.format(timeEnd), "UTF-8")
 						+ "&interval=" + bestAvailableInterval
 						// + "&parameters=" + parametersStr // Exclude this in order to collect all parameters from the source
 						);
