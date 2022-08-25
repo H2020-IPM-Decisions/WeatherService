@@ -706,9 +706,9 @@ public class WeatherDataSource implements Comparable {
 		                    {
 		                        //System.out.println("Distance: " + gisUtils.getDistanceInMetersWGS84(dataSourceGeometry.distance(clientGeometry)));
 		                        matching = true;
+		                        LOGGER.debug("This station(" + stationFeature.getId() + ") matches the provided location.");
 		                    }
 		                }
-		                LOGGER.debug("This station(" + stationFeature.getId() + ") matches the provided location.");
 		                return matching;
 		            })
 		            .flatMap(matchingStationFeature-> ((List<Integer>)matchingStationFeature.getProperties().get("additionalParameters")).stream())
