@@ -57,6 +57,9 @@ import net.ipmdecisions.weather.entity.WeatherData;
 import net.ipmdecisions.weather.entity.WeatherDataSourceException;
 import net.ipmdecisions.weather.util.WeatherDataUtil;
 import org.jboss.resteasy.annotations.GZIP;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.time.format.DateTimeFormatter;
 import javax.xml.datatype.DatatypeConfigurationException;
 import net.ipmdecisions.weather.datasourceadapters.dmi.DMIPointWebDataParser;
@@ -74,6 +77,8 @@ import net.ipmdecisions.weather.datasourceadapters.dmi.DMIPointWebDataParser;
  */
 @Path("rest/weatheradapter")
 public class WeatherAdapterService {
+	
+	private static Logger LOGGER = LoggerFactory.getLogger(WeatherAdapterService.class);
     
     private WeatherDataUtil weatherDataUtil;
     
@@ -315,8 +320,8 @@ public class WeatherAdapterService {
         // Is it a ISO-8601 timestamp or date?
         try
         {
-            timeStartInstant = ZonedDateTime.parse(timeStart).toInstant();
-            timeEndInstant = ZonedDateTime.parse(timeEnd).toInstant();
+            timeStartInstant = ZonedDateTime.parse(this.tryToFixTimestampString(timeStart)).toInstant();
+            timeEndInstant = ZonedDateTime.parse(this.tryToFixTimestampString(timeEnd)).toInstant();
         }
         catch(DateTimeParseException ex)
         {
@@ -662,5 +667,40 @@ public class WeatherAdapterService {
             this.weatherDataUtil = new WeatherDataUtil();
         }
         return this.weatherDataUtil;
+    }
+    
+    /**
+     * Through URL decoding, some chars like "+" may get lost. We try to fix this.
+     * 
+     * @param timestampStr
+     * @return
+     */
+    private String tryToFixTimestampString(String timestampStr)
+    {
+    	// Date parsing
+        // Is it a ISO-8601 timestamp or date?
+        try
+        {
+            ZonedDateTime.parse(timestampStr).toInstant();
+            // All is well, return unchanged
+            return timestampStr;
+        }
+        catch(DateTimeParseException ex1)
+        {
+        	// Something went wrong
+        	// Hypothesis 1: The + is missing
+        	String mod1 = timestampStr.replace(" ", "+");
+        	try
+        	{
+	        	ZonedDateTime.parse(mod1).toInstant();
+	            // All is well, return modified
+	            return mod1;
+        	}
+        	catch(DateTimeParseException ex2)
+            {
+        		// No more hypothesis - return original
+        		return timestampStr;
+            } 
+        }
     }
 }
