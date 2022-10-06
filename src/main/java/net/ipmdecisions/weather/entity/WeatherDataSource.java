@@ -20,6 +20,8 @@
 package net.ipmdecisions.weather.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.webcohesion.enunciate.metadata.DocumentationExample;
 import com.webcohesion.enunciate.metadata.rs.TypeHint;
@@ -31,6 +33,7 @@ import net.ipmdecisions.weather.util.SystemUtil;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -661,7 +664,7 @@ public class WeatherDataSource implements Comparable {
 		
 		GeoJSONReader reader = new GeoJSONReader();
     	GISUtils gisUtils = new GISUtils();
-		
+    			
 		try
         {
 			Feature closestFeature = null;
@@ -676,13 +679,93 @@ public class WeatherDataSource implements Comparable {
         			closestFeature = currentFeature;
         		}
         	}
-        	//System.out.println("Found closest station: " + (String) closestFeature.getProperties().get("name"));
-        	return (String) closestFeature.getProperties().get("id");
+        	LOGGER.debug("Found closest station: " + (String) closestFeature.getProperties().get("name"));
+        	//return (String) closestFeature.getProperties().get("id");
+        	return (String) new ObjectMapper().writeValueAsString(closestFeature.getId());
         }
-        catch(NullPointerException ex)
-        { return null; }
+        catch(NullPointerException | JsonProcessingException ex)
+        { 
+        	LOGGER.debug(ex.getMessage());
+        	return null; 
+        }
 	}
 	
+	/**
+	 * Get distance in meters between a station and a location
+	 * @param stationId
+	 * @param longitude
+	 * @param latitude
+	 * @return
+	 */
+	@JsonIgnore
+	public Double getDistanceToStation(String stationId, Double longitude, Double latitude)
+	{
+		if(this.getAccess_type().equals("stations") && !this.getSpatial().getGeoJSON().isBlank())
+		{
+			Feature stationFeature = this.getStation(stationId);
+			if(stationFeature == null)
+			{
+				return null;
+			}
+			GeoJSONReader reader = new GeoJSONReader();
+			Geometry stationPoint = reader.read(stationFeature.getGeometry());
+			GISUtils gisUtils = new GISUtils();
+	        Point locationPoint = new GeometryFactory(new PrecisionModel(), 4326).createPoint(new Coordinate(longitude,latitude));
+			return gisUtils.getDistanceInMetersWGS84(stationPoint.distance(locationPoint));
+		}
+		else
+		{
+			LOGGER.debug("This data source(" + this.getName() + ") is not station based, so no additional parameters can be added.");
+			return null;
+		}
+	}
+	
+	/**
+	 * 
+	 * @param stationId
+	 * @return
+	 */
+	public Feature getStation(String stationId)
+	{
+		ObjectMapper objectMapper = new ObjectMapper();
+		for(Feature stationFeature: this.getStationsGeometries()) {
+			try
+        	{
+        		if(objectMapper.writeValueAsString(stationFeature.getId()).equals(stationId))
+        		{
+        			return stationFeature;
+        		}
+        	}
+        	catch(JsonProcessingException ex)
+    		{
+    			LOGGER.debug(ex.getMessage());
+    			return null;
+    		}
+		}
+		return null;
+	}
+	
+	/**
+	 * If you already know the stationId, get its additional weather parameters. ONLY applicable to station based weather data sources
+	 * @param stationId
+	 * @return
+	 */
+	@JsonIgnore
+	public List<Integer> getAdditionalParametersForStation(String stationId)
+	{
+		if(this.getAccess_type().equals("stations") && !this.getSpatial().getGeoJSON().isBlank())
+		{
+			Feature stationFeature = this.getStation(stationId);
+			return stationFeature != null && (List<Integer>) stationFeature.getProperties().get("additionalParameters") != null? 
+					(List<Integer>) stationFeature.getProperties().get("additionalParameters") 
+					: new ArrayList<>();
+		}
+		else
+		{
+			LOGGER.debug("This data source(" + this.getName() + ") is not station based, so no additional parameters can be added.");
+			return new ArrayList<>();
+		}
+	}
 	
 	/**
 	 * Currently only applicable to station based data sources

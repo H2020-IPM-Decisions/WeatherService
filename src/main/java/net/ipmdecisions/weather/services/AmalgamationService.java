@@ -161,14 +161,28 @@ public class AmalgamationService {
 				//URLEncoder urlEncoder = URLEncoder.
 				if(currentWDS.getAccess_type().equals(WeatherDataSource.ACCESS_TYPE_STATIONS))
 				{
-					// Is it close enough??
+					
 					String weatherStationId = currentWDS.getIdOfClosestStation(longitude, latitude);
+					// Is it close enough??
+					// For now: Set default max distance between location and distance to 1 km (1000 m)
+					// TODO: Define the tolerance more generally
+					if(currentWDS.getDistanceToStation(weatherStationId, longitude, latitude) > 1000.0){
+						continue;
+					}
+					// Making sure we get all the parameters available for the station
+					Set<Integer> wdsParameters = Arrays.stream(currentWDS.getParameters().getCommon()).boxed().collect(Collectors.toSet());
+					if(wdsParameters == null)
+					{
+						wdsParameters = new HashSet<>();
+					}
+					wdsParameters.addAll(currentWDS.getAdditionalParametersForStation(weatherStationId));
+
 					url = new URL(currentWDS.getEndpointFullPath() 
 							+ "?weatherStationId=" +  weatherStationId
 							+ "&timeStart=" + URLEncoder.encode(format.format(timeStart), "UTF-8")
 							+ "&timeEnd=" + URLEncoder.encode(format.format(timeEnd), "UTF-8")
 							+ "&interval=" + bestAvailableInterval
-							+ "&parameters=" + IntStream.of(currentWDS.getParameters().getCommon()).mapToObj(Integer::toString).collect(Collectors.joining(","))
+							+ "&parameters=" + wdsParameters.stream().map(String::valueOf).collect(Collectors.joining(","))
 							// + "&parameters=" + parametersStr // Exclude this in order to collect all parameters from the source
 							);
 				}
@@ -185,7 +199,7 @@ public class AmalgamationService {
 					
 				}
 				
-				//System.out.println(currentWDS.getName() + ":  " + url);
+				LOGGER.debug(currentWDS.getName() + ":  " + url);
 				/*if(currentWDS.getName().equals("Euroweather seasonal gridded weather data and forecasts  by IPM Decisions"))
 				{
 					continue;
