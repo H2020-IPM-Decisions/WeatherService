@@ -7,6 +7,7 @@ COPY ./ ./
 # package our application code
 RUN mvn clean install
 
+RUN git clone --single-branch --branch main https://gitlab.nibio.no/madiphs/weather-metadata.git Weather-Metadata
 RUN git clone --single-branch --branch master https://github.com/datasets/geo-countries.git
 
 # Used this as a template: https://github.com/jboss-dockerfiles/wildfly/blob/master/Dockerfile 
@@ -35,12 +36,17 @@ RUN cd $HOME \
 # Replace standalone.xml (the main WildFly config file)
 COPY ./wildfly_config/standalone.xml_${WILDFLY_VERSION} ${JBOSS_HOME}/standalone/configuration/standalone.xml  
 
-ENV APP_VERSION=BETA-SNAPSHOT
+ENV APP_VERSION=1.0.0
 
 # copy only the artifacts we need from the first stage and discard the rest
 COPY --from=MAVEN_BUILD /target/IPMDecisionsWeatherService-$APP_VERSION.war /IPMDecisionsWeatherService-$APP_VERSION.war
 COPY --from=MAVEN_BUILD /geo-countries/data/countries.geojson /countries.geojson
 RUN ln -s /IPMDecisionsWeatherService-$APP_VERSION.war ${JBOSS_HOME}/standalone/deployments/IPMDecisionsWeatherService.war
+# This requires you to have cloned the formats repository from GitHub: https://github.com/H2020-IPM-Decisions/dss-metadata
+RUN mkdir /Weather-Metadata
+COPY  --from=MAVEN_BUILD /Weather-Metadata/ /Weather-Metadata/
+RUN chown -R jboss:jboss /Weather-Metadata
+
 
 # Ensure signals are forwarded to the JVM process correctly for graceful shutdown
 ENV LAUNCH_JBOSS_IN_BACKGROUND true
@@ -52,4 +58,4 @@ EXPOSE 8080
 
 # Set the default command to run on boot
 # This will boot WildFly in the standalone mode and bind to all interfaces
-CMD /opt/jboss/wildfly/bin/standalone.sh -b 0.0.0.0 -Dnet.ipmdecisions.weatherservice.COUNTRY_BOUNDARIES_FILE=/countries.geojson -Dnet.ipmdecisions.weatherservice.WEATHER_API_URL=${WEATHER_API_URL} -Dnet.ipmdecisions.weatherservice.BEARER_TOKEN_fr.meteo-concept.api=${BEARER_TOKEN_fr_meteo-concept_api}
+CMD /opt/jboss/wildfly/bin/standalone.sh -b 0.0.0.0 -Dnet.ipmdecisions.weatherservice.DATASOURCE_LIST_FILE=/Weather-Metadata/weather_datasources.yaml -Dnet.ipmdecisions.weatherservice.COUNTRY_BOUNDARIES_FILE=/countries.geojson -Dnet.ipmdecisions.weatherservice.WEATHER_API_URL=${WEATHER_API_URL} -Dnet.ipmdecisions.weatherservice.BEARER_TOKEN_fr.meteo-concept.api=${BEARER_TOKEN_fr_meteo-concept_api}
