@@ -287,7 +287,7 @@ public class AmalgamationService {
 			// Chop away any missing data at the beginning and end of the data set
 			WeatherDataUtil wdUtil = new WeatherDataUtil();
 			fusionedData = wdUtil.trimDataSet(fusionedData);
-			
+                        
 			return Response.ok().entity(fusionedData).build();
 		}
 		catch(IOException | WeatherDataSourceException | LocationWeatherDataException ex)
