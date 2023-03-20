@@ -4,7 +4,7 @@
 
     <groupId>net.ipmdecisions</groupId>
     <artifactId>IPMDecisionsWeatherService</artifactId>
-    <version>1.0.0</version>
+    <version>1.0.1</version>
     <packaging>war</packaging>
 
     <name>IPM Decisions Weather Service</name>
