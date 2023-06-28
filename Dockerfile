@@ -35,7 +35,7 @@ RUN cd $HOME \
 # Replace standalone.xml (the main WildFly config file)
 COPY ./wildfly_config/standalone.xml_${WILDFLY_VERSION} ${JBOSS_HOME}/standalone/configuration/standalone.xml  
 
-ENV APP_VERSION=BETA-SNAPSHOT
+ENV APP_VERSION=1.0.1
 
 # copy only the artifacts we need from the first stage and discard the rest
 COPY --from=MAVEN_BUILD /target/IPMDecisionsWeatherService-$APP_VERSION.war /IPMDecisionsWeatherService-$APP_VERSION.war
@@ -46,6 +46,9 @@ RUN ln -s /IPMDecisionsWeatherService-$APP_VERSION.war ${JBOSS_HOME}/standalone/
 ENV LAUNCH_JBOSS_IN_BACKGROUND true
 
 USER jboss
+
+# Increase RAM for WildFly
+ENV JBOSS_JAVA_SIZING="-Xms256m -Xmx8192m -XX:MetaspaceSize=96M -XX:MaxMetaspaceSize=4096M"
 
 # Expose the ports we're interested in
 EXPOSE 8080
