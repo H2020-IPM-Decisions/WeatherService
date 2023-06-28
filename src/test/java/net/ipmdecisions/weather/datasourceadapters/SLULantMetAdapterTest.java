@@ -80,19 +80,20 @@ public class SLULantMetAdapterTest {
         Date dateFrom = format.parse("2021-08-01");
         Date dateTo = format.parse("2021-08-03");
         Integer interval = 3600;
-        Integer[] params = {1002,2001};
+        Integer[] params = {1002, 2001, 5001};
         List<Integer> parameters = Arrays.asList(params); 
         SLULantMetAdapter instance = new SLULantMetAdapter();
         WeatherData result = instance.getData(longitude, latitude, dateFrom.toInstant(), dateTo.toInstant(), interval, parameters);
         assertNotNull(result);
         
         // Optional print
-        /*
-        ObjectMapper om = new ObjectMapper();
-        JavaTimeModule javaTimeModule =  new JavaTimeModule();
-        om.registerModule(javaTimeModule);
-        System.out.println(om.writeValueAsString(result));
-        */
+        Boolean print = false;
+        if(print) {
+            ObjectMapper om = new ObjectMapper();
+            JavaTimeModule javaTimeModule = new JavaTimeModule();
+            om.registerModule(javaTimeModule);
+            System.out.println(om.writeValueAsString(result));
+        }
     }
     
 }
