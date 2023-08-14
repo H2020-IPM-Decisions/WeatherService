@@ -34,9 +34,12 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.locationtech.jts.geom.Point;
 import org.wololo.geojson.Feature;
 import org.wololo.geojson.FeatureCollection;
 import org.wololo.geojson.GeoJSONFactory;
+import org.wololo.geojson.Geometry;
+import org.wololo.jts2geojson.GeoJSONReader;
 import org.wololo.jts2geojson.GeoJSONWriter;
 
 /**
@@ -102,5 +105,26 @@ public class GISUtils {
             }
         }
         return new GeoJSONWriter().write(matching);
+    }
+
+
+    /**
+     *
+     * @param point The location
+     * @return three letter country code (ISO A3)
+     */
+    public String getCountryCodeForPoint(Point point)
+    {
+        GeoJSONReader reader = new GeoJSONReader();
+        for(Feature feature: this.getCountryBoundaries().getFeatures())
+        {
+            // Convert from GeoJSON to JTS Geometry
+            org.locationtech.jts.geom.Geometry countryGeometry = reader.read(feature.getGeometry());
+            if(countryGeometry.contains(point))
+            {
+                return (String) feature.getProperties().get("ISO_A3");
+            }
+        }
+        return null;
     }
 }
