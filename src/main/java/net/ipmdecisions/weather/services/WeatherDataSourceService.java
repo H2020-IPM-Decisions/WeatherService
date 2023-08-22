@@ -160,6 +160,8 @@ public class WeatherDataSourceService {
         List<WeatherDataSource> retVal = weatherDataSourceBean.getWeatherDataSourcesForLocation(clientGeometries, tolerance);
         return retVal;
     }
+
+
     
     private List<Geometry> getGeometries(String geoJson)
     {
@@ -366,6 +368,25 @@ public class WeatherDataSourceService {
     		return Response.serverError().entity(ex.getMessage()).build();
     	}
     }
-    
+
+	@GET
+	@Path("country/{countryCodes}/")
+	@Produces("application/json")
+	public Response getCountryGeoJson(
+			@PathParam("countryCodes") String countryCodesStr
+	)
+	{
+		String[] countryCodes = countryCodesStr.split(",");
+		GISUtils gisUtils = new GISUtils();
+		FeatureCollection countryGeoJson = gisUtils.getCountryBoundaries(Set.of(countryCodes));
+		if(countryGeoJson != null && countryGeoJson.getFeatures().length > 0)
+		{
+			return Response.ok().entity(countryGeoJson).build();
+		}
+		else
+		{
+			return Response.status(Status.NOT_FOUND).build();
+		}
+	}
     
 }
