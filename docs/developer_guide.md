@@ -16,7 +16,7 @@ sudo docker build --tag ipmdecisions/weather_api:ALPHA-04 .
 To run it locally (assuming that you've set up your web server locally with ipmdlocaldocker as hostname):
 
 ``` bash
-sudo docker run --publish 18081:8080 --detach -e WEATHER_API_URL=http://ipmdlocaldocker -e BEARER_TOKEN_fr_meteo-concept_api=***YOUR AUTHTOKEN HERE*** --name ipmweather ipmdecisions/weather_api:ALPHA-04
+sudo docker run --publish 18081:8080 --detach -e WEATHER_API_URL=http://localhost:8080/WeatherService -e BEARER_TOKEN_fr_meteo-concept_api=***YOUR AUTHTOKEN HERE*** --name ipmweather ipmdecisions/weather_api:ALPHA-04
 ```
 
 If you skip the `WEATHER_API_URL` config parameter, it will be set to the default (`https://platform.ipmdecisions.net`)
