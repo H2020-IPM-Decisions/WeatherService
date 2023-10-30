@@ -149,7 +149,9 @@ public class SLULantMetAdapter {
 				(interval == 3600 ? 1 : 2),
 				timeStart.atZone(swedishNormalTime).format(format),
 				timeEnd.atZone(swedishNormalTime).format(format),
-				parameters.stream().map(i->weatherUtils.getVIPSParameterId(i)).collect(Collectors.joining(","))
+				parameters.stream()
+                                        .filter(i->weatherUtils.getVIPSParameterId(i) != null)
+                                        .map(i->weatherUtils.getVIPSParameterId(i)).collect(Collectors.joining(","))
 				));
 		//System.out.println(sluURL);
 		WeatherData result = weatherUtils.getWeatherDataFromVIPSWeatherObservations(sluURL, longitude, latitude, 0);
