@@ -866,7 +866,7 @@
 							"urlencoded": []
 						},
 						"url": {
-							"raw": "{{wx_url}}/rest/weatheradapter/dmipoint?longitude=9.201049804687502&latitude=56.32670304556049&interval=3600&ignoreErrors=true&timeStart=2021-03-01&timeEnd=2022-04-06&parameters=2001,3002,3101",
+							"raw": "{{wx_url}}/rest/weatheradapter/dmipoint?longitude=9.201049804687502&latitude=56.32670304556049&interval=3600&ignoreErrors=true&timeStart=2022-04-01&timeEnd=2022-04-06&parameters=2001,3002,3101,1112",
 							"host": [
 								"{{wx_url}}"
 							],
@@ -894,7 +894,7 @@
 								},
 								{
 									"key": "timeStart",
-									"value": "2021-03-01"
+									"value": "2022-04-01"
 								},
 								{
 									"key": "timeEnd",
@@ -902,7 +902,7 @@
 								},
 								{
 									"key": "parameters",
-									"value": "2001,3002,3101"
+									"value": "2001,3002,3101,1112"
 								}
 							]
 						}
@@ -942,7 +942,7 @@
 							"urlencoded": []
 						},
 						"url": {
-							"raw": "{{wx_url}}/rest/weatheradapter/lantmet?latitude=55.752&longitude=13.039&parameters=2001,1002,3002,3101&timeStart=2021-10-01&timeEnd=2021-10-10&interval=3600",
+							"raw": "{{wx_url}}/rest/weatheradapter/lantmet?longitude=17.3907&latitude=59.7156&interval=3600&ignoreErrors=true&timeStart=2023-04-01&timeEnd=2023-10-25&parameters=3101,3002,2001",
 							"host": [
 								"{{wx_url}}"
 							],
@@ -953,28 +953,32 @@
 							],
 							"query": [
 								{
-									"key": "latitude",
-									"value": "55.752"
-								},
-								{
 									"key": "longitude",
-									"value": "13.039"
+									"value": "17.3907"
 								},
 								{
-									"key": "parameters",
-									"value": "2001,1002,3002,3101"
-								},
-								{
-									"key": "timeStart",
-									"value": "2021-10-01"
-								},
-								{
-									"key": "timeEnd",
-									"value": "2021-10-10"
+									"key": "latitude",
+									"value": "59.7156"
 								},
 								{
 									"key": "interval",
 									"value": "3600"
+								},
+								{
+									"key": "ignoreErrors",
+									"value": "true"
+								},
+								{
+									"key": "timeStart",
+									"value": "2023-04-01"
+								},
+								{
+									"key": "timeEnd",
+									"value": "2023-10-25"
+								},
+								{
+									"key": "parameters",
+									"value": "3101,3002,2001"
 								}
 							]
 						}
@@ -1183,7 +1187,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{wx_url}}/rest/weatherdatasource/location/point/?latitude=59.678835236960765&longitude=12.01629638671875",
+							"raw": "{{wx_url}}/rest/weatherdatasource/location/point/?latitude=59.680468&longitude=11.781989&findForCountry=false",
 							"host": [
 								"{{wx_url}}"
 							],
@@ -1197,11 +1201,15 @@
 							"query": [
 								{
 									"key": "latitude",
-									"value": "59.678835236960765"
+									"value": "59.680468"
 								},
 								{
 									"key": "longitude",
-									"value": "12.01629638671875"
+									"value": "11.781989"
+								},
+								{
+									"key": "findForCountry",
+									"value": "false"
 								}
 							]
 						}
@@ -1251,6 +1259,139 @@
 								{
 									"key": "longitude",
 									"value": "10.781989"
+								},
+								{
+									"key": "includeFallbackParams",
+									"value": "true",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get weather parameters for simple point in Norway include fallback parameters",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"At least one parameter was found\", function(){",
+									"    var parameterList = pm.response.json();",
+									"    pm.expect(parameterList.length).to.be.above(0);",
+									"    var found4013 = false;",
+									"    for(i in parameterList)",
+									"    {",
+									"        if(parameterList[i] == 4013)",
+									"        {",
+									"            found4013 = true;",
+									"        }",
+									"    }",
+									"    pm.expect(found4013).to.be.true;",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{wx_url}}/rest/weatherparameter/location/point/?latitude=59.660468&longitude=10.781989&includeFallbackParams=true",
+							"host": [
+								"{{wx_url}}"
+							],
+							"path": [
+								"rest",
+								"weatherparameter",
+								"location",
+								"point",
+								""
+							],
+							"query": [
+								{
+									"key": "latitude",
+									"value": "59.660468"
+								},
+								{
+									"key": "longitude",
+									"value": "10.781989"
+								},
+								{
+									"key": "includeFallbackParams",
+									"value": "true"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get weather parameters for simple point in England include fallback and calculatable parameters",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"At least one parameter was found\", function(){",
+									"    var parameterList = pm.response.json();",
+									"    pm.expect(parameterList.length).to.be.above(0);",
+									"    var found4013 = false;",
+									"    for(i in parameterList)",
+									"    {",
+									"        if(parameterList[i] == 4013)",
+									"        {",
+									"            found4013 = true;",
+									"        }",
+									"    }",
+									"    pm.expect(found4013).to.be.true;",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{wx_url}}/rest/weatherparameter/location/point/?latitude=52.192792&longitude=-2.519963&includeFallbackParams=true&includeCalculatableParams=true",
+							"host": [
+								"{{wx_url}}"
+							],
+							"path": [
+								"rest",
+								"weatherparameter",
+								"location",
+								"point",
+								""
+							],
+							"query": [
+								{
+									"key": "latitude",
+									"value": "52.192792"
+								},
+								{
+									"key": "longitude",
+									"value": "-2.519963"
+								},
+								{
+									"key": "includeFallbackParams",
+									"value": "true"
+								},
+								{
+									"key": "includeCalculatableParams",
+									"value": "true"
 								}
 							]
 						}
@@ -1420,6 +1561,42 @@
 								"rest",
 								"weatherdatasource",
 								"location"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get polygons (geoJson) for Norway and Sweden",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"pm.test(\"Your test name\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.features.length).to.eql(2);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{wx_url}}/rest/country/NOR,SWE",
+							"host": [
+								"{{wx_url}}"
+							],
+							"path": [
+								"rest",
+								"country",
+								"NOR,SWE"
 							]
 						}
 					},
@@ -1689,7 +1866,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{wx_url}}/rest/amalgamation/amalgamate?longitude=-3.11369&latitude=48.3939&timeStart=2022-01-01&timeEnd=2022-01-31&interval=3600&parameters=2001,1002,3002,3101",
+							"raw": "{{wx_url}}/rest/amalgamation/amalgamate?longitude=-3.11369&latitude=48.3939&timeStart=2023-01-01&timeEnd=2023-01-31&interval=3600&parameters=2001,1002,3002,3101",
 							"host": [
 								"{{wx_url}}"
 							],
@@ -1709,11 +1886,11 @@
 								},
 								{
 									"key": "timeStart",
-									"value": "2022-01-01"
+									"value": "2023-01-01"
 								},
 								{
 									"key": "timeEnd",
-									"value": "2022-01-31"
+									"value": "2023-01-31"
 								},
 								{
 									"key": "interval",
@@ -1808,7 +1985,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{wx_url}}/rest/amalgamation/amalgamate?longitude=10.961&latitude=56.109&timeStart=2022-01-01&timeEnd=2022-01-23&interval=3600&parameters=1002",
+							"raw": "{{wx_url}}/rest/amalgamation/amalgamate?longitude=10.961&latitude=56.109&timeStart=2023-01-01&timeEnd=2023-01-23&interval=3600&parameters=1002",
 							"host": [
 								"{{wx_url}}"
 							],
@@ -1828,11 +2005,11 @@
 								},
 								{
 									"key": "timeStart",
-									"value": "2022-01-01"
+									"value": "2023-01-01"
 								},
 								{
 									"key": "timeEnd",
-									"value": "2022-01-23"
+									"value": "2023-01-23"
 								},
 								{
 									"key": "interval",
@@ -1878,7 +2055,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{wx_url}}/rest/amalgamation/amalgamate?longitude=-2.12296&latitude=52.58547&timeStart=2022-01-01&timeEnd=2022-01-23&interval=86400&parameters=1002,1003,1004",
+							"raw": "{{wx_url}}/rest/amalgamation/amalgamate?longitude=-2.12296&latitude=52.58547&timeStart=2023-01-01&timeEnd=2023-01-23&interval=86400&parameters=1002,1003,1004",
 							"host": [
 								"{{wx_url}}"
 							],
@@ -1898,11 +2075,11 @@
 								},
 								{
 									"key": "timeStart",
-									"value": "2022-01-01"
+									"value": "2023-01-01"
 								},
 								{
 									"key": "timeEnd",
-									"value": "2022-01-23"
+									"value": "2023-01-23"
 								},
 								{
 									"key": "interval",
@@ -1948,7 +2125,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{wx_url}}/rest/amalgamation/amalgamate?longitude=-2.12296&latitude=52.58547&timeStart=2022-01-01&timeEnd=2022-01-23&interval=3600&parameters=1002,1003,1004",
+							"raw": "{{wx_url}}/rest/amalgamation/amalgamate?longitude=-2.12296&latitude=52.58547&timeStart=2023-01-01&timeEnd=2023-01-23&interval=3600&parameters=1002,1003,1004",
 							"host": [
 								"{{wx_url}}"
 							],
@@ -1968,11 +2145,11 @@
 								},
 								{
 									"key": "timeStart",
-									"value": "2022-01-01"
+									"value": "2023-01-01"
 								},
 								{
 									"key": "timeEnd",
-									"value": "2022-01-23"
+									"value": "2023-01-23"
 								},
 								{
 									"key": "interval",
@@ -2018,7 +2195,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{wx_url}}/rest/amalgamation/amalgamate?longitude=10.961&latitude=56.109&timeStart=2022-01-01&timeEnd=2022-01-23&interval=3600&parameters=3101",
+							"raw": "{{wx_url}}/rest/amalgamation/amalgamate?longitude=10.961&latitude=56.109&timeStart=2024-01-01&timeEnd=2024-01-23&interval=3600&parameters=3101",
 							"host": [
 								"{{wx_url}}"
 							],
@@ -2038,11 +2215,11 @@
 								},
 								{
 									"key": "timeStart",
-									"value": "2022-01-01"
+									"value": "2024-01-01"
 								},
 								{
 									"key": "timeEnd",
-									"value": "2022-01-23"
+									"value": "2024-01-23"
 								},
 								{
 									"key": "interval",

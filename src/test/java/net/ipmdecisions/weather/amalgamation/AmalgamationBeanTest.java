@@ -123,7 +123,7 @@ public class AmalgamationBeanTest {
         WeatherData testData_3 = oMapper.readValue(weatherDataJson, WeatherData.class);
         weatherDataJson = fileUtils.getStringFromFileInApp("/fusionTestData_4.json");
         WeatherData testData_4 = oMapper.readValue(weatherDataJson, WeatherData.class);
-        result = instance.getFusionedWeatherData(List.of(testData_2, testData_1), 
+        result = instance.getFusionedWeatherData(List.of(testData_4, testData_3), 
                 LocalDate.of(2024, Month.JANUARY, 20).atStartOfDay(tzForLocation).toInstant(), 
                 ZonedDateTime.of(LocalDateTime.of(2024, Month.JANUARY, 23,0,0), tzForLocation).toInstant(),
                 WeatherDataUtil.INTERVAL_DAILY, 
@@ -133,5 +133,18 @@ public class AmalgamationBeanTest {
         expectedLength = 4; // 4 days
         assertEquals(expectedLength, result.getLocationWeatherData().get(0).getLength());
         
+        // Test with one WeatherData with values and the other without
+        WeatherData emptyData = new WeatherData();
+        result = instance.getFusionedWeatherData(List.of(testData_4, emptyData), 
+                LocalDate.of(2024, Month.JANUARY, 20).atStartOfDay(tzForLocation).toInstant(), 
+                ZonedDateTime.of(LocalDateTime.of(2024, Month.JANUARY, 23,0,0), tzForLocation).toInstant(),
+                WeatherDataUtil.INTERVAL_DAILY, 
+                tzForLocation
+        );
+        
+        
+        expectedLength = 4; // 4 days
+        assertEquals(expectedLength, result.getLocationWeatherData().get(0).getLength());
+        //System.out.println(oMapper.writeValueAsString(result));
     }
 }

@@ -61,7 +61,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.time.format.DateTimeFormatter;
+import javax.ejb.EJB;
 import javax.xml.datatype.DatatypeConfigurationException;
+import net.ipmdecisions.weather.controller.AmalgamationBean;
+import net.ipmdecisions.weather.datasourceadapters.OpenMeteoAdapter;
 import net.ipmdecisions.weather.datasourceadapters.dmi.DMIPointWebDataParser;
 
 /**
@@ -79,6 +82,9 @@ import net.ipmdecisions.weather.datasourceadapters.dmi.DMIPointWebDataParser;
 public class WeatherAdapterService {
 	
 	private static Logger LOGGER = LoggerFactory.getLogger(WeatherAdapterService.class);
+    
+    @EJB
+    AmalgamationBean amalgamationBean;
     
     private WeatherDataUtil weatherDataUtil;
     
@@ -451,6 +457,90 @@ public class WeatherAdapterService {
     }
     
     /**
+     * Get weather observations and forecasts in the IPM Decision's weather data format from the Open-Meteo.com service
+     * 
+     * @param longitude WGS84 Decimal degrees
+     * @param latitude WGS84 Decimal degrees
+     * @param timeStart Start of weather data period (ISO-8601 Timestamp, e.g. 2020-06-12T00:00:00+03:00)
+     * @param timeEnd End of weather data period (ISO-8601 Timestamp, e.g. 2020-07-03T00:00:00+03:00)
+     * @param logInterval The measuring interval in seconds. Please note that the only allowed interval in this version is 3600 (hourly)
+     * @param parameters Comma separated list of the requested weather parameters, given by <a href="/rest/parameter" target="new">their codes</a>
+     * @param ignoreErrors Set to "true" if you want the service to return weather data regardless of there being errors in the service
+     * @pathExample /rest/weatheradapter/openmeteo?latitude=56.488&longitude=9.583&parameters=2001&timeStart=2021-10-01&timeEnd=2021-10-20&interval=86400
+     * @return 
+     */
+    @GET
+    @POST
+    @Path("openmeteo/")
+    @GZIP
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getOpenMeteoObservations(
+            @QueryParam("longitude") Double longitude,
+            @QueryParam("latitude") Double latitude,
+            @QueryParam("timeStart") String timeStart,
+            @QueryParam("timeEnd") String timeEnd,
+            @QueryParam("interval") Integer logInterval,
+            @QueryParam("parameters") String parameters,
+            @QueryParam("ignoreErrors") String ignoreErrors
+    )
+    {
+        List<Integer> ipmDecisionsParameters = parameters != null ? Arrays.asList(parameters.split(",")).stream()
+                    .map(paramstr->Integer.valueOf(paramstr.strip())).collect(Collectors.toList())
+                 : null;
+        
+        ZoneId tzForLocation = amalgamationBean.getTimeZoneForLocation(longitude, latitude);
+        Instant timeStartInstant;
+        Instant timeEndInstant;
+        
+        // Date parsing
+        // Is it a ISO-8601 timestamp or date?
+        DateTimeFormatter dtf = DateTimeFormatter.ISO_DATE;
+        try
+        {
+            timeStartInstant = ZonedDateTime.parse(timeStart).toInstant();
+            timeEndInstant = ZonedDateTime.parse(timeEnd).toInstant();
+        }
+        catch(DateTimeParseException ex)
+        {
+            
+            timeStartInstant = LocalDate.parse(timeStart, dtf).atStartOfDay(ZoneId.of("GMT+1")).toInstant();//.atZone().toInstant();
+            timeEndInstant = LocalDate.parse(timeEnd, dtf).atStartOfDay(ZoneId.of("GMT+1")).toInstant();//.atZone(ZoneId.of("Europe/Helsinki")).toInstant();     
+        }
+        
+        Boolean ignoreErrorsB = ignoreErrors != null ? ignoreErrors.equals("true") : false;
+        
+        
+        // Default is hourly, optional is daily
+        logInterval = (logInterval == null || logInterval != 86400) ? 3600 : 86400;
+        
+        if(longitude == null || latitude == null)
+        {
+            return Response.status(Response.Status.BAD_REQUEST).entity("Missing longitude and/or latitude. Please correct this.").build();
+        }
+        
+        try
+        {
+            WeatherData theData = new OpenMeteoAdapter().getData(
+                    longitude, latitude, tzForLocation,
+                    timeStartInstant,timeEndInstant,
+                    logInterval,
+                    ipmDecisionsParameters
+            );
+            if(theData == null)
+            {
+                return Response.noContent().build();
+            }
+            
+            return Response.ok().entity(theData).build();
+        }
+        catch(WeatherDataSourceException ex)
+        {
+            return Response.serverError().entity(ex.getMessage()).build();
+        }
+
+    }
+    
+    /**
      * Get weather observations in the IPM Decision's weather data format from the the network of MeteoBot stations 
      * [https://meteobot.com/en/]
      * 
@@ -659,6 +749,8 @@ public class WeatherAdapterService {
             return Response.serverError().entity(ex).build();
         }
     }
+    
+    
     
     private WeatherDataUtil getWeatherDataUtil()
     {

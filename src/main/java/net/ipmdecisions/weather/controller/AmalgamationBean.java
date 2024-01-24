@@ -183,6 +183,16 @@ public class AmalgamationBean {
 		return weatherDataSourceBean.getWeatherDataSourceById("net.ipmdecisions.dwd.euroweather");
 	}
 	
+        /**
+         * Combine a list of weatherData. Data from the first in the list are kept, any missing data are added from the other files
+         * @param weatherData
+         * @param timeStart
+         * @param timeEnd
+         * @param interval
+         * @param zoneId
+         * @return
+         * @throws IOException 
+         */
 	public WeatherData getFusionedWeatherData(
 			List<WeatherData> weatherData,
 			Instant timeStart,

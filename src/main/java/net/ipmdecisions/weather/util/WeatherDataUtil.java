@@ -21,7 +21,6 @@ package net.ipmdecisions.weather.util;
 
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import net.ipmdecisions.weather.entity.LocationWeatherData;
@@ -32,6 +31,9 @@ import net.ipmdecisions.weather.entity.WeatherData;
  * @author Tor-Einar Skog <tor-einar.skog@nibio.no>
  */
 public class WeatherDataUtil {
+    
+    public final static Integer INTERVAL_HOURLY = 3600;
+    public final static Integer INTERVAL_DAILY = 86400;
     
     /**
      * Returns the weather data set with only the given parameters

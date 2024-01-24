@@ -63,7 +63,6 @@ public class JAXActivator extends Application{
      * @param resources 
      */
     private void addRestResourceClasses(Set<Class<?>> resources) {
-        resources.add(com.webcohesion.enunciate.rt.EnunciateJaxbContextResolver.class);
         resources.add(net.ipmdecisions.weather.services.AmalgamationService.class);
         resources.add(net.ipmdecisions.weather.services.JacksonConfig.class);
         resources.add(net.ipmdecisions.weather.services.MetaDataService.class);
