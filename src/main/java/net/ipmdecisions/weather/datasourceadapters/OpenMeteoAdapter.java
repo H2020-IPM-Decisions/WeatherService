@@ -36,9 +36,12 @@ import java.time.Instant;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import static java.util.Map.entry;
+import java.util.Set;
 import java.util.stream.Collectors;
 import net.ipmdecisions.weather.amalgamation.WeatherDataAggregationException;
 import net.ipmdecisions.weather.controller.AmalgamationBean;
@@ -141,6 +144,7 @@ public class OpenMeteoAdapter {
             this.aggregation = aggregation;
         }
     }
+    
     // Parameter mapping
     private final Map<Integer, String> ipmToOpenMeteoRequestHourly = Map.ofEntries(
             entry(1001, "temperature_2m"), // Only hourly
@@ -153,8 +157,6 @@ public class OpenMeteoAdapter {
             entry(4003, "wind_speed_10m"), // Only hourly
             entry(4012, "wind_speed_10m"), // Only hourly
             entry(4013, "wind_speed_10m"), // Only hourly
-            entry(1111, "soil_temperature_6cm"), // Only hourly
-            entry(1112, "soil_temperature_6cm"), // Only hourly
             entry(5001, "shortwave_radiation") // Hourly. Daily = shortwave_radiation_sum
     ); 
     
@@ -177,8 +179,6 @@ public class OpenMeteoAdapter {
             entry(4003, new OpenMeteoParameter(Variable.wind_speed,10)),
             entry(4012, new OpenMeteoParameter(Variable.wind_speed,10)),
             entry(4013, new OpenMeteoParameter(Variable.wind_speed,10)),
-            entry(1111, new OpenMeteoParameter(Variable.soil_temperature,6)),
-            entry(1112, new OpenMeteoParameter(Variable.soil_temperature,6)),
             entry(5001, new OpenMeteoParameter(Variable.shortwave_radiation))
 
     );
@@ -216,9 +216,15 @@ public class OpenMeteoAdapter {
         }
         return null;
     }
+
     
     public WeatherData getData(Double longitude, Double latitude, ZoneId tzForLocation, Instant timeStart, Instant timeEnd, Integer interval, List<Integer> parameters)
     {
+        // if parameters is NULL/empty, then return all Open-Meteo provided parameters
+        if(parameters == null || parameters.isEmpty())
+        {
+            parameters = List.of(1001,1003,1004,1901,2001,3001,4002,1111,5001); // Only unique parameters, no duplicates
+        }
         // Remove any parameters that Open-Meteo does not provide
         parameters = new ArrayList(parameters.stream().filter(p->
                 this.ipmToOpenMeteoRequestDaily.containsKey(p) || this.ipmToOpenMeteoRequestHourly.containsKey(p)
@@ -257,7 +263,7 @@ public class OpenMeteoAdapter {
                 encodedTimeZone
             ) 
             : null;
-        //System.out.println(historicURL);
+        LOGGER.debug(historicURL);
         String forecastURL = needForecasts ? String.format(this.FORECAST_ENDPOINT_TPL,
                 latitude, longitude,
                 this.getParametersURLString(parameters, interval),
@@ -265,7 +271,7 @@ public class OpenMeteoAdapter {
             )
             : null;
         
-        //System.out.println(forecastURL);
+        LOGGER.debug(forecastURL);
         try
         {
             WeatherApiResponse historicResponse = needHistoric ? this.getWeatherApiResponse(historicURL) : null;
@@ -334,6 +340,7 @@ public class OpenMeteoAdapter {
     private WeatherData getWeatherDataFromWeatherApiResponse(WeatherApiResponse ApiResponse, Double latitude, Double longitude, List<Integer> immutableParameters, Integer interval, ZoneId tzForLocation) throws WeatherDataAggregationException, IOException {
         // Need to ensure that the list can be modified
         ArrayList<Integer> parameters = new ArrayList<>(immutableParameters);
+        LOGGER.debug("(getWeatherDataFromWeatherApiResponse) Number of parameters: " + parameters.size());
         if(interval.equals(WeatherDataUtil.INTERVAL_HOURLY))
         {
             WeatherData hourlyData = new WeatherData();

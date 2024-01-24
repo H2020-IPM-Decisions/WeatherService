@@ -63,7 +63,7 @@ public class OpenMeteoAdapterTest {
         //Instant timeEnd = LocalDate.of(2024, Month.JANUARY, 28).atStartOfDay(tzForLocation).toInstant();
          System.out.println("timeStart = " + timeStart + ", timeEnd=" + timeEnd);
         Integer interval = WeatherDataUtil.INTERVAL_HOURLY;
-        List<Integer> parameters = List.of(1002,1003,3101,5001);
+        List<Integer> parameters = List.of(1002,1003,3101,1111,5001);
         OpenMeteoAdapter instance = new OpenMeteoAdapter();
         
         WeatherData result = instance.getData(longitude, latitude, tzForLocation, timeStart, timeEnd, interval, parameters);
