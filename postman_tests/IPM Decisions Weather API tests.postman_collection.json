@@ -984,6 +984,206 @@
 						}
 					},
 					"response": []
+				},
+				{
+					"name": "Open-Meteo hourly data",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.sendRequest(pm.environment.get(\"wx_url\") + \"/rest/schema/weatherdata\",function(err,res){",
+									"    pm.test(\"Data is valid WeatherData\", function(){",
+									"        var schema = res.json();",
+									"        pm.expect(tv4.validate(pm.response.json(), schema)).to.be.true;",
+									"    });",
+									"    ",
+									"});",
+									"",
+									"pm.test(\"Data has correct length\", function(){",
+									"    let weatherdata = pm.response.json();",
+									"    pm.expect(weatherdata.locationWeatherData[0].length).to.eql(168);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"var moment = require('moment');",
+									"var timeStart =moment().add(-3,'days').format('YYYY-MM-DD'); ",
+									"var timeEnd = moment().add(3,'days').format('YYYY-MM-DD');",
+									"pm.request.url.query.add({key: 'timeStart', value: timeStart});",
+									"pm.request.url.query.add({key: 'timeEnd', value: timeEnd});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": []
+						},
+						"url": {
+							"raw": "{{wx_url}}/rest/weatheradapter/openmeteo?longitude=17.3907&latitude=59.7156&interval=3600&ignoreErrors=true",
+							"host": [
+								"{{wx_url}}"
+							],
+							"path": [
+								"rest",
+								"weatheradapter",
+								"openmeteo"
+							],
+							"query": [
+								{
+									"key": "longitude",
+									"value": "17.3907"
+								},
+								{
+									"key": "latitude",
+									"value": "59.7156"
+								},
+								{
+									"key": "interval",
+									"value": "3600"
+								},
+								{
+									"key": "ignoreErrors",
+									"value": "true"
+								},
+								{
+									"key": "timeStart",
+									"value": "2023-04-01",
+									"description": "See pre-request script",
+									"disabled": true
+								},
+								{
+									"key": "timeEnd",
+									"value": "",
+									"description": "See pre-request script",
+									"disabled": true
+								},
+								{
+									"key": "parameters",
+									"value": "3101,3002,2001",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Open-Meteo daily data",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.sendRequest(pm.environment.get(\"wx_url\") + \"/rest/schema/weatherdata\",function(err,res){",
+									"    pm.test(\"Data is valid WeatherData\", function(){",
+									"        var schema = res.json();",
+									"        pm.expect(tv4.validate(pm.response.json(), schema)).to.be.true;",
+									"    });",
+									"    ",
+									"});",
+									"",
+									"pm.test(\"Data has correct length\", function(){",
+									"    let weatherdata = pm.response.json();",
+									"    pm.expect(weatherdata.locationWeatherData[0].length).to.eql(7);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"var moment = require('moment');",
+									"var timeStart =moment().add(-3,'days').format('YYYY-MM-DD'); ",
+									"var timeEnd = moment().add(3,'days').format('YYYY-MM-DD');",
+									"pm.request.url.query.add({key: 'timeStart', value: timeStart});",
+									"pm.request.url.query.add({key: 'timeEnd', value: timeEnd});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": []
+						},
+						"url": {
+							"raw": "{{wx_url}}/rest/weatheradapter/openmeteo?longitude=17.3907&latitude=59.7156&interval=86400&ignoreErrors=true",
+							"host": [
+								"{{wx_url}}"
+							],
+							"path": [
+								"rest",
+								"weatheradapter",
+								"openmeteo"
+							],
+							"query": [
+								{
+									"key": "longitude",
+									"value": "17.3907"
+								},
+								{
+									"key": "latitude",
+									"value": "59.7156"
+								},
+								{
+									"key": "interval",
+									"value": "86400"
+								},
+								{
+									"key": "ignoreErrors",
+									"value": "true"
+								},
+								{
+									"key": "timeStart",
+									"value": "2023-04-01",
+									"description": "See pre-request script",
+									"disabled": true
+								},
+								{
+									"key": "timeEnd",
+									"value": "",
+									"description": "See pre-request script",
+									"disabled": true
+								},
+								{
+									"key": "parameters",
+									"value": "3101,3002,2001",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
 				}
 			]
 		},
@@ -1693,75 +1893,6 @@
 					"response": []
 				},
 				{
-					"name": "Amalgamate proxy Euroweather test",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"pm.test(\"Status code is 500\", function () {",
-									"    pm.response.to.have.status(500);",
-									"});",
-									""
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{wx_url}}/rest/amalgamation/amalgamate/proxy?endpointURL=https%3A%2F%2Feuroweather.ipmdecisions.nibio.no%2Fweather_data&endpointQueryStr=longitude%3D10.961%26latitude%3D60.109%26interval%3D86400%26timeStart%3D2022-01-01%26timeEnd%3D2022-01-13%26ignoreErrors%3Dtrue%26parameters%3D1001%2C3002%2C2001%2C4012",
-							"host": [
-								"{{wx_url}}"
-							],
-							"path": [
-								"rest",
-								"amalgamation",
-								"amalgamate",
-								"proxy"
-							],
-							"query": [
-								{
-									"key": "longitude",
-									"value": "14.3711",
-									"disabled": true
-								},
-								{
-									"key": "latitude",
-									"value": "67.2828",
-									"disabled": true
-								},
-								{
-									"key": "altitude",
-									"value": "70",
-									"disabled": true
-								},
-								{
-									"key": "parameters",
-									"value": "1001, 3001",
-									"disabled": true
-								},
-								{
-									"key": "endpointURL",
-									"value": "https%3A%2F%2Feuroweather.ipmdecisions.nibio.no%2Fweather_data"
-								},
-								{
-									"key": "endpointQueryStr",
-									"value": "longitude%3D14.3711%26latitude%3D67.2828%26altitude%3D70%26parameters%3D1001%2C3001%2C3099",
-									"disabled": true
-								},
-								{
-									"key": "endpointQueryStr",
-									"value": "longitude%3D10.961%26latitude%3D60.109%26interval%3D86400%26timeStart%3D2022-01-01%26timeEnd%3D2022-01-13%26ignoreErrors%3Dtrue%26parameters%3D1001%2C3002%2C2001%2C4012"
-								}
-							]
-						}
-					},
-					"response": []
-				},
-				{
 					"name": "Interpolation test",
 					"protocolProfileBehavior": {
 						"disableBodyPruning": true
@@ -2025,7 +2156,7 @@
 					"response": []
 				},
 				{
-					"name": "Amalgamation test Euroweather max min dailies",
+					"name": "Amalgamation test Open-Meteo max min dailies",
 					"event": [
 						{
 							"listen": "test",
@@ -2035,9 +2166,9 @@
 									"    pm.response.to.have.status(200);",
 									"});",
 									"",
-									"pm.test(\"Three parameters are returned\", function () {",
+									"pm.test(\"Four parameters are returned\", function () {",
 									"    var jsonData = pm.response.json();",
-									"    pm.expect(jsonData.weatherParameters.length).to.equal(3);",
+									"    pm.expect(jsonData.weatherParameters.length).to.equal(4);",
 									"});",
 									"",
 									"pm.test(\"Param 1003 is returned\", function () {",
@@ -2055,7 +2186,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{wx_url}}/rest/amalgamation/amalgamate?longitude=-2.12296&latitude=52.58547&timeStart=2023-01-01&timeEnd=2023-01-23&interval=86400&parameters=1002,1003,1004",
+							"raw": "{{wx_url}}/rest/amalgamation/amalgamate?longitude=-2.12296&latitude=52.58547&timeStart=2023-01-01&timeEnd=2023-01-23&interval=86400&parameters=1002,1003,1004,5001",
 							"host": [
 								"{{wx_url}}"
 							],
@@ -2087,7 +2218,7 @@
 								},
 								{
 									"key": "parameters",
-									"value": "1002,1003,1004"
+									"value": "1002,1003,1004,5001"
 								}
 							]
 						}
@@ -2095,7 +2226,7 @@
 					"response": []
 				},
 				{
-					"name": "Amalgamation test Euroweather max min hourly should fail",
+					"name": "Amalgamation test Open-Meteo max min hourly should fail",
 					"event": [
 						{
 							"listen": "test",
@@ -2110,7 +2241,7 @@
 									"    pm.expect(jsonData.weatherParameters.length).to.equal(1);",
 									"});",
 									"",
-									"pm.test(\"Param 1003 is returned\", function () {",
+									"pm.test(\"Param 1002 is returned\", function () {",
 									"    var jsonData = pm.response.json();",
 									"    pm.expect(jsonData.weatherParameters.indexOf(1002)).greaterThan(-1);",
 									"});",
