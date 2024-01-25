@@ -148,15 +148,10 @@ public class OpenMeteoAdapter {
     // Parameter mapping
     private final Map<Integer, String> ipmToOpenMeteoRequestHourly = Map.ofEntries(
             entry(1001, "temperature_2m"), // Only hourly
-            entry(1002, "temperature_2m"), // Only hourly
             entry(1901, "dew_point_2m"), // Only hourly
             entry(2001, "precipitation"), // Hourly. Daily = precipitation_sum
             entry(3001, "relative_humidity_2m"),// Only hourly
-            entry(3002, "relative_humidity_2m"),// Only hourly
-            entry(4002, "wind_speed_10m"),// Only hourly
-            entry(4003, "wind_speed_10m"), // Only hourly
             entry(4012, "wind_speed_10m"), // Only hourly
-            entry(4013, "wind_speed_10m"), // Only hourly
             entry(5001, "shortwave_radiation") // Hourly. Daily = shortwave_radiation_sum
     ); 
     
@@ -170,15 +165,10 @@ public class OpenMeteoAdapter {
     
     private final Map<Integer, OpenMeteoParameter> ipmToOpenMeteoResponseHourly = Map.ofEntries(
             entry(1001, new OpenMeteoParameter(Variable.temperature, 2)), 
-            entry(1002, new OpenMeteoParameter(Variable.temperature, 2)),
             entry(1901, new OpenMeteoParameter(Variable.dew_point,2)),
             entry(2001, new OpenMeteoParameter(Variable.precipitation)),
             entry(3001, new OpenMeteoParameter(Variable.relative_humidity,2)),
-            entry(3002, new OpenMeteoParameter(Variable.relative_humidity,2)),
-            entry(4002, new OpenMeteoParameter(Variable.wind_speed,10)),
-            entry(4003, new OpenMeteoParameter(Variable.wind_speed,10)),
             entry(4012, new OpenMeteoParameter(Variable.wind_speed,10)),
-            entry(4013, new OpenMeteoParameter(Variable.wind_speed,10)),
             entry(5001, new OpenMeteoParameter(Variable.shortwave_radiation))
 
     );
