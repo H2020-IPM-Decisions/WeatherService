@@ -213,18 +213,13 @@ datasources:
         {"type": "Sphere"}
     parameters:
       common:
-       - 1001
-       - 1002
+       - 1001 
        - 1003
        - 1004
        - 1901
        - 2001
        - 3001
-       - 3002
-       - 4002
-       - 4003
        - 4012
-       - 4013
        - 5001
   - 
     id: net.ipmdecisions.dwd.forecast.germany
@@ -298,10 +293,10 @@ datasources:
         }
     parameters:
       common:
-       - 1001 # Instantaneous temperature at 2m (Celcius)
-       - 3001 # Instantaneous RH at 2m (%)
-       - 2001 # Precipitation (mm)
-       - 4002 # Instantaneous wind speed at 2m
+       - 1001 
+       - 3001 
+       - 2001 
+       - 4002 
   - 
     id: net.ipmdecisions.dwd.forecast.europe
     name: "Deutsche Wetterdienst EU Area location forecast by IPM Decisions"
