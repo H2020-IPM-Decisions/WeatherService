@@ -29,18 +29,17 @@ import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 import javax.ejb.EJB;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
@@ -56,14 +55,19 @@ import java.time.LocalDate;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import java.io.DataOutputStream;
+import java.nio.charset.StandardCharsets;
+import java.util.Collections;
 
-import net.iakovlev.timeshape.TimeZoneEngine;
+
 import net.ipmdecisions.weather.amalgamation.AmalgamationServiceErrorMessage;
 import net.ipmdecisions.weather.amalgamation.Interpolation;
 import net.ipmdecisions.weather.amalgamation.indices.IndicesBean;
 import net.ipmdecisions.weather.controller.AmalgamationBean;
+import net.ipmdecisions.weather.controller.WeatherDataSourceBean;
 import net.ipmdecisions.weather.entity.LocationWeatherData;
 import net.ipmdecisions.weather.entity.LocationWeatherDataException;
 import net.ipmdecisions.weather.entity.WeatherDataSourceException;
@@ -77,7 +81,7 @@ import net.ipmdecisions.weather.entity.WeatherDataSource;
  * weather data that needs fixing: QC failing data, missing data, data that
  * needs to be calculated, you name it
  * 
- * @copyright 2021-2022 <a href="http://www.nibio.no/">NIBIO</a>
+ * @copyright 2021-2024 <a href="http://www.nibio.no/">NIBIO</a>
  * @author Tor-Einar Skog <tor-einar.skog@nibio.no>
  */
 @Path("rest/amalgamation")
@@ -97,6 +101,62 @@ public class AmalgamationService {
 	
 	@EJB
 	IndicesBean indicesBean;
+        
+        @EJB
+        WeatherDataSourceBean weatherDataSourceBean;
+        
+        
+        /**
+	 * Attempts to give you all the requested parameters for the given location
+	 * in the specified period. It's a best effort.
+	 * @param longitude
+	 * @param latitude
+	 * @param timeStartStr ISO Date (e.g. 2021-03-01) 
+	 * @param timeEndStr ISO Date (e.g. 2021-09-01) 
+         * @param interval logging interval for weather data in seconds. Hourly = 3600, daily= 86400
+	 * @param parametersStr
+	 * @return
+	 */
+	@GET
+	@Path("amalgamate")
+	@Produces(MediaType.APPLICATION_JSON)
+        public Response amalgamateGET(@QueryParam("longitude") Double longitude,
+			@QueryParam("latitude") Double latitude,
+			@QueryParam("timeStart") String timeStartStr,
+			@QueryParam("timeEnd") String timeEndStr,
+			@QueryParam("interval") Integer interval,
+			@QueryParam("parameters") String parametersStr)
+        {
+            return this.amalgamate(longitude, latitude, timeStartStr, timeEndStr, interval, parametersStr, null);
+        }
+        
+        /**
+	 * Attempts to give you all the requested parameters for the given location
+	 * in the specified period. It's a best effort.
+	 * @param longitude
+	 * @param latitude
+	 * @param timeStartStr ISO Date (e.g. 2021-03-01) 
+	 * @param timeEndStr ISO Date (e.g. 2021-09-01) 
+         * @param interval logging interval for weather data in seconds. Hourly = 3600, daily= 86400
+         * @param privateWeatherStationInfo 
+	 * @param parametersStr
+	 * @return
+	 */
+	@POST
+	@Path("amalgamate/private")
+        @Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+        public Response amalgamatePOST(@QueryParam("longitude") Double longitude,
+			@QueryParam("latitude") Double latitude,
+			@QueryParam("timeStart") String timeStartStr,
+			@QueryParam("timeEnd") String timeEndStr,
+			@QueryParam("interval") Integer interval,
+			@QueryParam("parameters") String parametersStr,
+                        JsonNode privateWeatherStationInfo
+            )
+        {
+            return this.amalgamate(longitude, latitude, timeStartStr, timeEndStr, interval, parametersStr, privateWeatherStationInfo);
+        }
 	
 	/**
 	 * Attempts to give you all the requested parameters for the given location
@@ -105,20 +165,23 @@ public class AmalgamationService {
 	 * @param latitude
 	 * @param timeStartStr ISO Date (e.g. 2021-03-01) 
 	 * @param timeEndStr ISO Date (e.g. 2021-09-01) 
+         * @param interval logging interval for weather data in seconds. Hourly = 3600, daily= 86400
 	 * @param parametersStr
 	 * @return
 	 */
 	@GET
 	@Path("amalgamate")
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response amalgamate(
+	private Response amalgamate(
 			@QueryParam("longitude") Double longitude,
 			@QueryParam("latitude") Double latitude,
 			@QueryParam("timeStart") String timeStartStr,
 			@QueryParam("timeEnd") String timeEndStr,
 			@QueryParam("interval") Integer interval,
-			@QueryParam("parameters") String parametersStr
+			@QueryParam("parameters") String parametersStr,
+                        JsonNode privateWeatherStationInfo
 	) {
+            WeatherDataUtil wdUtil = new WeatherDataUtil();
 		try
 		{
 			if(parametersStr == null)
@@ -139,7 +202,22 @@ public class AmalgamationService {
 					timeStart,
 					timeEnd);
 			//wdss.forEach(w->System.out.println(w.getName()));
-			if(wdss.size() == 0)
+                        
+                        // If the user has provided info about a private weather station,
+                        // add this to the list of weather data sources
+                        LOGGER.debug("privateWeatherStationInfo is " + (privateWeatherStationInfo != null? "not" : "") + " null");
+                        WeatherDataSource privateWeatherDataSource = null;
+                        if(privateWeatherStationInfo != null)
+                        {
+                            String weatherDataSourceId = privateWeatherStationInfo.get("WeatherDataSourceId").asText();
+                            privateWeatherDataSource = weatherDataSourceBean.getWeatherDataSourceById(weatherDataSourceId);
+                            wdss.add(privateWeatherDataSource);
+                            // Places the private source as the first (top priority)
+                            Integer index = wdss.indexOf(privateWeatherDataSource);
+                            Collections.rotate(wdss.subList(0, index+1), 1);
+                        }
+                        
+			if(wdss.isEmpty())
 			{
 				return Response.status(Status.NOT_FOUND).entity(
 						List.of(new AmalgamationServiceErrorMessage(null,"No weather data found for given location and period", Status.NOT_FOUND.getStatusCode()))
@@ -157,18 +235,27 @@ public class AmalgamationService {
 						.max(Integer::compare).get();
 						
 				// Is the data source location or station based?
-				URL url;
+				String endpoint;
+                                String parameters;
 				//URLEncoder urlEncoder = URLEncoder.
 				if(currentWDS.getAccess_type().equals(WeatherDataSource.ACCESS_TYPE_STATIONS))
 				{
-					
-					String weatherStationId = currentWDS.getIdOfClosestStation(longitude, latitude);
+					String weatherStationId = currentWDS !=  privateWeatherDataSource ? 
+                                                currentWDS.getIdOfClosestStation(longitude, latitude)
+                                                : privateWeatherStationInfo.get("WeatherStationId").asText();
 					// Is it close enough??
-					// For now: Set default max distance between location and distance to 1 km (1000 m)
+					// For now: Set default max distance between location and distance to 3 km (3000 m)
 					// TODO: Define the tolerance more generally
-					if(currentWDS.getDistanceToStation(weatherStationId, longitude, latitude) > 1000.0){
-						continue;
+                                        try
+                                        {
+                                            if(currentWDS.getDistanceToStation(weatherStationId, longitude, latitude) > 3000.0){
+                                                    continue;
+                                            }
 					}
+                                        catch(NullPointerException ex)
+                                        {
+
+                                        }
 					// Making sure we get all the parameters available for the station
 					Set<Integer> wdsParameters = Arrays.stream(currentWDS.getParameters().getCommon()).boxed().collect(Collectors.toSet());
 					if(wdsParameters == null)
@@ -177,33 +264,31 @@ public class AmalgamationService {
 					}
 					wdsParameters.addAll(currentWDS.getAdditionalParametersForStation(weatherStationId));
 
-					url = new URL(currentWDS.getEndpointFullPath() 
-							+ "?weatherStationId=" +  weatherStationId
+					endpoint = currentWDS.getEndpointFullPath() ;
+                                        parameters = "weatherStationId=" +  weatherStationId
 							+ "&timeStart=" + URLEncoder.encode(format.format(timeStart), "UTF-8")
 							+ "&timeEnd=" + URLEncoder.encode(format.format(timeEnd), "UTF-8")
 							+ "&interval=" + bestAvailableInterval
-							+ "&parameters=" + wdsParameters.stream().map(String::valueOf).collect(Collectors.joining(","))
-							// + "&parameters=" + parametersStr // Exclude this in order to collect all parameters from the source
-							);
+							+ "&parameters=" + wdsParameters.stream().map(String::valueOf).collect(Collectors.joining(","));
+                                        LOGGER.debug("currentWDS.getAccess_type()=" + currentWDS.getAccess_type());
+                                        if(currentWDS.getAuthentication_type() != null && currentWDS.getAuthentication_type().equals(WeatherDataSource.AUTHENTICATION_TYPE_CREDENTIALS))
+                                        {
+                                            parameters += "&credentials={\"userName\":\"" + privateWeatherStationInfo.get("Username").asText() + "\", \"password\":\"" + privateWeatherStationInfo.get("Password").asText() + "\"}";
+                                        }
 				}
 				else
 				{
-					url = new URL(currentWDS.getEndpointFullPath() 
-						+ "?longitude=" + longitude 
+					endpoint = currentWDS.getEndpointFullPath();
+					parameters = "longitude=" + longitude 
 						+ "&latitude=" + latitude 
 						+ "&timeStart=" + URLEncoder.encode(format.format(timeStart), "UTF-8")
 						+ "&timeEnd=" + URLEncoder.encode(format.format(timeEnd), "UTF-8")
-						+ "&interval=" + bestAvailableInterval
-						// + "&parameters=" + parametersStr // Exclude this in order to collect all parameters from the source
-						);
+						+ "&interval=" + bestAvailableInterval;
 					
 				}
 				
-				LOGGER.debug(currentWDS.getName() + ":  " + url);
-				/*if(currentWDS.getName().equals("Euroweather seasonal gridded weather data and forecasts  by IPM Decisions"))
-				{
-					continue;
-				}*/
+				LOGGER.debug(currentWDS.getName() + ":  " + endpoint + "?" + parameters);
+
 				try
 				{
 					Map<String, String> authentication = null;
@@ -212,7 +297,7 @@ public class AmalgamationService {
 						authentication = new HashMap<>();
 						authentication.put(WeatherDataSource.AUTHENTICATION_TYPE_BEARER_TOKEN, this.getWeatherDataSourceBearerToken(currentWDS.getId()));
 					}
-					weatherDataFromSources.add(this.getWeatherDataFromSource(url, currentWDS.getAuthentication_type(),authentication));
+					weatherDataFromSources.add(this.getWeatherDataFromSource(endpoint, parameters, currentWDS.getAuthentication_type(),authentication));
 					//System.out.println("Successfully added " + currentWDS.getName());
 				}
 				catch(WeatherDataSourceException ex)
@@ -229,14 +314,16 @@ public class AmalgamationService {
 			
 			// Fail or success?
 			// Error on all data sources -> safe to say that we've failed
-			if(weatherDataFromSources.size() == 0)
+			if(weatherDataFromSources.isEmpty())
 			{
 				return Response.status(Status.SERVICE_UNAVAILABLE).entity(errorLog).build();
 			}
 			
 			// TODO: Catch that some sources have not failed, but no or almost no data has been fetched
-			
-			
+                        /*WeatherData test = weatherDataFromSources.get(0);
+                        Arrays.asList(test.getLocationWeatherData().get(0).getData()[0]).forEach(d->System.out.println(d));
+                        Arrays.asList(test.getWeatherParameters()).forEach(d->System.out.println(d));
+                        System.out.println("timeStart=" + test.getTimeStart() + ", timeEnd=" + test.getTimeEnd());*/
 			WeatherData fusionedData = amalgamationBean.getFusionedWeatherData(
 					weatherDataFromSources,
 					timeStart,
@@ -244,14 +331,10 @@ public class AmalgamationService {
 					interval,
 					tzForLocation
 					);
-			/*
+
 			// Dumping current weather data to console
-			ObjectMapper objectMapper = new ObjectMapper();
-			objectMapper.registerModule(new JavaTimeModule()); 
-			System.out.println(objectMapper.writeValueAsString(fusionedData));
-			*/
-			
-			
+			//System.out.println(wdUtil.serializeWeatherData(fusionedData));
+
 			// 1.  Data control
 			// 1.1 Are there missing parameters?
 			Set<Integer> missingParameters = requestedParameters != null && ! requestedParameters.isEmpty() && fusionedData.getWeatherParameters() != null ? 
@@ -331,7 +414,7 @@ public class AmalgamationService {
 			//System.out.println(objectMapper.writeValueAsString(fusionedData));
 			
 			// Chop away any missing data at the beginning and end of the data set
-			WeatherDataUtil wdUtil = new WeatherDataUtil();
+			
 			fusionedData = wdUtil.trimDataSet(fusionedData);
 			
 			return Response.ok().entity(fusionedData).build();
@@ -371,8 +454,8 @@ public class AmalgamationService {
 		try {
 			//System.out.println(endpointURL);
 			//System.out.println(endpointQueryStr);
-			URL completeURL = new URL(endpointURL + (endpointQueryStr.indexOf("?") == 0 ? "" : "?") + endpointQueryStr);
-			WeatherData dataFromSource = this.getWeatherDataFromSource(completeURL, null, null); 
+			//URL completeURL = new URL(endpointURL + (endpointQueryStr.indexOf("?") == 0 ? "" : "?") + endpointQueryStr);
+			WeatherData dataFromSource = this.getWeatherDataFromSource(endpointURL, endpointQueryStr, null, null); 
 			// Checks!
 			
 			// 1. Are there missing parameters?
@@ -502,24 +585,43 @@ public class AmalgamationService {
 		return null;
 	}
 	
-	private WeatherData getWeatherDataFromSource(URL theURL, String authenticationType, Map<String,String> authentication) throws JsonMappingException, JsonProcessingException, IOException, WeatherDataSourceException
+	private WeatherData getWeatherDataFromSource(String endpoint, String parameters, String authenticationType, Map<String,String> authentication) throws JsonMappingException, JsonProcessingException, IOException, WeatherDataSourceException
 	{
 		ObjectMapper objectMapper = new ObjectMapper();
-		WeatherData weatherData = objectMapper.readValue(this.getResponseAsPlainText(theURL, authenticationType, authentication),
+		WeatherData weatherData = objectMapper.readValue(this.getResponseAsPlainText(endpoint, parameters, authenticationType, authentication),
 				WeatherData.class);
 		return weatherData;
 	}
 
-	private String getResponseAsPlainText(URL theURL, String authenticationType, Map<String,String> authentication) throws IOException, WeatherDataSourceException {
-		HttpURLConnection conn = (HttpURLConnection) theURL.openConnection();
-
+	private String getResponseAsPlainText(String endpoint, String parameters, String authenticationType, Map<String,String> authentication) throws IOException, WeatherDataSourceException {
+		
+                URL theURL = new URL(endpoint + (
+                            authenticationType != null && authenticationType.equals(WeatherDataSource.AUTHENTICATION_TYPE_CREDENTIALS) ?
+                                ""
+                                :"?" + parameters
+                            )
+                        );
+                HttpURLConnection conn = (HttpURLConnection) theURL.openConnection();
 		if(authenticationType != null && ! authenticationType.equals(WeatherDataSource.AUTHENTICATION_TYPE_NONE))
 		{
 			if(authenticationType.equals(WeatherDataSource.AUTHENTICATION_TYPE_BEARER_TOKEN))
 			{
 				conn.setRequestProperty("Authorization",authentication.get(WeatherDataSource.AUTHENTICATION_TYPE_BEARER_TOKEN));
 			}
+                        else if (authenticationType.equals(WeatherDataSource.AUTHENTICATION_TYPE_CREDENTIALS))
+                        {
+                            conn.setRequestMethod("POST");
+                            byte[] postData = parameters.getBytes(StandardCharsets.UTF_8);
+                            int postDataLength = postData.length;
+                            conn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
+                            conn.setRequestProperty("Content-Length", Integer.toString(postDataLength));
+                            conn.setDoOutput(true);
+                            try (DataOutputStream wr = new DataOutputStream(conn.getOutputStream())) {
+                                wr.write(postData);
+                            }
+                        }
 		}
+                
 		int resultCode = conn.getResponseCode();
 		// Follow redirects, also https
 		if(resultCode == HttpURLConnection.HTTP_MOVED_PERM || resultCode == HttpURLConnection.HTTP_MOVED_TEMP)
