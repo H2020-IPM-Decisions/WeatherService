@@ -19,6 +19,9 @@
 
 package net.ipmdecisions.weather.util;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
@@ -156,5 +159,20 @@ public class WeatherDataUtil {
 
 		return source;
 	}
+    
+    public String serializeWeatherData(WeatherData weatherData)
+    {
+        ObjectMapper om = new ObjectMapper();
+        JavaTimeModule javaTimeModule =  new JavaTimeModule();
+            om.registerModule(javaTimeModule);
+        try
+        {
+            return(om.writeValueAsString(weatherData));
+        }
+        catch(JsonProcessingException ex)
+        {
+            return ex.getMessage();
+        }
+    }
 
 }
