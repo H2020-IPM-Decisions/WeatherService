@@ -75,13 +75,13 @@ import net.ipmdecisions.weather.datasourceadapters.dmi.DMIPointWebDataParser;
  * is using an adapter to download the weather data from a data source, the 
  * adapter's endpoint is specified in the weather data source catalogue.
  * 
- * @copyright 2020 <a href="http://www.nibio.no/">NIBIO</a>
+ * @copyright 2020-2024 <a href="http://www.nibio.no/">NIBIO</a>
  * @author Tor-Einar Skog <tor-einar.skog@nibio.no>
  */
 @Path("rest/weatheradapter")
 public class WeatherAdapterService {
 	
-	private static Logger LOGGER = LoggerFactory.getLogger(WeatherAdapterService.class);
+    private static Logger LOGGER = LoggerFactory.getLogger(WeatherAdapterService.class);
     
     @EJB
     AmalgamationBean amalgamationBean;
@@ -592,17 +592,33 @@ public class WeatherAdapterService {
 
             Set<Integer> ipmDecisionsParameters = new HashSet(Arrays.asList(parameters.split(",")).stream()
                         .map(paramstr->Integer.parseInt(paramstr.strip())).collect(Collectors.toList()));
+            
+            
             // Date parsing
-            LocalDate startDate = LocalDate.parse(timeStart);
-            LocalDate endDate = LocalDate.parse(timeEnd);
-
+            LocalDate startDate, endDate;
+            try
+            {
+                startDate = LocalDate.parse(timeStart);
+                endDate = LocalDate.parse(timeEnd);
+            }
+            catch(DateTimeParseException ex)
+            {
+                ZonedDateTime zStartDate = ZonedDateTime.parse(timeStart);
+                ZonedDateTime zEndDate = ZonedDateTime.parse(timeEnd);
+                startDate = zStartDate.toLocalDate();
+                endDate = zEndDate.toLocalDate();
+            }
+            
+            //LOGGER.debug("timeStart=" + timeStart + " => startDate=" + startDate + ". timeEnd=" + timeEnd + " => endDate=" + endDate);
             Boolean ignoreErrorsB = ignoreErrors != null ? ignoreErrors.equals("true") : false;
 
             WeatherData theData = new MeteobotAPIAdapter().getWeatherData(weatherStationId,userName,password,startDate, endDate);
+            //LOGGER.debug(this.getWeatherDataUtil().serializeWeatherData(this.getWeatherDataUtil().filterParameters(theData, ipmDecisionsParameters)));
             return Response.ok().entity(this.getWeatherDataUtil().filterParameters(theData, ipmDecisionsParameters)).build();
         }
         catch(JsonProcessingException | ParseWeatherDataException ex)
         {
+            ex.printStackTrace();
             return Response.serverError().entity(ex).build();
         }
     }
