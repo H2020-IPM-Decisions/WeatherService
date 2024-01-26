@@ -139,12 +139,18 @@ public class MetosAPIAdapter {
     
     public WeatherData getWeatherData(String stationID, String publicKey, String privateKey, LocalDate startDate, LocalDate endDate) throws GeneralSecurityException, IOException, ParseWeatherDataException
     {
+        // The MetOS stations may have a GMT offset for data that differs from the location timeZone
+        // For instance, our test station in Lithuania has location timeZone "Europe/Vilnius" (UTC + 2) (Standard for Lithuania, obviously),
+        // while the data has 3 hours offset from UTC.
         JsonNode stationInfo = this.getStationInfo(stationID, publicKey, privateKey);
+        ObjectMapper om = new ObjectMapper();
+        //System.out.println(om.writeValueAsString(stationInfo));
         Integer minutesOffset = stationInfo.get("config").get("timezone_offset").asInt();
         Integer GMTOffset = minutesOffset/60;
-        //System.out.println("GMTOffset=" + GMTOffset);
-        TimeZone timeZone =  GMTOffset >= 0 ? TimeZone.getTimeZone("GMT+" + GMTOffset) : TimeZone.getTimeZone("GMT" + GMTOffset);
-        List<VIPSWeatherObservation> VIPSobs = this.getWeatherObservations(stationID, publicKey, privateKey, Date.from(startDate.atStartOfDay(ZoneId.of(timeZone.getID())).toInstant()), timeZone);
+        TimeZone dataTimeZone =  GMTOffset >= 0 ? TimeZone.getTimeZone("GMT+" + GMTOffset) : TimeZone.getTimeZone("GMT" + GMTOffset);
+        String timeZoneCode = stationInfo.get("position").get("timezoneCode").asText();
+        TimeZone locationTimeZone = TimeZone.getTimeZone(ZoneId.of(timeZoneCode));
+        List<VIPSWeatherObservation> VIPSobs = this.getWeatherObservations(stationID, publicKey, privateKey, Date.from(startDate.atStartOfDay(ZoneId.of(locationTimeZone.getID())).toInstant()), dataTimeZone);
         List<Double> coordinate = new ArrayList<>();
         stationInfo.get("position").get("geo").get("coordinates").iterator().forEachRemaining(c->{
             coordinate.add(c.asDouble());
