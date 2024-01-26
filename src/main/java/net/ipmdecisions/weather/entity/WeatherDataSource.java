@@ -753,7 +753,7 @@ public class WeatherDataSource implements Comparable {
 	@JsonIgnore
 	public List<Integer> getAdditionalParametersForStation(String stationId)
 	{
-		if(this.getAccess_type().equals("stations") && !this.getSpatial().getGeoJSON().isBlank())
+		if(this.getAccess_type().equals("stations") && this.getSpatial().getGeoJSON() != null && !this.getSpatial().getGeoJSON().isBlank())
 		{
 			Feature stationFeature = this.getStation(stationId);
 			return stationFeature != null && (List<Integer>) stationFeature.getProperties().get("additionalParameters") != null? 
@@ -762,7 +762,7 @@ public class WeatherDataSource implements Comparable {
 		}
 		else
 		{
-			LOGGER.debug("This data source(" + this.getName() + ") is not station based, so no additional parameters can be added.");
+			LOGGER.debug("This data source(" + this.getName() + ") is either not station based OR it has no specific station info, so no additional parameters can be added.");
 			return new ArrayList<>();
 		}
 	}
