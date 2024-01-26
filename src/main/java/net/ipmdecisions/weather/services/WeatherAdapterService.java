@@ -676,14 +676,26 @@ public class WeatherAdapterService {
             Set<Integer> ipmDecisionsParameters = new HashSet(Arrays.asList(parameters.split(",")).stream()
                         .map(paramstr->Integer.parseInt(paramstr.strip())).collect(Collectors.toList()));
             // Date parsing
-            LocalDate startDate = LocalDate.parse(timeStart);
-            LocalDate endDate = LocalDate.parse(timeEnd);
+            LocalDate startDate, endDate;
+            try
+            {
+                startDate = LocalDate.parse(timeStart);
+                endDate = LocalDate.parse(timeEnd);
+            }
+            catch(DateTimeParseException ex)
+            {
+                ZonedDateTime zStartDate = ZonedDateTime.parse(timeStart);
+                ZonedDateTime zEndDate = ZonedDateTime.parse(timeEnd);
+                startDate = zStartDate.toLocalDate();
+                endDate = zEndDate.toLocalDate();
+            }
 
             Boolean ignoreErrorsB = ignoreErrors != null ? ignoreErrors.equals("true") : false;
 
             WeatherData theData = new MetosAPIAdapter().getWeatherData(weatherStationId,publicKey,privateKey,startDate, endDate);
             if(theData != null)
             {
+                //LOGGER.debug(this.getWeatherDataUtil().serializeWeatherData(this.getWeatherDataUtil().filterParameters(theData, ipmDecisionsParameters)));
             	return Response.ok().entity(this.getWeatherDataUtil().filterParameters(theData, ipmDecisionsParameters)).build();
             }
             else
