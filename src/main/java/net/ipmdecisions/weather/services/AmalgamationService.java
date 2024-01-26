@@ -266,6 +266,7 @@ public class AmalgamationService {
 
 					endpoint = currentWDS.getEndpointFullPath() ;
                                         parameters = "weatherStationId=" +  weatherStationId
+                                                        + "&timeZone=" + URLEncoder.encode(tzForLocation.getId(), "UTF-8")
 							+ "&timeStart=" + URLEncoder.encode(format.format(timeStart), "UTF-8")
 							+ "&timeEnd=" + URLEncoder.encode(format.format(timeEnd), "UTF-8")
 							+ "&interval=" + bestAvailableInterval

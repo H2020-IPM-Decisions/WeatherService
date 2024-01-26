@@ -42,7 +42,7 @@ import net.ipmdecisions.weather.util.vips.WeatherUtils;
 
 /**
  * Reads/parses data from a Davis weather station using the fruitweb service: http://www.fruitweb.info/ 
- * @copyright 2016-2020 <a href="http://www.nibio.no/">NIBIO</a>
+ * @copyright 2016-2024 <a href="http://www.nibio.no/">NIBIO</a>
  * @author Tor-Einar Skog <tor-einar.skog@nibio.no>
  */
 public class DavisFruitwebAdapter {
@@ -56,7 +56,7 @@ public class DavisFruitwebAdapter {
     
 
     public final static String FRUITWEB_URL_TEMPLATE = "https://www.fruitweb.info/sc/getFile.php?id={0}&pw={1}&date={2}";
-    // Metos parameters, including name and aggregation type
+    // Davis/Fruitweb parameters, including name and aggregation type
     private final static String[][] ELEMENT_MEASUREMENT_TYPES = {
         {"RAIN","RR","SUM"},
         {"LW1","BT","SUM"},
@@ -64,13 +64,16 @@ public class DavisFruitwebAdapter {
         {"AIRHUM","UM","AVG"}
     };
     
-    public WeatherData getWeatherData(String stationID, String password, LocalDate startDate, LocalDate endDate) throws ParseWeatherDataException 
+    public WeatherData getWeatherData(String stationID, String password, LocalDate startDate, LocalDate endDate, TimeZone timeZone) throws ParseWeatherDataException 
     {
-        // TODO Timezone must be obtainable from the weather station
-        TimeZone timeZone = TimeZone.getTimeZone("UTC");
+        // Time zone is not obtainable from station
+        if(timeZone == null)
+        {
+            timeZone = TimeZone.getTimeZone("UTC");
+        }
         
         return this.wUtils.getWeatherDataFromVIPSWeatherObservations(
-                this.getWeatherObservations(stationID, password, timeZone, Date.from(startDate.atStartOfDay(ZoneId.of(timeZone.getID())).toInstant()), Date.from(endDate.atStartOfDay(ZoneId.of(timeZone.getID())).toInstant())), 
+                this.getWeatherObservations(stationID, password, timeZone, Date.from(startDate.atStartOfDay(ZoneId.of(timeZone.getID())).toInstant()), Date.from(endDate.atStartOfDay(ZoneId.of(timeZone.getID())).toInstant())),  
                 0.0, // TODO Get location
                 0.0, // TODO Get location
                 0
