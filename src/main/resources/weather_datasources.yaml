@@ -2372,7 +2372,9 @@ datasources:
     parameters:
       common:
        - 1001 # Instantaneous temperature at 2m (Celcius)
+       - 1002 # Average temperature at 2m (Celcius)
        - 3001 # Instantaneous RH at 2m (%)
+       - 3002 # Average RH at 2m (%)
        - 2001 # Precipitation (mm)
        - 4002 # Instantaneous wind speed at 2m
   - 
