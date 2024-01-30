@@ -138,7 +138,7 @@ public class AmalgamationService {
 	 * @param timeStartStr ISO Date (e.g. 2021-03-01) 
 	 * @param timeEndStr ISO Date (e.g. 2021-09-01) 
          * @param interval logging interval for weather data in seconds. Hourly = 3600, daily= 86400
-         * @param privateWeatherStationInfo 
+         * @param privateWeatherStationInfo Json information with information about the private weather data source. Example: {"weatherStationId": "18150444", "weatherSourceId": "com.meteobot", "userName": "theUser","password":"theSuperPassword"}
 	 * @param parametersStr
 	 * @return
 	 */
@@ -209,7 +209,7 @@ public class AmalgamationService {
                         WeatherDataSource privateWeatherDataSource = null;
                         if(privateWeatherStationInfo != null)
                         {
-                            String weatherDataSourceId = privateWeatherStationInfo.get("WeatherDataSourceId").asText();
+                            String weatherDataSourceId = privateWeatherStationInfo.get("weatherSourceId").asText();
                             privateWeatherDataSource = weatherDataSourceBean.getWeatherDataSourceById(weatherDataSourceId);
                             wdss.add(privateWeatherDataSource);
                             // Places the private source as the first (top priority)
@@ -242,7 +242,7 @@ public class AmalgamationService {
 				{
 					String weatherStationId = currentWDS !=  privateWeatherDataSource ? 
                                                 currentWDS.getIdOfClosestStation(longitude, latitude)
-                                                : privateWeatherStationInfo.get("WeatherStationId").asText();
+                                                : privateWeatherStationInfo.get("weatherStationId").asText();
 					// Is it close enough??
 					// For now: Set default max distance between location and distance to 3 km (3000 m)
 					// TODO: Define the tolerance more generally
@@ -274,7 +274,7 @@ public class AmalgamationService {
                                         LOGGER.debug("currentWDS.getAccess_type()=" + currentWDS.getAccess_type());
                                         if(currentWDS.getAuthentication_type() != null && currentWDS.getAuthentication_type().equals(WeatherDataSource.AUTHENTICATION_TYPE_CREDENTIALS))
                                         {
-                                            parameters += "&credentials={\"userName\":\"" + privateWeatherStationInfo.get("Username").asText() + "\", \"password\":\"" + privateWeatherStationInfo.get("Password").asText() + "\"}";
+                                            parameters += "&credentials={\"userName\":\"" + privateWeatherStationInfo.get("userName").asText() + "\", \"password\":\"" + privateWeatherStationInfo.get("password").asText() + "\"}";
                                         }
 				}
 				else
