@@ -209,12 +209,25 @@ public class AmalgamationService {
                         WeatherDataSource privateWeatherDataSource = null;
                         if(privateWeatherStationInfo != null)
                         {
-                            String weatherDataSourceId = privateWeatherStationInfo.get("weatherSourceId").asText();
-                            privateWeatherDataSource = weatherDataSourceBean.getWeatherDataSourceById(weatherDataSourceId);
-                            wdss.add(privateWeatherDataSource);
-                            // Places the private source as the first (top priority)
-                            Integer index = wdss.indexOf(privateWeatherDataSource);
-                            Collections.rotate(wdss.subList(0, index+1), 1);
+                            try
+                            {
+                                String weatherDataSourceId = privateWeatherStationInfo.get("weatherSourceId").asText();
+                                // Input check. Trying to fail it
+                                privateWeatherStationInfo.get("weatherStationId").asText();
+                                privateWeatherStationInfo.get("userName").asText();
+                                privateWeatherStationInfo.get("password").asText();
+                                
+                                privateWeatherDataSource = weatherDataSourceBean.getWeatherDataSourceById(weatherDataSourceId);
+                                wdss.add(privateWeatherDataSource);
+                                // Places the private source as the first (top priority)
+                                Integer index = wdss.indexOf(privateWeatherDataSource);
+                                Collections.rotate(wdss.subList(0, index+1), 1);
+                            }
+                            catch(NullPointerException ex)
+                            {
+                                return Response.status(Status.BAD_REQUEST).entity("The private weatherstation info does not meet the requirements. Please check it.").build();
+                            }
+                            
                         }
                         
 			if(wdss.isEmpty())
