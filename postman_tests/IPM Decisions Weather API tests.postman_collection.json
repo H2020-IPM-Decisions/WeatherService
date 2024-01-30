@@ -1998,7 +1998,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"WeatherDataSourceId\": \"com.meteobot\",\n    \"WeatherStationId\": \"18150029\",\n    \"WeatherStationReference\":\"My main weather source\",\n    \"Username\":\"3138313530303239\",\n    \"Password\":\"Y3Nw_48aNe4y1Z0Wj\"\n}",
+							"raw": "{\n    \"weatherSourceId\": \"com.meteobot\",\n    \"weatherStationId\": \"18150029\",\n    \"weatherStationReference\":\"My main weather source\",\n    \"userName\":\"3138313530303239\",\n    \"password\":\"Y3Nw_48aNe4y1Z0Wj\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -2066,7 +2066,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"WeatherDataSourceId\": \"net.ipmdecisions.metos\",\n    \"WeatherStationId\": \"000012DE\",\n    \"WeatherStationReference\":\"My main weather source\",\n    \"Username\":\"c511e7d5ddcafe7d49941a016d897f2425c852cba7436cc3\",\n    \"Password\":\"3fda3e0ce8c6c768d48b80ace10e544ab282b3965345d81e\"\n}",
+							"raw": "{\n    \"weatherSourceId\": \"net.ipmdecisions.metos\",\n    \"weatherStationId\": \"000012DE\",\n    \"weatherStationReference\":\"My main weather source\",\n    \"userName\":\"c511e7d5ddcafe7d49941a016d897f2425c852cba7436cc3\",\n    \"password\":\"3fda3e0ce8c6c768d48b80ace10e544ab282b3965345d81e\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -2134,7 +2134,75 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"WeatherDataSourceId\": \"info.fruitweb\",\n    \"WeatherStationId\": \"536\",\n    \"WeatherStationReference\":\"My main weather source\",\n    \"Username\":\"\",\n    \"Password\":\"GF90esoleo\"\n}",
+							"raw": "{\n    \"weatherSourceId\": \"info.fruitweb\",\n    \"weatherStationId\": \"536\",\n    \"weatherStationReference\":\"My main weather source\",\n    \"userName\":\"\",\n    \"password\":\"GF90esoleo\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{wx_url}}/rest/amalgamation/amalgamate/private?longitude=12.0&latitude=55.3960648&timeStart=2024-01-25&timeEnd=2024-01-28&interval=3600&parameters=2001,1002,3002",
+							"host": [
+								"{{wx_url}}"
+							],
+							"path": [
+								"rest",
+								"amalgamation",
+								"amalgamate",
+								"private"
+							],
+							"query": [
+								{
+									"key": "longitude",
+									"value": "12.0"
+								},
+								{
+									"key": "latitude",
+									"value": "55.3960648"
+								},
+								{
+									"key": "timeStart",
+									"value": "2024-01-25"
+								},
+								{
+									"key": "timeEnd",
+									"value": "2024-01-28"
+								},
+								{
+									"key": "interval",
+									"value": "3600"
+								},
+								{
+									"key": "parameters",
+									"value": "2001,1002,3002"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Amalgamation with private station SHOULD FAIL",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 400\", function () {",
+									"    pm.response.to.have.status(400);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"WeatherSourceId\": \"info.fruitweb\",\n    \"weatherStationId\": \"536\",\n    \"WeatherStationReference\":\"My main weather source\",\n    \"UserName\":\"\",\n    \"Password\":\"GF90esoleo\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
