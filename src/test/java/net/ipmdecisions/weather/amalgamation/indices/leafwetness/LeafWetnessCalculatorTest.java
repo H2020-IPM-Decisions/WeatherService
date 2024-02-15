@@ -77,16 +77,14 @@ public class LeafWetnessCalculatorTest {
         System.out.println("calculateFromLSTM");
         try
         {
-        FileUtils fileUtils = new FileUtils();
-    	String weatherDataJson = fileUtils.getStringFromFileInApp("/lmt_weatherdata_missing_lwd.json");
-    	ObjectMapper oMapper = new ObjectMapper();
-    	WeatherData weatherData = oMapper.readValue(weatherDataJson, WeatherData.class);
-        LeafWetnessCalculator instance = new LeafWetnessCalculator();
-        
-        WeatherData result = instance.calculateFromLSTM(weatherData);
-        assertNotNull(result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+            FileUtils fileUtils = new FileUtils();
+            String weatherDataJson = fileUtils.getStringFromFileInApp("/lmt_weatherdata_missing_lwd.json");
+            ObjectMapper oMapper = new ObjectMapper();
+            WeatherData weatherData = oMapper.readValue(weatherDataJson, WeatherData.class);
+            LeafWetnessCalculator instance = new LeafWetnessCalculator();
+
+            WeatherData result = instance.calculateFromLSTM(weatherData);
+            assertNotNull(result);
         }
         catch(IOException ex)
         {
