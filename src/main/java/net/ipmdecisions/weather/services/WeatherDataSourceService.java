@@ -32,6 +32,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import javax.ejb.EJB;
@@ -46,10 +47,16 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
+import net.ipmdecisions.weather.controller.AmalgamationBean;
 import net.ipmdecisions.weather.controller.WeatherDataSourceBean;
 import net.ipmdecisions.weather.entity.WeatherDataSource;
+import net.ipmdecisions.weather.entity.WeatherParameter;
 import net.ipmdecisions.weather.util.GISUtils;
+
+import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Geometry;
+import org.locationtech.jts.geom.GeometryFactory;
+import org.locationtech.jts.geom.PrecisionModel;
 import org.wololo.geojson.Feature;
 import org.wololo.geojson.FeatureCollection;
 import org.wololo.geojson.GeoJSONFactory;
@@ -68,6 +75,9 @@ public class WeatherDataSourceService {
 	
 	@EJB
 	WeatherDataSourceBean weatherDataSourceBean;
+	
+	@EJB
+	AmalgamationBean amalgamationBean;
 
     /**
      * Get a list of all the available weather data sources
@@ -121,30 +131,50 @@ public class WeatherDataSourceService {
     @Consumes("application/json")
     @Produces("application/json")
     @TypeHint(WeatherDataSource[].class)
-    public Response listWeatherDataSourcesForLocation(@QueryParam("tolerance") Double tolerance, String geoJson)
+    public Response listWeatherDataSourcesForLocationEndpoint(@QueryParam("tolerance") Double tolerance, String geoJson)
     {
         Double toleranceFinal = tolerance == null ? 0.0 : tolerance;
         try
-        {
-	        FeatureCollection clientFeatures = (FeatureCollection) GeoJSONFactory.create(geoJson);
-	        GeoJSONReader reader = new GeoJSONReader();
-	        // Get all geometries in request
-	        List<Geometry> clientGeometries = new ArrayList<>();
-	        for(Feature feature: clientFeatures.getFeatures())
-	        {
-	            Geometry geom = reader.read(feature.getGeometry());
-	            clientGeometries.add(geom);
-	        }
-	        // Loop through all weather data sources
-	        // Return only data sources with geometries intersecting with the client's
-	        // specified geometries
-	        List<WeatherDataSource> retVal = weatherDataSourceBean.getWeatherDataSourcesForLocation(clientGeometries, toleranceFinal); 
-	        		
-	        return Response.ok().entity(retVal).build();
+        {	
+	        return Response.ok().entity(this.listWeatherDataSourcesForLocation(toleranceFinal, geoJson)).build();
         }catch(IOException ex)
         {
             return Response.serverError().entity(ex.getMessage()).build();
         }
+    }
+    
+    /**
+     * 
+     * @param tolerance Add some tolerance (in meters) to allow for e.g. a point to match
+     * the location of a weather station. The default is 0 meters (no tolerance)
+     * @param geoJson
+     * @return
+     * @throws IOException
+     */
+    private List<WeatherDataSource> listWeatherDataSourcesForLocation(Double tolerance, String geoJson) throws IOException
+    {
+    	List<Geometry> clientGeometries = this.getGeometries(geoJson);
+        // Loop through all weather data sources
+        // Return only data sources with geometries intersecting with the client's
+        // specified geometries
+        List<WeatherDataSource> retVal = weatherDataSourceBean.getWeatherDataSourcesForLocation(clientGeometries, tolerance);
+        return retVal;
+    }
+
+
+    
+    private List<Geometry> getGeometries(String geoJson)
+    {
+    	FeatureCollection clientFeatures = (FeatureCollection) GeoJSONFactory.create(geoJson);
+        GeoJSONReader reader = new GeoJSONReader();
+        // Get all geometries in request
+        List<Geometry> geometries = new ArrayList<>();
+        for(Feature feature: clientFeatures.getFeatures())
+        {
+            Geometry geom = reader.read(feature.getGeometry());
+            geometries.add(geom);
+        }
+        return geometries;
     }
     
     /**
@@ -153,6 +183,7 @@ public class WeatherDataSourceService {
      * the location of a weather station. The default is 0 meters (no tolerance)
      * @param latitude in decimal degrees (WGS84)
      * @param longitude in decimal degrees (WGS84)
+	 * @param findForCountry if true, figures out which country the point is in, and returns all weather data sources that are valid for that country. VERY TIME CONSUMING
      * @return A list of all the matching weather data sources
      * 
      * @pathExample /rest/weatherdatasource/location/point/?latitude=59.678835236960765&longitude=12.01629638671875
@@ -161,22 +192,162 @@ public class WeatherDataSourceService {
     @Path("weatherdatasource/location/point")
     @Produces("application/json")
     @TypeHint(WeatherDataSource[].class)
-    public Response listWeatherDataSourcesForPoint(
+    public Response listWeatherDataSourcesForPointEnd(
             @QueryParam("latitude") Double latitude, 
             @QueryParam("longitude") Double longitude,
-            @QueryParam("tolerance") Double tolerance
+            @QueryParam("tolerance") Double tolerance,
+			@QueryParam("findForCountry") Boolean findForCountry
             )
     {
     	try
     	{
 	        tolerance = tolerance == null ? 0.0 : tolerance;
-	        return Response.ok().entity(weatherDataSourceBean.getWeatherDataSourcesForLocation(longitude, latitude, tolerance)).build();
+			System.out.println(findForCountry);
+			if(findForCountry == null || ! findForCountry) {
+				return Response.ok().entity(weatherDataSourceBean.getWeatherDataSourcesForLocation(longitude, latitude, tolerance)).build();
+			}
+			else {
+				GISUtils gisUtils = new GISUtils();
+				// Get the country polygon - use the listWeatherDataSourcesForLocation(Double tolerance, String geoJson)
+				Coordinate c = new Coordinate(longitude, latitude);
+				GeometryFactory gf = new GeometryFactory(new PrecisionModel(), 4326);
+				org.locationtech.jts.geom.Point point = gf.createPoint(c);
+				String countryCode = gisUtils.getCountryCodeForPoint(point);
+				GeoJSONWriter writer = new GeoJSONWriter();
+				Feature countryBoundary = gisUtils.getCountryBoundary(countryCode);
+				List<Feature> fList = new ArrayList<>();
+				fList.add(countryBoundary);
+				return Response.ok().entity(this.listWeatherDataSourcesForLocation(tolerance, writer.write(fList).toString())).build();
+			}
     	}
     	catch(IOException ex)
     	{
     		return Response.serverError().entity(ex.getMessage()).build();
     	}
     }
+    
+    
+    /**
+     * 
+     * @param tolerance toleranceInput Add some tolerance (in meters) to allow for e.g. a point to match
+     * the location of a weather station. The default is 0 meters (no tolerance)
+     * @param includeFallbackParamsStr If true, all fallback parameters will be added.The default value is false
+     * @param geoJson
+     * @return
+     */
+    @POST
+    @Path("weatherparameter/location")
+    @Produces("application/json")
+    @TypeHint(WeatherParameter[].class)
+    public Response listWeatherParametersForLocation(
+    		@QueryParam("tolerance") Double tolerance,
+    		@QueryParam("includeFallbackParams") String includeFallbackParamsStr,
+    		@QueryParam("includeCalculatableParams") String includeCalculatableParamsStr,
+    		String geoJson
+    		) {
+    	Double toleranceFinal = tolerance == null ? 0.0 : tolerance;
+    	Boolean includeFallbackParams = includeFallbackParamsStr == null ? false : includeFallbackParamsStr.equals("true");
+    	Boolean includeCalculatableParams = includeCalculatableParamsStr == null ? false : includeCalculatableParamsStr.equals("true");
+    	List<Geometry> clientGeometries = this.getGeometries(geoJson);
+        try
+        {	
+        	List<WeatherDataSource> dataSourcesForLocation = this.listWeatherDataSourcesForLocation(toleranceFinal, geoJson);
+        	Set<Integer> retVal = new HashSet<>();
+        	for(WeatherDataSource ds: dataSourcesForLocation)
+        	{
+        		// Get common weather parameters for this datasource
+        		retVal.addAll(Arrays.stream(ds.getParameters().getCommon()).boxed().collect(Collectors.toList()));
+        		// Get additional parameters for this location
+        		List<Integer> additionalParameters = ds.getAdditionalParametersForLocation(clientGeometries, tolerance);
+        		if(additionalParameters != null)
+        		{
+        			retVal.addAll(additionalParameters);
+        		}
+        	}
+        	
+        	if(includeFallbackParams)
+        	{
+        		Set<Integer> fallbackParams = new HashSet<>();
+        		for(Integer original:retVal)
+        		{
+        			fallbackParams.addAll(amalgamationBean.getInterchangeableParameters(original));
+        		}
+        		retVal.addAll(fallbackParams);
+        	}
+        	
+        	if(includeCalculatableParams)
+        	{
+        		retVal.addAll(amalgamationBean.getCalculatableParameters(new HashSet<Integer>(retVal)));
+        	}
+
+	        return Response.ok().entity(retVal).build();
+        }catch(IOException ex)
+        {
+            return Response.serverError().entity(ex.getMessage()).build();
+        }
+    }
+    
+    @GET
+    @Path("weatherparameter/location/point")
+    @Produces("application/json")
+    @TypeHint(WeatherParameter[].class)
+    public Response listWeatherParametersForPoint(
+    		@QueryParam("latitude") Double latitude, 
+            @QueryParam("longitude") Double longitude,
+            @QueryParam("includeFallbackParams") String includeFallbackParamsStr,
+            @QueryParam("includeCalculatableParams") String includeCalculatableParamsStr,
+            @QueryParam("tolerance") Double tolerance
+            ) {
+    	try
+    	{
+	        tolerance = tolerance == null ? 0.0 : tolerance;
+	        Boolean includeFallbackParams = includeFallbackParamsStr == null ? false : includeFallbackParamsStr.equals("true");
+	        Boolean includeCalculatableParams = includeCalculatableParamsStr == null ? false : includeCalculatableParamsStr.equals("true");
+	        List<WeatherDataSource> dataSourcesForLocation = weatherDataSourceBean.getWeatherDataSourcesForLocation(longitude, latitude, tolerance); 
+	        Set<Integer> retVal = new HashSet<>();
+	        List<Geometry> clientGeometries = new ArrayList<>();
+	        double[] coordinate = new double[2];
+	        coordinate[0] = longitude;
+	        coordinate[1] = latitude;
+	        Coordinate c = new Coordinate(longitude, latitude);
+	        GeometryFactory gf = new GeometryFactory(new PrecisionModel(), 4326);
+	        org.locationtech.jts.geom.Point point = gf.createPoint(c);
+	        clientGeometries.add(point);
+        	for(WeatherDataSource ds: dataSourcesForLocation)
+        	{
+        		// Get common weather parameters for this datasource
+        		retVal.addAll(Arrays.stream(ds.getParameters().getCommon()).boxed().collect(Collectors.toList()));
+        		// Get additional parameters for this location
+        		List<Integer> additionalParameters = ds.getAdditionalParametersForLocation(clientGeometries, tolerance);
+        		if(additionalParameters != null)
+        		{
+        			retVal.addAll(additionalParameters);
+        		}
+        	}
+        	if(includeFallbackParams)
+        	{
+        		Set<Integer> fallbackParams = new HashSet<>();
+        		for(Integer original:retVal)
+        		{
+        			fallbackParams.addAll(amalgamationBean.getInterchangeableParameters(original));
+        		}
+        		retVal.addAll(fallbackParams);
+        	}
+        	
+        	if(includeCalculatableParams)
+        	{
+        		retVal.addAll(amalgamationBean.getCalculatableParameters(new HashSet<Integer>(retVal)));
+        	}
+        	
+	        return Response.ok().entity(retVal).build();
+    	}
+    	catch(IOException ex)
+    	{
+    		return Response.serverError().entity(ex.getMessage()).build();
+    	}
+    }
+    
+    
     
     @GET
     @Path("weatherdatasource/{id}")
@@ -197,6 +368,25 @@ public class WeatherDataSourceService {
     		return Response.serverError().entity(ex.getMessage()).build();
     	}
     }
-    
+
+	@GET
+	@Path("country/{countryCodes}/")
+	@Produces("application/json")
+	public Response getCountryGeoJson(
+			@PathParam("countryCodes") String countryCodesStr
+	)
+	{
+		String[] countryCodes = countryCodesStr.split(",");
+		GISUtils gisUtils = new GISUtils();
+		FeatureCollection countryGeoJson = gisUtils.getCountryBoundaries(Set.of(countryCodes));
+		if(countryGeoJson != null && countryGeoJson.getFeatures().length > 0)
+		{
+			return Response.ok().entity(countryGeoJson).build();
+		}
+		else
+		{
+			return Response.status(Status.NOT_FOUND).build();
+		}
+	}
     
 }

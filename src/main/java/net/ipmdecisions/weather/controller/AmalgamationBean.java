@@ -28,15 +28,12 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
-import java.util.TimeZone;
 import java.util.stream.Collectors;
 
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
@@ -46,7 +43,6 @@ import net.ipmdecisions.weather.entity.LocationWeatherData;
 import net.ipmdecisions.weather.entity.WeatherData;
 import net.ipmdecisions.weather.entity.WeatherDataSource;
 import net.ipmdecisions.weather.entity.WeatherParameter;
-import net.ipmdecisions.weather.services.WeatherDataSourceService;
 
 /**
  * 
@@ -55,6 +51,20 @@ import net.ipmdecisions.weather.services.WeatherDataSourceService;
  */
 @Stateless
 public class AmalgamationBean {
+
+    public AmalgamationBean() {
+    }
+    
+    /**
+     * Use this if you're not injecting this bean through @EJB
+     * @param weatherDataSourceBean
+     * @param metaDataBean 
+     */
+        public AmalgamationBean(WeatherDataSourceBean weatherDataSourceBean, MetaDataBean metaDataBean)
+        {
+            this.weatherDataSourceBean = weatherDataSourceBean;
+            this.metaDataBean = metaDataBean;
+        }
 	
 	TimeZoneEngine tzEngine;
 	
@@ -83,7 +93,7 @@ public class AmalgamationBean {
 	/*
 	 * Parameters that can be used to calculate the requested parameter
 	 */
-	private Map<Integer, List<Integer>> calculationParams = Map.of(
+	private final Map<Integer, List<Integer>> calculationParams = Map.of(
 			3101, List.of(3001,3002,3003), // Leaf wetness 2m
 			3102, List.of(3001,3002,3003), // Leaf wetness in canopy
 			3103, List.of(3001,3002,3003)  // Leaf wetness in grass
@@ -173,6 +183,16 @@ public class AmalgamationBean {
 		return weatherDataSourceBean.getWeatherDataSourceById("net.ipmdecisions.dwd.euroweather");
 	}
 	
+        /**
+         * Combine a list of weatherData. Data from the first in the list are kept, any missing data are added from the other files
+         * @param weatherData
+         * @param timeStart
+         * @param timeEnd
+         * @param interval
+         * @param zoneId
+         * @return
+         * @throws IOException 
+         */
 	public WeatherData getFusionedWeatherData(
 			List<WeatherData> weatherData,
 			Instant timeStart,
@@ -183,7 +203,7 @@ public class AmalgamationBean {
 	{
 		ObjectMapper oMapper = new ObjectMapper();
 		oMapper.registerModule(new JavaTimeModule());
-		Long length = (timeEnd.toEpochMilli() - timeStart.toEpochMilli()) / 1000 / interval;
+		Long length = 1 + (timeEnd.toEpochMilli() - timeStart.toEpochMilli()) / 1000 / interval;
 		WeatherData fusionedWD = new WeatherData();
 		fusionedWD.setTimeStart(timeStart);
 		fusionedWD.setTimeEnd(timeEnd);
@@ -307,7 +327,7 @@ public class AmalgamationBean {
 			fusionedLWD.setData(dataMatrix);
 			List<Integer> newFusionedWDParams = new ArrayList<>(fusionedWDParams); // To make sure it's mutable
 			newFusionedWDParams.addAll(newParams);
-			fusionedWD.setWeatherParameters(newFusionedWDParams.toArray(new Integer[newFusionedWDParams.size()]));
+			fusionedWD.setWeatherParameters(newFusionedWDParams.toArray(Integer[]::new));
 			
 			// We must update the qc and amalgamation arrays too
 			Integer[] newQC = new Integer[fusionedWD.getWeatherParameters().length];
@@ -414,6 +434,23 @@ public class AmalgamationBean {
 	}
 	
 	/**
+	 * TODO Make more streamlined
+	 * @param inputParameters
+	 * @return all parameters that the API can calculate based on the provided parameters
+	 */
+	public List<Integer> getCalculatableParameters(Set<Integer> inputParameters)
+	{
+		List<Integer> retVal = new ArrayList<>();
+		// If we have relative humidity, we can calculate Leaf wetness
+		Set<Integer> rhParams = Set.of(3001,3002,3003);
+		if(inputParameters.retainAll(rhParams))
+		{
+			retVal.add(3101);
+		}
+		return retVal;
+	}
+	
+	/**
 	 * Using this API: https://github.com/RomanIakovlev/timeshape
 	 * @return
 	 */
@@ -464,6 +501,8 @@ public class AmalgamationBean {
 		Integer sourceValuesPerAggregationValue = requestedInterval / source.getInterval();
 		//System.out.println("sourceValuesPerAggregationValue=" + sourceValuesPerAggregationValue);
 		// What's the start index, considering midnight for time zone? (Assuming hourly to daily)
+                //System.out.println("[AmalgamationBean.aggregate]: timeZone=" + timeZone);
+                //System.out.println("[AmalgamationBean.aggregate]: source.getTimeStart().atZone(timeZone).getHour()=" + source.getTimeStart().atZone(timeZone).getHour());
 		Integer startIndex = source.getTimeStart().atZone(timeZone).getHour() == 0 ? 0 : 23 - source.getTimeStart().atZone(timeZone).getHour();
 		// TODO If the start index >= 15, consider creating a "day 1" using those values
 		

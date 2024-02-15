@@ -57,7 +57,7 @@ public class JacksonConfig implements ContextResolver<ObjectMapper>
                            SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
         JavaTimeModule javaTimeModule =  new JavaTimeModule();
         objectMapper.registerModule(javaTimeModule);
-        objectMapper.setDateFormat(new SimpleDateFormat("yyyy-MM-dd'TEST'HH:mm:ssXXX"));
+        objectMapper.setDateFormat(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX"));
         objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
     }
 

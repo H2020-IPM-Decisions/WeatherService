@@ -18,6 +18,7 @@
  */
 package net.ipmdecisions.weather.controller;
 
+import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -59,10 +60,11 @@ public class WeatherDataSourceBean {
      * @throws IOException 
      */
     public List<WeatherDataSource> getAllWeatherDataSources() throws IOException{
-            File dsFile = new File(System.getProperty("net.ipmdecisions.weatherservice.DATASOURCE_LIST_FILE"));
+            BufferedInputStream inputStream = new BufferedInputStream(this.getClass().getResourceAsStream("/weather_datasources.yaml"));
             ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
             mapper.registerModule(new JavaTimeModule());
-            List<Map> prelim =  (List<Map>) mapper.readValue(dsFile, HashMap.class).get("datasources");
+            Map prelimResult = mapper.readValue(inputStream, HashMap.class);
+            List<Map> prelim =  (List<Map>) prelimResult.get("datasources");
             List<WeatherDataSource> retVal = new ArrayList<>();
             prelim.forEach((m) -> {
                 retVal.add(mapper.convertValue(m, new TypeReference<WeatherDataSource>(){}));

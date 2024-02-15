@@ -20,6 +20,8 @@
 package net.ipmdecisions.weather.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.webcohesion.enunciate.metadata.DocumentationExample;
 import com.webcohesion.enunciate.metadata.rs.TypeHint;
@@ -31,6 +33,7 @@ import net.ipmdecisions.weather.util.SystemUtil;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -41,6 +44,8 @@ import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.Point;
 import org.locationtech.jts.geom.PrecisionModel;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.wololo.geojson.Feature;
 import org.wololo.geojson.FeatureCollection;
 import org.wololo.geojson.GeoJSONFactory;
@@ -55,6 +60,9 @@ import org.wololo.jts2geojson.GeoJSONReader;
  * @author Tor-Einar Skog <tor-einar.skog@nibio.no>
  */
 public class WeatherDataSource implements Comparable {
+	
+	private static Logger LOGGER = LoggerFactory.getLogger(WeatherDataSource.class);
+	
     private String id, name, description, public_URL,endpoint, authentication_type, needs_data_control, access_type;
     private Integer priority;
     private Temporal temporal;
@@ -69,6 +77,7 @@ public class WeatherDataSource implements Comparable {
     
     /** No authentication required for the data source */
     public static String AUTHENTICATION_TYPE_NONE = "NONE";
+
     
     /** 
      * <p>
@@ -655,7 +664,7 @@ public class WeatherDataSource implements Comparable {
 		
 		GeoJSONReader reader = new GeoJSONReader();
     	GISUtils gisUtils = new GISUtils();
-		
+    			
 		try
         {
 			Feature closestFeature = null;
@@ -670,11 +679,144 @@ public class WeatherDataSource implements Comparable {
         			closestFeature = currentFeature;
         		}
         	}
-        	//System.out.println("Found closest station: " + (String) closestFeature.getProperties().get("name"));
-        	return (String) closestFeature.getProperties().get("id");
+        	LOGGER.debug("Found closest station: " + (String) closestFeature.getProperties().get("name"));
+        	//return (String) closestFeature.getProperties().get("id");
+        	return (String) new ObjectMapper().writeValueAsString(closestFeature.getId());
         }
-        catch(NullPointerException ex)
-        { return null; }
+        catch(NullPointerException | JsonProcessingException ex)
+        { 
+        	LOGGER.debug(ex.getMessage());
+        	return null; 
+        }
+	}
+	
+	/**
+	 * Get distance in meters between a station and a location
+	 * @param stationId
+	 * @param longitude
+	 * @param latitude
+	 * @return
+	 */
+	@JsonIgnore
+	public Double getDistanceToStation(String stationId, Double longitude, Double latitude)
+	{
+		if(this.getAccess_type().equals("stations") && !this.getSpatial().getGeoJSON().isBlank())
+		{
+			Feature stationFeature = this.getStation(stationId);
+			if(stationFeature == null)
+			{
+				return null;
+			}
+			GeoJSONReader reader = new GeoJSONReader();
+			Geometry stationPoint = reader.read(stationFeature.getGeometry());
+			GISUtils gisUtils = new GISUtils();
+	        Point locationPoint = new GeometryFactory(new PrecisionModel(), 4326).createPoint(new Coordinate(longitude,latitude));
+			return gisUtils.getDistanceInMetersWGS84(stationPoint.distance(locationPoint));
+		}
+		else
+		{
+			LOGGER.debug("This data source(" + this.getName() + ") is not station based, so no additional parameters can be added.");
+			return null;
+		}
+	}
+	
+	/**
+	 * 
+	 * @param stationId
+	 * @return
+	 */
+	public Feature getStation(String stationId)
+	{
+		ObjectMapper objectMapper = new ObjectMapper();
+		for(Feature stationFeature: this.getStationsGeometries()) {
+			try
+        	{
+        		if(objectMapper.writeValueAsString(stationFeature.getId()).equals(stationId))
+        		{
+        			return stationFeature;
+        		}
+        	}
+        	catch(JsonProcessingException ex)
+    		{
+    			LOGGER.debug(ex.getMessage());
+    			return null;
+    		}
+		}
+		return null;
+	}
+	
+	/**
+	 * If you already know the stationId, get its additional weather parameters. ONLY applicable to station based weather data sources
+	 * @param stationId
+	 * @return
+	 */
+	@JsonIgnore
+	public List<Integer> getAdditionalParametersForStation(String stationId)
+	{
+		if(this.getAccess_type().equals("stations") && this.getSpatial().getGeoJSON() != null && !this.getSpatial().getGeoJSON().isBlank())
+		{
+			Feature stationFeature = this.getStation(stationId);
+			return stationFeature != null && (List<Integer>) stationFeature.getProperties().get("additionalParameters") != null? 
+					(List<Integer>) stationFeature.getProperties().get("additionalParameters") 
+					: new ArrayList<>();
+		}
+		else
+		{
+			LOGGER.debug("This data source(" + this.getName() + ") is either not station based OR it has no specific station info, so no additional parameters can be added.");
+			return new ArrayList<>();
+		}
+	}
+	
+	/**
+	 * Currently only applicable to station based data sources
+	 * @return List of parameter codes that this location provides in addition to the "common" ones
+	 */
+	@JsonIgnore
+	public List<Integer> getAdditionalParametersForLocation(List<Geometry> clientGeometries, Double toleranceInput)
+	{
+		if(this.getAccess_type().equals("stations") && !this.getSpatial().getGeoJSON().isBlank())
+		{
+			LOGGER.debug("This data source(" + this.getName() + ") is station based.");
+			GeoJSONReader reader = new GeoJSONReader();
+			GISUtils gisUtils = new GISUtils();
+			return this.getStationsGeometries().stream()
+		            .filter(stationFeature->{
+		            	Geometry stationGeometry = reader.read(stationFeature.getGeometry());
+		                Boolean matching = false;
+		                for(Geometry clientGeometry: clientGeometries)
+		                {
+		                    if(stationGeometry.intersects(clientGeometry) || gisUtils.getDistanceInMetersWGS84(stationGeometry.distance(clientGeometry)) <= toleranceInput)
+		                    {
+		                        //System.out.println("Distance: " + gisUtils.getDistanceInMetersWGS84(dataSourceGeometry.distance(clientGeometry)));
+		                        matching = true;
+		                        LOGGER.debug("This station(" + stationFeature.getId() + ") matches the provided location.");
+		                    }
+		                }
+		                return matching;
+		            })
+		            .flatMap(matchingStationFeature-> ((List<Integer>)matchingStationFeature.getProperties().get("additionalParameters")).stream())
+		            .collect(Collectors.toList());
+		}
+		else
+		{
+			LOGGER.debug("This data source(" + this.getName() + ") is not station based, so no additional parameters can be added.");
+			return null;
+		}
+	}
+	
+	@JsonIgnore
+	public List<Feature> getStationsGeometries()
+	{
+		if(this.getAccess_type().equals("stations") && !this.getSpatial().getGeoJSON().isBlank())
+		{
+			return Arrays.asList(
+			((FeatureCollection) GeoJSONFactory.create(this.getSpatial().getGeoJSON())).getFeatures()
+			);
+		}
+		else
+		{
+			return null;
+		}
 	}
 
 	/**

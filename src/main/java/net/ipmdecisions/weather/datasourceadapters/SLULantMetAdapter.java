@@ -92,7 +92,8 @@ public class SLULantMetAdapter {
 			4003, // Mean wind speed (m/s) at 2m
 			//3101, // Leaf wetness (min/hour) // TODO reinstate this when you know that LantMet can handle it
 			1102, // Mean temperature (C) at -5cm
-			1112 // Mean temperature (C) at -10cm
+			1112, // Mean temperature (C) at -10cm
+			5001 // Global radiation
 			};
 	
 	/**
@@ -148,7 +149,9 @@ public class SLULantMetAdapter {
 				(interval == 3600 ? 1 : 2),
 				timeStart.atZone(swedishNormalTime).format(format),
 				timeEnd.atZone(swedishNormalTime).format(format),
-				parameters.stream().map(i->weatherUtils.getVIPSParameterId(i)).collect(Collectors.joining(","))
+				parameters.stream()
+                                        .filter(i->weatherUtils.getVIPSParameterId(i) != null)
+                                        .map(i->weatherUtils.getVIPSParameterId(i)).collect(Collectors.joining(","))
 				));
 		//System.out.println(sluURL);
 		WeatherData result = weatherUtils.getWeatherDataFromVIPSWeatherObservations(sluURL, longitude, latitude, 0);

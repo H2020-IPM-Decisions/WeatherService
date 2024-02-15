@@ -36,6 +36,8 @@ import java.util.TimeZone;
 import net.ipmdecisions.weather.entity.WeatherData;
 import net.ipmdecisions.weather.util.vips.VIPSWeatherObservation;
 import net.ipmdecisions.weather.util.vips.WeatherUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -43,11 +45,13 @@ import net.ipmdecisions.weather.util.vips.WeatherUtils;
  * 
  * Code from the VIPSWeatherProxy adapted to IPM Decisions
  *
- * @copyright 2020 <a href="http://www.nibio.no/">NIBIO</a>
+ * @copyright 2020-2024 <a href="http://www.nibio.no/">NIBIO</a>
  * @author Brita Linnestad <brita.linnestad@nibio.no>
  * @author Tor-Einar Skog <tor-einar.skog@nibio.no>
  */
 public class MeteobotAPIAdapter {
+    
+    private static Logger LOGGER = LoggerFactory.getLogger(MeteobotAPIAdapter.class);
 
     private final WeatherUtils weatherUtils;
 

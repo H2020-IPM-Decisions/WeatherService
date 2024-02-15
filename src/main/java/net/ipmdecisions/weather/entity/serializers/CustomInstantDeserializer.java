@@ -20,23 +20,32 @@ public class CustomInstantDeserializer extends JsonDeserializer<Instant>{
 			throws IOException {
 		try
 		{
+			// Works for "2022-01-01T00:00:00+01:00"
 			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX");
 			Date d = sdf.parse(arg0.getText());
 			return d.toInstant();
 		}
-		catch(ParseException ex)
+		catch(ParseException ex1)
 		{
-			try
-			{
-				// Check if this is an epoch number
-				Long possibleEpochSecond = ((Double)Double.parseDouble(arg0.getText())).longValue();
-				return Instant.ofEpochSecond(possibleEpochSecond);
+			try {
+				// Works for "2022-01-01T00:00:00+0100" (as opposed to +01:00, with the colon in between)
+				SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
+				Date d = sdf.parse(arg0.getText());
+				return d.toInstant();
 			}
-			catch(NumberFormatException ex2)
+			catch(ParseException ex2)
 			{
-				throw new IOException(ex.getMessage());				
+				try
+				{
+					// Check if this is an epoch number
+					Long possibleEpochSecond = ((Double)Double.parseDouble(arg0.getText())).longValue();
+					return Instant.ofEpochSecond(possibleEpochSecond);
+				}
+				catch(NumberFormatException ex3)
+				{
+					throw new IOException(ex3.getMessage());				
+				}
 			}
-			
 		}
 	}
 	

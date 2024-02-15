@@ -259,8 +259,8 @@ public class WeatherUtils {
 			throw new WeatherDataSourceException("ERROR: Got Http response code " + conn.getResponseCode() + " from data source. Message from server was: " + response.toString());
 		}
 		ObjectMapper objectMapper = new ObjectMapper();
+                //System.out.println(response);
 		List<VIPSWeatherObservation> observations = objectMapper.readValue(response, new TypeReference<List<VIPSWeatherObservation>>(){});
-		//System.out.println("getWeatherDataFromVIPSWeatherObservations = " + observations);
 		return this.getWeatherDataFromVIPSWeatherObservations(observations, longitude, latitude, defaultQC);
     }
     

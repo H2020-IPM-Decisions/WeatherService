@@ -1,19 +1,18 @@
-<enunciate xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://enunciate.webcohesion.com/schemas/enunciate-2.13.0.xsd">
+<enunciate xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://enunciate.webcohesion.com/schemas/enunciate-2.15.0.xsd">
 	<title>IPM Decisions Weather Service</title>
 	<description format="markdown" file="README.md"/>
 	<copyright>IPM Decisions</copyright>
-	<version>BETA</version>
-
+	<version>1.1.0</version>
 	<namespaces>
 		<namespace id="model" uri="http://ipmdecisions.net"/>
 	</namespaces>
-
 	<modules>
 		<docs>
 			<download file="LICENSE" name="GNU Affero GPL v3" description="The license governing this API" showLink="true"/>
 		</docs>
 		<swagger basePath="/api/wx/" docsSubdir="swagger" />
-		<java-json-client javac-source="11" javac-target="11"/>
-    	<java-xml-client javac-source="11" javac-target="11"/>
 	</modules>
+        <api-classes>
+            <include pattern="net.ipmdecisions.**"/>
+        </api-classes>
 </enunciate>
