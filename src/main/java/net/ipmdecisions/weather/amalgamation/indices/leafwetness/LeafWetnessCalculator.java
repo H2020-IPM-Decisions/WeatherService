@@ -19,32 +19,12 @@
 
 package net.ipmdecisions.weather.amalgamation.indices.leafwetness;
 
-import ai.onnxruntime.NodeInfo;
-import ai.onnxruntime.OnnxJavaType;
-import ai.onnxruntime.OnnxTensor;
-import ai.onnxruntime.OrtEnvironment;
-import ai.onnxruntime.OrtException;
-import ai.onnxruntime.OrtSession;
-import ai.onnxruntime.OrtSession.Result;
-import ai.onnxruntime.OrtSession.SessionOptions;
-import ai.onnxruntime.OrtSession.SessionOptions.OptLevel;
-import ai.onnxruntime.OrtUtil;
-import ai.onnxruntime.TensorInfo;
-import static ai.onnxruntime.TensorInfo.constructFromJavaArray;
-import com.fasterxml.jackson.databind.node.ArrayNode;
 import java.io.IOException;
 
-import java.nio.ByteBuffer;
-import java.nio.FloatBuffer;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.logging.Level;
 import java.util.stream.Collectors;
 
@@ -52,8 +32,6 @@ import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.nio.charset.StandardCharsets;
-import static javax.ws.rs.client.Entity.json;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -61,10 +39,6 @@ import org.slf4j.LoggerFactory;
 import net.ipmdecisions.weather.amalgamation.indices.IndiceCalculator;
 import net.ipmdecisions.weather.entity.LocationWeatherData;
 import net.ipmdecisions.weather.entity.WeatherData;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClientBuilder;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -91,9 +65,6 @@ public class LeafWetnessCalculator implements IndiceCalculator{
                 if (rhParamsInDataset != null && tmParamsInDataset != null && rrParamsInDataset != null && wsParamsInDataset != null){
                     try {
                         weatherData = this.calculateFromLSTM(weatherData);
-                    } catch (OrtException ex) {
-                        weatherData = this.calculateFromConstantRH(weatherData);
-                        java.util.logging.Logger.getLogger(LeafWetnessCalculator.class.getName()).log(Level.SEVERE, null, ex);
                     } catch (IOException ex) {
                         java.util.logging.Logger.getLogger(LeafWetnessCalculator.class.getName()).log(Level.SEVERE, null, ex);
                     }
@@ -152,7 +123,7 @@ public class LeafWetnessCalculator implements IndiceCalculator{
 		return weatherData;
 	}
 
-    private WeatherData calculateFromLSTM(WeatherData weatherData) throws OrtException, IOException {
+    private WeatherData calculateFromLSTM(WeatherData weatherData) throws  IOException {
         
         List<Integer> tmParamsInDataset = this.getParamsInDataSet(weatherData,List.of(1001,1002,1021,1022));
         List<Integer> rhParamsInDataset = this.getParamsInDataSet(weatherData,List.of(3001,3002));
