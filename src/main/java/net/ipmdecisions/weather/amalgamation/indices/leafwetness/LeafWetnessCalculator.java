@@ -19,6 +19,7 @@
 
 package net.ipmdecisions.weather.amalgamation.indices.leafwetness;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 
 
@@ -123,7 +124,7 @@ public class LeafWetnessCalculator implements IndiceCalculator{
 		return weatherData;
 	}
 
-    private WeatherData calculateFromLSTM(WeatherData weatherData) throws  IOException {
+    public WeatherData calculateFromLSTM(WeatherData weatherData) throws  IOException {
         
         List<Integer> tmParamsInDataset = this.getParamsInDataSet(weatherData,List.of(1001,1002,1021,1022));
         List<Integer> rhParamsInDataset = this.getParamsInDataSet(weatherData,List.of(3001,3002));
@@ -172,6 +173,7 @@ public class LeafWetnessCalculator implements IndiceCalculator{
             } 
             
             dataobj.put("Data",weatherdata);
+            //System.out.println(dataobj.toString(4));
             
             try{
             
