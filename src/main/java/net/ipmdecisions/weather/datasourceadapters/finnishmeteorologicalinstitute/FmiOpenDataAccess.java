@@ -36,7 +36,7 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 /**
- * 
+ * To see all stored queries in  opendata.fmi.fi: https://opendata.fmi.fi/wfs?service=WFS&version=2.0.0&request=describeStoredQueries& 
  * @author Markku Koistinen <markku.koistinen@luke.fi>
  * @author Tor-Einar Skog <tor-einar.skog@nibio.no>
  */
@@ -281,7 +281,7 @@ public class FmiOpenDataAccess {
     {
         try
         {
-            String URLTemplate = "http://opendata.fmi.fi/wfs?storedquery_id=fmi::forecast::hirlam::surface::point::multipointcoverage&latlon={0},{1}&request=getFeature&starttime={2}&parameters=Temperature,Humidity,WindSpeedMS,DewPoint,Precipitation1h,radiationglobal";
+            String URLTemplate = "http://opendata.fmi.fi/wfs?storedquery_id=fmi::forecast::harmonie::surface::point::multipointcoverage&latlon={0},{1}&request=getFeature&starttime={2}&parameters=Temperature,Humidity,WindSpeedMS,DewPoint,Precipitation1h,radiationglobal";
             // Get today at midnight, GMT time zone
             LocalDateTime todayAtMidnight = LocalDateTime.now().withHour(0).withMinute(0).withSecond(0);
             ZoneId UTCId = ZoneId.of("UTC");
