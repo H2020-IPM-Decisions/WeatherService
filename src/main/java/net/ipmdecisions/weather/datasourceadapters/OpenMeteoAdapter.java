@@ -36,12 +36,9 @@ import java.time.Instant;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import static java.util.Map.entry;
-import java.util.Set;
 import java.util.stream.Collectors;
 import net.ipmdecisions.weather.amalgamation.WeatherDataAggregationException;
 import net.ipmdecisions.weather.controller.AmalgamationBean;
@@ -286,7 +283,7 @@ public class OpenMeteoAdapter {
             //System.out.println(objectMapper.writeValueAsString(historicData));
             //System.out.println(objectMapper.writeValueAsString(forecastData));
             */
-            
+                        
             // As this.amalgamationBean.getFusionedWeatherData(...) performs time
             // capping, we use it to ensure correct length of data when only
             // using forecast data
