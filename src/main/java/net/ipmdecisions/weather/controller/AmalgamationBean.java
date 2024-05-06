@@ -77,6 +77,7 @@ public class AmalgamationBean {
 	// Interchangeable parameters (e.g. instantaneous and average temperatures)
 	// Temperature: 1001 (inst) - 1002 (avg) 
 	// Relative humidity: 3001 (inst) - 3002 (avg)
+	// Leaf wetness: 3103 (ground level) - 3101 (2m)
 	// Wind speed: 4002 (inst 2m) - 4003 (avg 2m) - 4012 (inst 10m) - 4013 (avg 10m)
 	// Used in  this.addFallbackParameters(WeatherData weatherData, Set<Integer> missingParameters)
 	private Map<Integer, List<Integer>> fallbackParams = Map.of(
@@ -84,6 +85,7 @@ public class AmalgamationBean {
 			1002, List.of(1001),
 			3001, List.of(3002),
 			3002, List.of(3001),
+			3103, List.of(3101),
 			4002, List.of(4003,4012,4013),
 			4003, List.of(4002,4013,4012),
 			4012, List.of(4013,4002,4003),
