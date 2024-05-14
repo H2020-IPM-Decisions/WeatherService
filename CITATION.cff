@@ -18,6 +18,9 @@ authors:
   - given-names: Markku
     family-names: Koistinen
     email: markku.koistinen@luke.fi
+  - given-names: Aleksi
+    family-names: Toivanen
+    email: aleksi.toivanen@luke.fi
 repository-code: 'https://github.com/H2020-IPM-Decisions/WeatherService'
 license: AGPL-3.0
 version: 2024-05
