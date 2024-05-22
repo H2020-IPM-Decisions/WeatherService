@@ -504,8 +504,8 @@ public class WeatherAdapterService {
         catch(DateTimeParseException ex)
         {
             
-            timeStartInstant = LocalDate.parse(timeStart, dtf).atStartOfDay(ZoneId.of("GMT+1")).toInstant();//.atZone().toInstant();
-            timeEndInstant = LocalDate.parse(timeEnd, dtf).atStartOfDay(ZoneId.of("GMT+1")).toInstant();//.atZone(ZoneId.of("Europe/Helsinki")).toInstant();     
+            timeStartInstant = LocalDate.parse(timeStart, dtf).atStartOfDay(tzForLocation).toInstant();
+            timeEndInstant = LocalDate.parse(timeEnd, dtf).atStartOfDay(tzForLocation).toInstant();
         }
         
         Boolean ignoreErrorsB = ignoreErrors != null ? ignoreErrors.equals("true") : false;

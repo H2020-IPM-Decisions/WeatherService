@@ -38,7 +38,7 @@ RUN cd $HOME \
 # Replace standalone.xml (the main WildFly config file)
 COPY ./wildfly_config/standalone.xml_${WILDFLY_VERSION} ${JBOSS_HOME}/standalone/configuration/standalone.xml  
 
-ENV APP_VERSION=1.1.0
+ENV APP_VERSION=1.1.1
 
 # copy only the artifacts we need from the first stage and discard the rest
 COPY --from=MAVEN_BUILD /target/IPMDecisionsWeatherService-$APP_VERSION.war /IPMDecisionsWeatherService-$APP_VERSION.war
