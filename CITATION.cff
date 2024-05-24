@@ -1,0 +1,27 @@
+# This CITATION.cff file was generated with cffinit.
+# Visit https://bit.ly/cffinit to generate yours today!
+
+cff-version: 1.2.0
+title: IPM Decisions Weather API
+message: >-
+  If you use this software, please cite it using the
+  metadata from this file.
+type: software
+authors:
+  - given-names: Tor-Einar
+    family-names: Skog
+    email: tor-einar.skog@nibio.no
+    name-particle: Tor-Einar
+  - given-names: Brita
+    family-names: Linnestad
+    email: brita.linnestad@nibio.no
+  - given-names: Markku
+    family-names: Koistinen
+    email: markku.koistinen@luke.fi
+  - given-names: Aleksi
+    family-names: Toivanen
+    email: aleksi.toivanen@luke.fi
+repository-code: 'https://github.com/H2020-IPM-Decisions/WeatherService'
+license: AGPL-3.0
+version: 2024-05
+date-released: '2024-05-13'
