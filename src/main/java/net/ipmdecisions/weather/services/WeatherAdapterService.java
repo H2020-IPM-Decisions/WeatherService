@@ -38,6 +38,7 @@ import java.util.stream.Collectors;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
+import javax.ws.rs.NotAuthorizedException;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
@@ -622,6 +623,10 @@ public class WeatherAdapterService {
         {
             ex.printStackTrace();
             return Response.serverError().entity(ex).build();
+        }
+        catch(NotAuthorizedException ex)
+        {
+            return Response.status(Status.UNAUTHORIZED).entity(ex.getMessage()).build();
         }
     }
     

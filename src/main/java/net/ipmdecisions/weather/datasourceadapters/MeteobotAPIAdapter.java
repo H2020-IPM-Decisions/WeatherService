@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.net.URLConnection;
+import java.net.HttpURLConnection;
 import java.text.MessageFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -33,6 +34,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TimeZone;
+
+import javax.ws.rs.NotAuthorizedException;
+
 import net.ipmdecisions.weather.entity.WeatherData;
 import net.ipmdecisions.weather.util.vips.VIPSWeatherObservation;
 import net.ipmdecisions.weather.util.vips.WeatherUtils;
@@ -79,15 +83,21 @@ public class MeteobotAPIAdapter {
         {"evapotranspiration", "DUMMY", "AVG"}
     };
 
-    public WeatherData getWeatherData(Integer stationID, String userName, String password, LocalDate startDate, LocalDate endDate) throws ParseWeatherDataException {
+    public WeatherData getWeatherData(Integer stationID, String userName, String password, LocalDate startDate, LocalDate endDate) throws ParseWeatherDataException, NotAuthorizedException {
         try {
             // First we get the location of the weather station
             String method = "Locate";
             URL meteobotURL = new URL(MessageFormat.format(MeteobotAPIAdapter.METEOS_URL_TEMPLATE, method, stationID, startDate, endDate));
-            URLConnection connection = meteobotURL.openConnection();
+            HttpURLConnection connection = (HttpURLConnection) meteobotURL.openConnection();
             String userpass = userName + ":" + password;
             String basicAuth = "Basic " + javax.xml.bind.DatatypeConverter.printBase64Binary(userpass.getBytes());
             connection.setRequestProperty("Authorization", basicAuth);
+            
+            int responseCode = connection.getResponseCode();
+            if(responseCode == 401) // Unauthorized
+            {
+                throw new NotAuthorizedException("Access denied by MeteoBot. Please check your credentials");
+            }
             BufferedReader in;
             in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
             String inputLine;
