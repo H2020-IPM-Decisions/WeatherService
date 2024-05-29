@@ -39,6 +39,8 @@ import java.util.stream.Collectors;
 import javax.xml.datatype.DatatypeConfigurationException;
 
 import org.joda.time.LocalDateTime;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 import net.ipmdecisions.weather.entity.LocationWeatherData;
 import net.ipmdecisions.weather.entity.WeatherData;
@@ -56,6 +58,8 @@ import net.ipmdecisions.weather.util.vips.WeatherUtils;
  *
  */
 public class SLULantMetAdapter {
+
+	private Logger LOGGER = LoggerFactory.getLogger(SLULantMetAdapter.class);
 	
 	/*
 	 * Parameters used
@@ -78,7 +82,11 @@ public class SLULantMetAdapter {
 			+ "&startDate=%s"
 			+ "&endDate=%s"
 			+ "&elementMeasurementTypeList=%s"
-			+ "&nDegrees=0&eDegrees=0";
+			+ "&nDegrees=0&eDegrees=0"
+			+ (System.getProperty("net.ipmdecisions.weatherservice.SLU_LANTMET_ADAPTER_CREDENTIALS_PARAMSTRING") != null ?
+				System.getProperty("net.ipmdecisions.weatherservice.SLU_LANTMET_ADAPTER_CREDENTIALS_PARAMSTRING")
+				: "")
+			;
 
 	// See the IPM Decisions parameters list for details
 	private Integer[] defaultParameters = {
@@ -153,7 +161,7 @@ public class SLULantMetAdapter {
                                         .filter(i->weatherUtils.getVIPSParameterId(i) != null)
                                         .map(i->weatherUtils.getVIPSParameterId(i)).collect(Collectors.joining(","))
 				));
-		//System.out.println(sluURL);
+		LOGGER.debug(sluURL.toString());
 		WeatherData result = weatherUtils.getWeatherDataFromVIPSWeatherObservations(sluURL, longitude, latitude, 0);
 		return result;
     }

@@ -452,6 +452,7 @@ public class WeatherAdapterService {
         }
         catch(DatatypeConfigurationException | IOException | WeatherDataSourceException ex)
         {
+            ex.printStackTrace();
             return Response.serverError().entity(ex.getMessage()).build();
         }
 
