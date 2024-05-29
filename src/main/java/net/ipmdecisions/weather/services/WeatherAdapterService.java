@@ -714,6 +714,10 @@ public class WeatherAdapterService {
         {
             return Response.serverError().entity(ex).build();
         }
+        catch(NotAuthorizedException ex)
+        {
+            return Response.status(Status.UNAUTHORIZED).entity(ex.getMessage()).build();
+        }
     }
     
     /**
