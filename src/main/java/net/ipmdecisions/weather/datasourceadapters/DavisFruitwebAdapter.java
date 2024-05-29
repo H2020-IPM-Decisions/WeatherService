@@ -22,6 +22,7 @@ package net.ipmdecisions.weather.datasourceadapters;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
 import java.net.URL;
 import java.text.MessageFormat;
 import java.text.ParseException;
@@ -35,6 +36,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.TimeZone;
 import java.util.stream.Collectors;
+
+import javax.ws.rs.NotAuthorizedException;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import net.ipmdecisions.weather.entity.WeatherData;
 import net.ipmdecisions.weather.util.vips.VIPSWeatherObservation;
 import net.ipmdecisions.weather.util.vips.WeatherUtils;
@@ -46,6 +53,8 @@ import net.ipmdecisions.weather.util.vips.WeatherUtils;
  * @author Tor-Einar Skog <tor-einar.skog@nibio.no>
  */
 public class DavisFruitwebAdapter {
+
+    private Logger LOGGER = LoggerFactory.getLogger(DavisFruitwebAdapter.class);
     
     private WeatherUtils wUtils;
     
@@ -100,9 +109,17 @@ public class DavisFruitwebAdapter {
         Map<Integer, Integer> elementOrdering = new HashMap<>();
         try {
             URL fruitwebDavisURL = new URL(MessageFormat.format(DavisFruitwebAdapter.FRUITWEB_URL_TEMPLATE, stationID,password,urlDFormat.format(startDate)));
-            //System.out.println(fruitwebDavisURL.toString());
+            LOGGER.debug(fruitwebDavisURL.toString());
+            HttpURLConnection connection = (HttpURLConnection) fruitwebDavisURL.openConnection();
+            
+            int responseCode = connection.getResponseCode();
+            if(responseCode == 401 || responseCode == 403) // Unauthorized or Forbidden
+            {
+                throw new NotAuthorizedException("Access denied by FruitWeb. Please check your credentials");
+            }
+
             BufferedReader in = new BufferedReader(
-            new InputStreamReader(fruitwebDavisURL.openStream()));
+            new InputStreamReader(connection.getInputStream()));
 
             String inputLine;
             Date testTimestamp;
