@@ -60,13 +60,15 @@ public class LeafWetnessCalculator implements IndiceCalculator {
         List<Integer> rhParamsInDataset = this.getParamsInDataSet(weatherData, List.of(3001, 3002));
         List<Integer> rrParamsInDataset = this.getParamsInDataSet(weatherData, List.of(2001));
         List<Integer> wsParamsInDataset = this.getParamsInDataSet(weatherData, List.of(4002, 4003));
-
+        
         if (rhParamsInDataset != null && tmParamsInDataset != null && rrParamsInDataset != null && wsParamsInDataset != null) {
             try {
                 weatherData = this.calculateFromLSTM(weatherData);
             } catch (IOException ex) {
-                java.util.logging.Logger.getLogger(LeafWetnessCalculator.class.getName()).log(Level.SEVERE, null, ex);
-            }
+                System.out.println("LSTM docker not running, ConstantRH is used for LWD-calculation");
+                weatherData = this.calculateFromConstantRH(weatherData);
+                //java.util.logging.Logger.getLogger(LeafWetnessCalculator.class.getName()).log(Level.SEVERE, null, ex);
+            }       
         } else {
             weatherData = this.calculateFromConstantRH(weatherData);
         }
@@ -84,7 +86,6 @@ public class LeafWetnessCalculator implements IndiceCalculator {
     public WeatherData calculateFromConstantRH(WeatherData weatherData) {
         //LOGGER.debug("Running calculateFromConstantRH");
         // Look for RH (3001, 3002)
-
         List<Integer> rhParamsInDataset = this.getParamsInDataSet(weatherData, List.of(3001, 3002));
 
         if (rhParamsInDataset != null && rhParamsInDataset.size() > 0) {
@@ -122,7 +123,7 @@ public class LeafWetnessCalculator implements IndiceCalculator {
      * @throws IOException 
      */
     public WeatherData calculateFromLSTM(WeatherData weatherData) throws IOException {
-
+        
         List<Integer> tmParamsInDataset = this.getParamsInDataSet(weatherData, List.of(1001, 1002, 1021, 1022));
         List<Integer> rhParamsInDataset = this.getParamsInDataSet(weatherData, List.of(3001, 3002));
         List<Integer> rrParamsInDataset = this.getParamsInDataSet(weatherData, List.of(2001));
@@ -133,7 +134,7 @@ public class LeafWetnessCalculator implements IndiceCalculator {
         Integer rrParamsIndex = weatherData.getParameterIndex(rrParamsInDataset.get(0));
         Integer wsParamsIndex = weatherData.getParameterIndex(wsParamsInDataset.get(0));
 
-        var nOfParams = 6;
+        var nOfParams = 7;
 
         for (LocationWeatherData lwd : weatherData.getLocationWeatherData()) {
             var oldData = lwd.getData();
@@ -152,10 +153,21 @@ public class LeafWetnessCalculator implements IndiceCalculator {
                 newData[row][2] = convertToFloat(oldData[row][rrParamsIndex]);
                 newData[row][3] = convertToFloat(oldData[row][wsParamsIndex]);
 
-                // Calcuate dew point temperature and BT_RH needed as input to the LSTM model
+                // Calcuate dew point temperature (DPD) needed as input to the LSTM model
                 newData[row][4] = convertToFloat(oldData[row][tmParamsIndex] - (oldData[row][tmParamsIndex] - (100 - oldData[row][rhParamsIndex]) / 5));
-                //newData[row][5]= convertToFloat(oldData[row][rhParamsIndex] >= 87.0 ? 1.0 : 0.0); 
-                newData[row][5] = (float) (newData[row][1] >= 87.0 ? 1.0 : 0.0);
+                
+                // Calculate VPD needed as input to the LSTM model
+                double TM = convertToFloat(oldData[row][tmParamsIndex]);
+                double TK = TK = TM + 273.15; 
+                double UM = convertToFloat(oldData[row][rhParamsIndex]);
+                
+                double logew = 10.79574 * (1 - 273.16/TK) - 5.02800 * Math.log10(TK / 273.16) + 1.50475e-4 * (1 - Math.pow(10, -8.2969 * (TK / 273.16 - 1))) + 0.42873e-3 * (Math.pow(10, 4.76955 * (1 - 273.16 / TK)) - 1) + 0.78614;
+                double ew = Math.pow(10, logew) / 10;
+                double Parp = UM * ew / 100;
+                newData[row][5] = (float) (ew - Parp);
+                
+                // Calculate BT_RR needed as input to the LSTM model
+                newData[row][6] = (float) (newData[row][2] > 0.2 ? 1.0 : 0.0);
 
                 //System.out.println(newData[row][1], newData[row][5]);
                 tmpdata.put("TM", newData[row][0]);
@@ -163,13 +175,14 @@ public class LeafWetnessCalculator implements IndiceCalculator {
                 tmpdata.put("RR", newData[row][2]);
                 tmpdata.put("FM2", newData[row][3]);
                 tmpdata.put("DPD", newData[row][4]);
-                tmpdata.put("BT_RH", newData[row][5]);
+                tmpdata.put("VPD", newData[row][5]);
+                tmpdata.put("BT_RR", newData[row][6]);
 
                 weatherdata.put(tmpdata);
             }
 
             dataobj.put("Data", weatherdata);
-            //System.out.println(dataobj.toString(4));
+            //System.out.println(dataobj.toString(7));
 
             try {
                 // TODO the LSTM model hostname and port should be configurable
@@ -181,11 +194,12 @@ public class LeafWetnessCalculator implements IndiceCalculator {
                 conn.setDoInput(true);
                 conn.setDoOutput(true);
                 conn.setRequestProperty("Content-Type", "application/json");
-
+                
                 try (PrintStream ps = new PrintStream(conn.getOutputStream())) {
                     ps.print(dataobj);
+                } catch (IOException e) {
                 }
-
+             
                 if (conn.getResponseCode() != 200) {
                     throw new RuntimeException("Failed : HTTP error code : "
                             + conn.getResponseCode());
@@ -197,7 +211,7 @@ public class LeafWetnessCalculator implements IndiceCalculator {
 
                 String output;
                 int[] BT = new int[oldData.length];
-
+              
                 while ((output = br.readLine()) != null) {
 
                     String cleanOutput = output.replaceAll("[\\D+\\.]", "");
@@ -224,17 +238,15 @@ public class LeafWetnessCalculator implements IndiceCalculator {
                     }
                 }
                 lwd.setData(addedData);
-
+                
+                // Add the missing parameter to end of parameter list in weather data
+                List<Integer> wpList = new ArrayList<>(Arrays.asList(weatherData.getWeatherParameters()));
+                wpList.add(3101);
+                weatherData.setWeatherParameters(wpList.toArray(new Integer[wpList.size()]));
+                
             } catch (MalformedURLException e) {
-            } catch (IOException e) {
-            }
+            }    
         }
-
-        // Add the missing parameter to end of parameter list in weather data
-        List<Integer> wpList = new ArrayList<>(Arrays.asList(weatherData.getWeatherParameters()));
-        wpList.add(3101);
-        weatherData.setWeatherParameters(wpList.toArray(new Integer[wpList.size()]));
-
         return weatherData;
 
     }
