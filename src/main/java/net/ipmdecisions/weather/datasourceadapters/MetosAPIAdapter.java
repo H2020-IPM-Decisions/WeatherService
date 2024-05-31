@@ -36,6 +36,8 @@ import java.util.List;
 import java.util.TimeZone;
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
+import javax.ws.rs.NotAuthorizedException;
+
 import net.ipmdecisions.weather.entity.WeatherData;
 import net.ipmdecisions.weather.util.vips.VIPSWeatherObservation;
 import net.ipmdecisions.weather.util.vips.WeatherElements;
@@ -53,6 +55,8 @@ import org.apache.http.conn.ssl.TrustStrategy;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.ssl.SSLContextBuilder;
 import org.apache.http.util.EntityUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * 
@@ -63,6 +67,9 @@ import org.apache.http.util.EntityUtils;
  * @author Tor-Einar Skog <tor-einar.skog@nibio.no>
  */
 public class MetosAPIAdapter {
+
+private static Logger LOGGER = LoggerFactory.getLogger(MetosAPIAdapter.class);
+
     private WeatherUtils wUtils;
     
     public MetosAPIAdapter(){
@@ -199,7 +206,12 @@ public class MetosAPIAdapter {
 
             HttpResponse response = client.execute(request);
             HttpEntity entity = response.getEntity();
-            //System.out.println(response.getStatusLine());
+            LOGGER.debug(String.valueOf(response.getStatusLine().getStatusCode()));
+
+            if(response.getStatusLine().getStatusCode() == 401)
+            {
+                throw new NotAuthorizedException("Access denied by Metos FieldClimate. Please check your credentials");
+            }
 
             //EntityUtils.consume(entity);
             String responseString = EntityUtils.toString(entity, "UTF-8");
@@ -228,7 +240,7 @@ public class MetosAPIAdapter {
         }
     }
     
-    private JsonNode getStationInfo(String stationId,String publicKey, String privateKey) throws IOException, GeneralSecurityException
+    private JsonNode getStationInfo(String stationId,String publicKey, String privateKey) throws IOException, GeneralSecurityException, NotAuthorizedException
     {
             SSLContextBuilder builder = new SSLContextBuilder();
             builder.loadTrustMaterial(null, new TrustStrategy() {
@@ -262,7 +274,13 @@ public class MetosAPIAdapter {
 
             HttpResponse response = client.execute(request);
             HttpEntity entity = response.getEntity();
-            //System.out.println("TZ:" + response.getStatusLine());
+
+            if(response.getStatusLine().getStatusCode() == 401)
+            {
+                throw new NotAuthorizedException("Access denied by Metos FieldClimate. Please check your credentials");
+            }
+
+            LOGGER.debug(String.valueOf(response.getStatusLine().getStatusCode()));
 
             //EntityUtils.consume(entity);
             String responseString = EntityUtils.toString(entity, "UTF-8");

@@ -16,11 +16,12 @@ sudo docker build --tag ipmdecisions/weather_api:ALPHA-04 .
 To run it locally (assuming that you've set up your web server locally with ipmdlocaldocker as hostname):
 
 ``` bash
-sudo docker run --publish 18081:8080 --detach -e WEATHER_API_URL=http://localhost:8080/WeatherService -e BEARER_TOKEN_fr_meteo-concept_api=***YOUR AUTHTOKEN HERE*** --name ipmweather ipmdecisions/weather_api:ALPHA-04
+sudo docker run --publish 18081:8080 --detach -e WEATHER_API_URL=http://localhost:8080/WeatherService -e BEARER_TOKEN_fr_meteo-concept_api=***YOUR AUTHTOKEN HERE*** -e 'SLU_LANTMET_ADAPTER_CREDENTIALS_PARAMSTRING=***YOUR CREDENTIALS PARAMSTRING HERE***' --name ipmweather ipmdecisions/weather_api:***YOUR VERSION***
 ```
 
 If you skip the `WEATHER_API_URL` config parameter, it will be set to the default (`https://platform.ipmdecisions.net`)
-If you skip the `BEARER_TOKEN_fr.meteo-concept.api`, then calls to the MeteoConcept weather station network in France will fail
+If you skip the `BEARER_TOKEN_fr.meteo-concept.api` calls to the MeteoConcept weather station network in France will fail
+If you skip the `SLU_LANTMET_ADAPTER_CREDENTIALS_PARAMSTRING` calls to the Swedish LantMet weatherstation network will fail
 
 Test it with Postman (url = [http://localhost:18081/WeatherService](http://localhost:18081/WeatherService)). If the tests run OK, then you can proceed to push the image. If not, you need to rebuild the image:
 
