@@ -158,7 +158,7 @@ public class LeafWetnessCalculator implements IndiceCalculator {
                 
                 // Calculate VPD needed as input to the LSTM model
                 double TM = convertToFloat(oldData[row][tmParamsIndex]);
-                double TK = TK = TM + 273.15; 
+                double TK = TM + 273.15; 
                 double UM = convertToFloat(oldData[row][rhParamsIndex]);
                 
                 double logew = 10.79574 * (1 - 273.16/TK) - 5.02800 * Math.log10(TK / 273.16) + 1.50475e-4 * (1 - Math.pow(10, -8.2969 * (TK / 273.16 - 1))) + 0.42873e-3 * (Math.pow(10, 4.76955 * (1 - 273.16 / TK)) - 1) + 0.78614;
