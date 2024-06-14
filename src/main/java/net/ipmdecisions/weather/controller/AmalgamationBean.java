@@ -343,7 +343,14 @@ public class AmalgamationBean {
 			}
 			for(; i < fusionedWDParams.size() + newParams.size(); i++)
 			{
-				newQC[i] = currentLWD.getQC()[currentWD.getParameterIndex(fusionedWD.getWeatherParameters()[i])];
+				if(currentLWD.getQC() != null && currentLWD.getQC().length > 0)
+				{
+					newQC[i] = currentLWD.getQC()[currentWD.getParameterIndex(fusionedWD.getWeatherParameters()[i])];
+				}
+				else
+				{
+					newQC[i] = 0;
+				}
 				newAmalgamation[i] = fusionedLWD.getAmalgamation()[currentWD.getParameterIndex(fusionedWD.getWeatherParameters()[i])];
 			}
 			fusionedLWD.setQC(newQC);
