@@ -84,7 +84,7 @@ public class AmalgamationBeanTest {
     	public void setMetaDataBean(MetaDataBean bean)
     	{
     		this.metaDataBean = bean;
-    	}
+    	}    
     }
     
     @Test

@@ -58,4 +58,4 @@ EXPOSE 8080
 
 # Set the default command to run on boot
 # This will boot WildFly in the standalone mode and bind to all interfaces
-CMD /opt/jboss/wildfly/bin/standalone.sh -b 0.0.0.0 -Dnet.ipmdecisions.weatherservice.COUNTRY_BOUNDARIES_FILE=/countries.geojson -Dnet.ipmdecisions.weatherservice.WEATHER_API_URL=${WEATHER_API_URL} -Dnet.ipmdecisions.weatherservice.BEARER_TOKEN_fr.meteo-concept.api=${BEARER_TOKEN_fr_meteo-concept_api} -Dnet.ipmdecisions.weatherservice.SLU_LANTMET_ADAPTER_CREDENTIALS_PARAMSTRING=${SLU_LANTMET_ADAPTER_CREDENTIALS_PARAMSTRING}
+CMD /opt/jboss/wildfly/bin/standalone.sh -b 0.0.0.0 -Dnet.ipmdecisions.weatherservice.COUNTRY_BOUNDARIES_FILE=/countries.geojson -Dnet.ipmdecisions.weatherservice.WEATHER_API_URL=${WEATHER_API_URL} -Dnet.ipmdecisions.weatherservice.BEARER_TOKEN_fr.meteo-concept.api=${BEARER_TOKEN_fr_meteo-concept_api} -Dnet.ipmdecisions.weatherservice.SLU_LANTMET_ADAPTER_CREDENTIALS_PARAMSTRING=${SLU_LANTMET_ADAPTER_CREDENTIALS_PARAMSTRING} -Dnet.ipmdecisions.weatherservice.LWD_LSTM_HOSTNAME=${LWD_LSTM_HOSTNAME}
