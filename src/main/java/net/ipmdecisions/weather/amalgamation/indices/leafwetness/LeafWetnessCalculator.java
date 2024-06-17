@@ -64,16 +64,18 @@ public class LeafWetnessCalculator implements IndiceCalculator {
 
     @Override
     public WeatherData calculateIndice(WeatherData weatherData, Integer weatherParameter) {
-        // TODO: Check available source parameters in the weather data object
-        // Based on this: Select the preferred method.
-        // Currently (June 2022) we only have one, then constant RH method
 
         List<Integer> tmParamsInDataset = this.getParamsInDataSet(weatherData, List.of(1001, 1002, 1021, 1022));
         List<Integer> rhParamsInDataset = this.getParamsInDataSet(weatherData, List.of(3001, 3002));
         List<Integer> rrParamsInDataset = this.getParamsInDataSet(weatherData, List.of(2001));
         List<Integer> wsParamsInDataset = this.getParamsInDataSet(weatherData, List.of(4002, 4003));
         
-        if (rhParamsInDataset != null && tmParamsInDataset != null && rrParamsInDataset != null && wsParamsInDataset != null) {
+        // Have we got RH, temp, rainfall and wind speed? If so: use the LWD LSTM method
+        if (rhParamsInDataset != null && !rhParamsInDataset.isEmpty() 
+            && tmParamsInDataset != null && !tmParamsInDataset.isEmpty()
+            && rrParamsInDataset != null && !rrParamsInDataset.isEmpty()
+            && wsParamsInDataset != null && !wsParamsInDataset.isEmpty()) 
+        {
             try {
                 weatherData = this.calculateFromLSTM(weatherData);
             } catch (IOException | NullPointerException ex) {
@@ -81,7 +83,8 @@ public class LeafWetnessCalculator implements IndiceCalculator {
                 weatherData = this.calculateFromConstantRH(weatherData);
                 //java.util.logging.Logger.getLogger(LeafWetnessCalculator.class.getName()).log(Level.SEVERE, null, ex);
             }       
-        } else {
+        } // If not: Use the simple constant RH method 
+        else {
             weatherData = this.calculateFromConstantRH(weatherData);
         }
 
