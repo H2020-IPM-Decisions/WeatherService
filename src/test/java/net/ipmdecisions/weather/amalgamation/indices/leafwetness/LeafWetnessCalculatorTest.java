@@ -128,11 +128,26 @@ public class LeafWetnessCalculatorTest {
                 for (LocationWeatherData lwd : result.getLocationWeatherData()) {
                     Double[] bt = lwd.getColumn(result.getParameterIndex(3101));
                     testLWD(bt);
-            }
+                }
                 
             } catch (IOException ex) {
                 System.out.println("LSTM docker not reachable, LSTM calculation not tested. Reason: " + ex.getMessage()); 
             }    
+
+            weatherDataJson = fileUtils.getStringFromFileInApp("/lwd_testdata_2.json");
+            weatherData = oMapper.readValue(weatherDataJson, WeatherData.class);
+            try {
+                // Can this be mocked or fixed in CI/CD?
+                System.setProperty("net.ipmdecisions.weatherservice.LWD_LSTM_HOSTNAME", "http://localhost:5000");
+                WeatherData result = instance.calculateFromLSTM(weatherData);
+                for (LocationWeatherData lwd : result.getLocationWeatherData()) {
+                    Double[] bt = lwd.getColumn(result.getParameterIndex(3101));
+                    testLWD(bt);
+                }
+
+            } catch (IOException ex) {
+                System.out.println("LSTM docker not reachable, LSTM calculation not tested. Reason: " + ex.getMessage()); 
+            }   
         }
         catch(IOException ex)
         {

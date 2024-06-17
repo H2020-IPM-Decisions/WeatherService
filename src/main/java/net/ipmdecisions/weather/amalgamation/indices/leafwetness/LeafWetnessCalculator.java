@@ -77,9 +77,11 @@ public class LeafWetnessCalculator implements IndiceCalculator {
             && wsParamsInDataset != null && !wsParamsInDataset.isEmpty()) 
         {
             try {
+                //System.out.println(this.objectMapper.writeValueAsString(weatherData));
                 weatherData = this.calculateFromLSTM(weatherData);
+                LOGGER.debug("Calculationg LWD using the LSTM model!");
             } catch (IOException | NullPointerException ex) {
-                System.out.println("LSTM docker not reachable, ConstantRH is used for LWD-calculation");
+                LOGGER.debug("LSTM docker not reachable, ConstantRH is used for LWD-calculation");
                 weatherData = this.calculateFromConstantRH(weatherData);
                 //java.util.logging.Logger.getLogger(LeafWetnessCalculator.class.getName()).log(Level.SEVERE, null, ex);
             }       
