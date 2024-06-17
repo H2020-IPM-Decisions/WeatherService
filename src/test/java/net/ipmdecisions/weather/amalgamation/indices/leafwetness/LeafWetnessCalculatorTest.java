@@ -6,7 +6,11 @@ package net.ipmdecisions.weather.amalgamation.indices.leafwetness;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -107,10 +111,19 @@ public class LeafWetnessCalculatorTest {
             FileUtils fileUtils = new FileUtils();
             String weatherDataJson = fileUtils.getStringFromFileInApp("/lmt_weatherdata_missing_lwd.json");
             ObjectMapper oMapper = new ObjectMapper();
+            new ObjectMapper().configure(
+                           SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
+            JavaTimeModule javaTimeModule =  new JavaTimeModule();
+            oMapper.registerModule(javaTimeModule);
+            oMapper.setDateFormat(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX"));
             WeatherData weatherData = oMapper.readValue(weatherDataJson, WeatherData.class);
             LeafWetnessCalculator instance = new LeafWetnessCalculator();
             
+            //System.out.println(oMapper.writeValueAsString(weatherData));
+
             try {
+                // Can this be mocked or fixed in CI/CD?
+                System.setProperty("net.ipmdecisions.weatherservice.LWD_LSTM_HOSTNAME", "http://localhost:5000");
                 WeatherData result = instance.calculateFromLSTM(weatherData);
                 for (LocationWeatherData lwd : result.getLocationWeatherData()) {
                     Double[] bt = lwd.getColumn(result.getParameterIndex(3101));
@@ -118,7 +131,7 @@ public class LeafWetnessCalculatorTest {
             }
                 
             } catch (IOException ex) {
-                System.out.println("LSTM docker not running, LSTM calculation not tested"); 
+                System.out.println("LSTM docker not reachable, LSTM calculation not tested. Reason: " + ex.getMessage()); 
             }    
         }
         catch(IOException ex)

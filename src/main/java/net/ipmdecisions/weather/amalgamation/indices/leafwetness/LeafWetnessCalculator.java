@@ -19,7 +19,8 @@
 package net.ipmdecisions.weather.amalgamation.indices.leafwetness;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import java.io.IOException;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -31,6 +32,7 @@ import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.text.SimpleDateFormat;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,11 +46,21 @@ import org.json.JSONObject;
 /**
  *
  * @author Tor-Einar Skog <tor-einar.skog@nibio.no>
+ * @author Brita Linnestad <brita.linnestad@nibio.no>
  *
  */
 public class LeafWetnessCalculator implements IndiceCalculator {
 
     private static Logger LOGGER = LoggerFactory.getLogger(LeafWetnessCalculator.class);
+    private final ObjectMapper objectMapper = new ObjectMapper();
+
+    public LeafWetnessCalculator()
+    {
+        this.objectMapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
+        JavaTimeModule javaTimeModule =  new JavaTimeModule();
+        this.objectMapper.registerModule(javaTimeModule);
+        this.objectMapper.setDateFormat(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX"));
+    }
 
     @Override
     public WeatherData calculateIndice(WeatherData weatherData, Integer weatherParameter) {
@@ -64,8 +76,8 @@ public class LeafWetnessCalculator implements IndiceCalculator {
         if (rhParamsInDataset != null && tmParamsInDataset != null && rrParamsInDataset != null && wsParamsInDataset != null) {
             try {
                 weatherData = this.calculateFromLSTM(weatherData);
-            } catch (IOException ex) {
-                System.out.println("LSTM docker not running, ConstantRH is used for LWD-calculation");
+            } catch (IOException | NullPointerException ex) {
+                System.out.println("LSTM docker not reachable, ConstantRH is used for LWD-calculation");
                 weatherData = this.calculateFromConstantRH(weatherData);
                 //java.util.logging.Logger.getLogger(LeafWetnessCalculator.class.getName()).log(Level.SEVERE, null, ex);
             }       
@@ -122,7 +134,10 @@ public class LeafWetnessCalculator implements IndiceCalculator {
      * @return
      * @throws IOException 
      */
-    public WeatherData calculateFromLSTM(WeatherData weatherData) throws IOException {
+    public WeatherData calculateFromLSTM(WeatherData weatherData) throws MalformedURLException, NullPointerException, IOException {
+
+
+        //System.out.println(oMapper.writeValueAsString(weatherData));
         
         List<Integer> tmParamsInDataset = this.getParamsInDataSet(weatherData, List.of(1001, 1002, 1021, 1022));
         List<Integer> rhParamsInDataset = this.getParamsInDataSet(weatherData, List.of(3001, 3002));
@@ -181,71 +196,67 @@ public class LeafWetnessCalculator implements IndiceCalculator {
                 weatherdata.put(tmpdata);
             }
 
+            
             dataobj.put("Data", weatherdata);
-            //System.out.println(dataobj.toString(7));
 
-            try {
-                // TODO the LSTM model hostname and port should be configurable
-                // (And in Docker it should probably be delivered not by the Flask dev 
-                // web server, but rather by ngninx/wsgi or similar)
-                URL url = new URL("http://localhost:5000/runLSTM");
-                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-                conn.setRequestMethod("POST");
-                conn.setDoInput(true);
-                conn.setDoOutput(true);
-                conn.setRequestProperty("Content-Type", "application/json");
-                
-                try (PrintStream ps = new PrintStream(conn.getOutputStream())) {
-                    ps.print(dataobj);
-                } catch (IOException e) {
-                }
-             
-                if (conn.getResponseCode() != 200) {
-                    throw new RuntimeException("Failed : HTTP error code : "
-                            + conn.getResponseCode());
-                } else {
-                }
+            //System.out.println(dataobj.toString());
 
-                BufferedReader br = new BufferedReader(new InputStreamReader(
-                        (conn.getInputStream())));
+            URL url = new URL(System.getProperty("net.ipmdecisions.weatherservice.LWD_LSTM_HOSTNAME") + "/runLSTM");
+            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            conn.setRequestMethod("POST");
+            conn.setDoInput(true);
+            conn.setDoOutput(true);
+            conn.setRequestProperty("Content-Type", "application/json");
+            
+            try (PrintStream ps = new PrintStream(conn.getOutputStream())) {
+                ps.print(dataobj);
+            } catch (IOException e) {
+            }
+            
+            if (conn.getResponseCode() != 200) {
+                throw new RuntimeException("Failed : HTTP error code : "
+                        + conn.getResponseCode());
+            } else {
+            }
 
-                String output;
-                int[] BT = new int[oldData.length];
-              
-                while ((output = br.readLine()) != null) {
+            BufferedReader br = new BufferedReader(new InputStreamReader(
+                    (conn.getInputStream())));
 
-                    String cleanOutput = output.replaceAll("[\\D+\\.]", "");
+            String output;
+            int[] BT = new int[oldData.length];
+            
+            while ((output = br.readLine()) != null) {
 
-                    for (int i = 0; i < cleanOutput.length(); i++) {
-                        BT[i] = Integer.parseInt(String.valueOf(cleanOutput.charAt(i)));
-                    }
+                String cleanOutput = output.replaceAll("[\\D+\\.]", "");
 
+                for (int i = 0; i < cleanOutput.length(); i++) {
+                    BT[i] = Integer.parseInt(String.valueOf(cleanOutput.charAt(i)));
                 }
 
-                conn.disconnect();
+            }
 
-                Double[][] addedData = new Double[oldData.length][oldData[0].length + 1];
+            conn.disconnect();
 
-                for (int row = 0; row < oldData.length; row++) {
-                    for (int col = 0; col < addedData[0].length; col++) {
-                        // Old data are copied
-                        if (col < oldData[0].length) {
-                            addedData[row][col] = oldData[row][col];
-                        } else // Column for LW based on RH
-                        {
-                            addedData[row][col] = BT[row] >= 1 ? 60.0 : 0.0;
-                        }
+            Double[][] addedData = new Double[oldData.length][oldData[0].length + 1];
+
+            for (int row = 0; row < oldData.length; row++) {
+                for (int col = 0; col < addedData[0].length; col++) {
+                    // Old data are copied
+                    if (col < oldData[0].length) {
+                        addedData[row][col] = oldData[row][col];
+                    } else // Column for LW based on RH
+                    {
+                        addedData[row][col] = BT[row] >= 1 ? 60.0 : 0.0;
                     }
                 }
-                lwd.setData(addedData);
+            }
+            lwd.setData(addedData);
+            
+            // Add the missing parameter to end of parameter list in weather data
+            List<Integer> wpList = new ArrayList<>(Arrays.asList(weatherData.getWeatherParameters()));
+            wpList.add(3101);
+            weatherData.setWeatherParameters(wpList.toArray(new Integer[wpList.size()]));
                 
-                // Add the missing parameter to end of parameter list in weather data
-                List<Integer> wpList = new ArrayList<>(Arrays.asList(weatherData.getWeatherParameters()));
-                wpList.add(3101);
-                weatherData.setWeatherParameters(wpList.toArray(new Integer[wpList.size()]));
-                
-            } catch (MalformedURLException e) {
-            }    
         }
         return weatherData;
 
