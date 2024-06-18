@@ -161,11 +161,16 @@ public class LeafWetnessCalculator implements IndiceCalculator {
 
             float[][] newData = new float[oldData.length][nOfParams];
 
-            JSONArray weatherdata = new JSONArray();
+            JSONArray LSTMweatherdata = new JSONArray();
             JSONObject dataobj = new JSONObject();
-
-            for (int row = 0; row < oldData.length; row++) {
-
+            
+            // The LSTM model needs sequences of 24 hour of data as input. 
+            // Use the LSTM model to calculate the LWD for main part of the weather data 
+            // The last part of the data set (< 24 hours) will use ConstantRH model 
+            int nOfRows = (int) Math.floor((oldData.length)/24) * 24;
+            
+            for (int row = 0; row < nOfRows; row++) {
+                
                 JSONObject tmpdata = new JSONObject();
                 // Create an 3D array that consist of TM, UM, RR, WS, DPD, BT_RH
                 newData[row][0] = convertToFloat(oldData[row][tmParamsIndex]);
@@ -198,15 +203,16 @@ public class LeafWetnessCalculator implements IndiceCalculator {
                 tmpdata.put("VPD", newData[row][5]);
                 tmpdata.put("BT_RR", newData[row][6]);
 
-                weatherdata.put(tmpdata);
+                LSTMweatherdata.put(tmpdata);
             }
-
             
-            dataobj.put("Data", weatherdata);
+                       
+            dataobj.put("Data", LSTMweatherdata);
 
             //System.out.println(dataobj.toString());
 
-            URL url = new URL(System.getProperty("net.ipmdecisions.weatherservice.LWD_LSTM_HOSTNAME") + "/runLSTM");
+            //URL url = new URL(System.getProperty("net.ipmdecisions.weatherservice.LWD_LSTM_HOSTNAME") + "/runLSTM");
+            URL url = new URL("http://localhost:5000/runLSTM");
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
             conn.setRequestMethod("POST");
             conn.setDoInput(true);
@@ -228,20 +234,33 @@ public class LeafWetnessCalculator implements IndiceCalculator {
                     (conn.getInputStream())));
 
             String output;
-            int[] BT = new int[oldData.length];
+            
+            // BT calculted in the LSTM model fetched here
+            int[] BTLSTM = new int[nOfRows];
             
             while ((output = br.readLine()) != null) {
 
                 String cleanOutput = output.replaceAll("[\\D+\\.]", "");
 
                 for (int i = 0; i < cleanOutput.length(); i++) {
-                    BT[i] = Integer.parseInt(String.valueOf(cleanOutput.charAt(i)));
+                    BTLSTM[i] = Integer.parseInt(String.valueOf(cleanOutput.charAt(i)));
                 }
 
             }
 
             conn.disconnect();
-
+            
+            //If we have weather data that doesn't add up in 24 hours sequnces, the BT for the last hours are
+            //calculated here using the constantRH method
+            
+            int[] BT = new int[oldData.length];
+            
+            System.arraycopy(BTLSTM, 0, BT, 0, nOfRows);
+            
+            for (int row = nOfRows; row < oldData.length; row++) {
+                BT[row] =  convertToFloat(oldData[row][rhParamsIndex]) >= 87.0 ? 1 : 0;
+            }
+            
             Double[][] addedData = new Double[oldData.length][oldData[0].length + 1];
 
             for (int row = 0; row < oldData.length; row++) {
@@ -249,7 +268,7 @@ public class LeafWetnessCalculator implements IndiceCalculator {
                     // Old data are copied
                     if (col < oldData[0].length) {
                         addedData[row][col] = oldData[row][col];
-                    } else // Column for LW based on RH
+                    } else 
                     {
                         addedData[row][col] = BT[row] >= 1 ? 60.0 : 0.0;
                     }
