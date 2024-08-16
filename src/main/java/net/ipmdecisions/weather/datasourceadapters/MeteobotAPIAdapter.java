@@ -88,6 +88,7 @@ public class MeteobotAPIAdapter {
             // First we get the location of the weather station
             String method = "Locate";
             URL meteobotURL = new URL(MessageFormat.format(MeteobotAPIAdapter.METEOS_URL_TEMPLATE, method, stationID, startDate, endDate));
+            LOGGER.debug(meteobotURL.toString());
             HttpURLConnection connection = (HttpURLConnection) meteobotURL.openConnection();
             String userpass = userName + ":" + password;
             String basicAuth = "Basic " + javax.xml.bind.DatatypeConverter.printBase64Binary(userpass.getBytes());
