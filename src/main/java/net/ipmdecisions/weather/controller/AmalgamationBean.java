@@ -455,7 +455,7 @@ public class AmalgamationBean {
 		Set<Integer> rhParams = Set.of(3001,3002,3003);
 		if(inputParameters.retainAll(rhParams))
 		{
-			retVal.add(3101);
+			retVal.addAll(this.getInterchangeableParameters(3101));
 		}
 		return retVal;
 	}
