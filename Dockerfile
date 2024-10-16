@@ -1,13 +1,13 @@
 # the first stage of our build will use a maven 3.6 parent image
 FROM maven:3.8-openjdk-17 AS MAVEN_BUILD
- 
+
 # copy the pom and src code to the container
 COPY ./ ./
- 
+
 # package our application code
 RUN mvn clean install
 
-RUN git clone --single-branch --branch master https://github.com/datasets/geo-countries.git
+RUN git clone --single-branch --branch main https://github.com/datasets/geo-countries.git
 
 # Used this as a template: https://github.com/jboss-dockerfiles/wildfly/blob/master/Dockerfile 
 # Use latest jboss/base-jdk:11 image as the base
