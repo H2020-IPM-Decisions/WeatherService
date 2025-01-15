@@ -33,7 +33,7 @@
         <dependency>
             <groupId>org.jboss.resteasy</groupId>
             <artifactId>resteasy-core</artifactId>
-            <version>4.7.2.Final</version>
+            <version>4.7.8.Final</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
