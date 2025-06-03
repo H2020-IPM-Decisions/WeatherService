@@ -59,7 +59,7 @@ public class MeteobotAPIAdapter {
 
     private final WeatherUtils weatherUtils;
 
-    public final static String METEOS_URL_TEMPLATE = "https://export.meteobot.com/v1/Generic/{0}?id={1,number,#}&startdate={2}&enddate={3}&timeFormat=iso-8601";
+    public final static String METEOS_URL_TEMPLATE = "https://export.meteobot.com/v2/Generic/{0}?id={1,number,#}&startdate={2}&enddate={3}&timeFormat=iso-8601";
 
     private final static String[][] elementMeasurementTypes = {
         {"airTemperature", "TM", "AVG"},
