@@ -145,6 +145,7 @@ public class OpenMeteoAdapter {
     // Parameter mapping
     private final Map<Integer, String> ipmToOpenMeteoRequestHourly = Map.ofEntries(
             entry(1001, "temperature_2m"), // Only hourly
+            entry(1002, "temperature_2m"), // Only hourly
             entry(1901, "dew_point_2m"), // Only hourly
             entry(2001, "precipitation"), // Hourly. Daily = precipitation_sum
             entry(3001, "relative_humidity_2m"),// Only hourly
@@ -162,6 +163,7 @@ public class OpenMeteoAdapter {
     
     private final Map<Integer, OpenMeteoParameter> ipmToOpenMeteoResponseHourly = Map.ofEntries(
             entry(1001, new OpenMeteoParameter(Variable.temperature, 2)), 
+            entry(1002, new OpenMeteoParameter(Variable.temperature, 2)), 
             entry(1901, new OpenMeteoParameter(Variable.dew_point,2)),
             entry(2001, new OpenMeteoParameter(Variable.precipitation)),
             entry(3001, new OpenMeteoParameter(Variable.relative_humidity,2)),
