@@ -28,7 +28,7 @@ import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import javax.ejb.Stateless;
+import javax.enterprise.context.ApplicationScoped;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -41,7 +41,7 @@ import net.ipmdecisions.weather.entity.WeatherParameter;
  * @author Tor-Einar Skog <tor-einar.skog@nibio.no>
  *
  */
-@Stateless
+@ApplicationScoped
 public class MetaDataBean {
 	
 	private List<WeatherParameter> weatherParameterList;

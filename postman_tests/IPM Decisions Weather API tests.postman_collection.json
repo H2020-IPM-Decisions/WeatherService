@@ -4,7 +4,8 @@
 		"name": "IPM Decisions Weather API tests",
 		"description": "This is the test suite for the IPM Decisions Weather API",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-		"_exporter_id": "5789128"
+		"_exporter_id": "5789128",
+		"_collection_link": "https://grey-eclipse-463120.postman.co/workspace/My-Workspace~6b58be42-cd43-40ed-8053-51ab1d8655fb/collection/5789128-3febfc92-66df-4e6f-9626-609621038503?action=share&source=collection_link&creator=5789128"
 	},
 	"item": [
 		{
@@ -244,7 +245,9 @@
 									"    });",
 									"});"
 								],
-								"type": "text/javascript"
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
 							}
 						}
 					],
@@ -292,14 +295,15 @@
 							]
 						},
 						"url": {
-							"raw": "{{wx_url}}/rest/weatheradapter/davisfruitweb",
+							"raw": "{{wx_url}}/rest/weatheradapter/davisfruitweb/",
 							"host": [
 								"{{wx_url}}"
 							],
 							"path": [
 								"rest",
 								"weatheradapter",
-								"davisfruitweb"
+								"davisfruitweb",
+								""
 							],
 							"query": [
 								{
@@ -360,7 +364,9 @@
 									"    });",
 									"});"
 								],
-								"type": "text/javascript"
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
 							}
 						}
 					],
@@ -408,14 +414,15 @@
 							]
 						},
 						"url": {
-							"raw": "{{wx_url}}/rest/weatheradapter/meteobot",
+							"raw": "{{wx_url}}/rest/weatheradapter/meteobot/",
 							"host": [
 								"{{wx_url}}"
 							],
 							"path": [
 								"rest",
 								"weatheradapter",
-								"meteobot"
+								"meteobot",
+								""
 							],
 							"query": [
 								{
@@ -479,7 +486,119 @@
 									"    });",
 									"}"
 								],
-								"type": "text/javascript"
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "weatherStationId",
+									"value": "000012DE",
+									"type": "text"
+								},
+								{
+									"key": "interval",
+									"value": "3600",
+									"type": "text"
+								},
+								{
+									"key": "ignoreErrors",
+									"value": "true",
+									"type": "text"
+								},
+								{
+									"key": "timeStart",
+									"value": "2025-01-01",
+									"type": "text"
+								},
+								{
+									"key": "timeEnd",
+									"value": "2025-01-10",
+									"type": "text"
+								},
+								{
+									"key": "parameters",
+									"value": "1002,3002",
+									"type": "text"
+								},
+								{
+									"key": "credentials",
+									"value": "{\"userName\":\"c511e7d5ddcafe7d49941a016d897f2425c852cba7436cc3\",\"password\":\"3fda3e0ce8c6c768d48b80ace10e544ab282b3965345d81e\"}",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{wx_url}}/rest/weatheradapter/metos",
+							"host": [
+								"{{wx_url}}"
+							],
+							"path": [
+								"rest",
+								"weatheradapter",
+								"metos"
+							],
+							"query": [
+								{
+									"key": "weatherStationId",
+									"value": "18150029",
+									"disabled": true
+								},
+								{
+									"key": "interval",
+									"value": "3600",
+									"disabled": true
+								},
+								{
+									"key": "ignoreErrors",
+									"value": "true",
+									"disabled": true
+								},
+								{
+									"key": "timeStart",
+									"value": "2020-06-12",
+									"disabled": true
+								},
+								{
+									"key": "timeEnd",
+									"value": "2020-07-03",
+									"disabled": true
+								},
+								{
+									"key": "parameters",
+									"value": "1002,3002",
+									"disabled": true
+								},
+								{
+									"key": "credentials",
+									"value": "{\"username\":\"3138313530303239\",\"password\":\"Y3Nw_48aNe4y1Z0Wj\"}",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Metos (FieldClimate) Unauthorized",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 401 (Unauthorized)\", function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([401]);",
+									"});",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
 							}
 						}
 					],
@@ -521,7 +640,7 @@
 								},
 								{
 									"key": "credentials",
-									"value": "{\"userName\":\"c511e7d5ddcafe7d49941a016d897f2425c852cba7436cc3\",\"password\":\"3fda3e0ce8c6c768d48b80ace10e544ab282b3965345d81e\"}",
+									"value": "{\"userName\":\"FooBar\",\"password\":\"ACME\"}",
 									"type": "text"
 								}
 							]
@@ -927,22 +1046,16 @@
 									"    });",
 									"});"
 								],
-								"type": "text/javascript"
+								"type": "text/javascript",
+								"packages": {}
 							}
 						}
 					],
-					"protocolProfileBehavior": {
-						"disableBodyPruning": true
-					},
 					"request": {
 						"method": "GET",
 						"header": [],
-						"body": {
-							"mode": "urlencoded",
-							"urlencoded": []
-						},
 						"url": {
-							"raw": "{{wx_url}}/rest/weatheradapter/lantmet?longitude=17.3907&latitude=59.7156&interval=3600&ignoreErrors=true&timeStart=2023-04-01&timeEnd=2023-10-25&parameters=3101,3002,2001",
+							"raw": "{{wx_url}}/rest/weatheradapter/lantmet?longitude=17.3907&latitude=59.7156&interval=3600&ignoreErrors=true&timeStart=2025-03-01&timeEnd=2025-06-01&parameters=3101,3002,2001",
 							"host": [
 								"{{wx_url}}"
 							],
@@ -970,11 +1083,11 @@
 								},
 								{
 									"key": "timeStart",
-									"value": "2023-04-01"
+									"value": "2025-03-01"
 								},
 								{
 									"key": "timeEnd",
-									"value": "2023-10-25"
+									"value": "2025-06-01"
 								},
 								{
 									"key": "parameters",
@@ -986,7 +1099,7 @@
 					"response": []
 				},
 				{
-					"name": "Open-Meteo hourly data",
+					"name": "Open-Meteo current hourly data",
 					"event": [
 						{
 							"listen": "test",
@@ -1009,7 +1122,8 @@
 									"    pm.expect(weatherdata.locationWeatherData[0].length).to.eql(168);",
 									"});"
 								],
-								"type": "text/javascript"
+								"type": "text/javascript",
+								"packages": {}
 							}
 						},
 						{
@@ -1022,7 +1136,8 @@
 									"pm.request.url.query.add({key: 'timeStart', value: timeStart});",
 									"pm.request.url.query.add({key: 'timeEnd', value: timeEnd});"
 								],
-								"type": "text/javascript"
+								"type": "text/javascript",
+								"packages": {}
 							}
 						}
 					],
@@ -1037,7 +1152,108 @@
 							"urlencoded": []
 						},
 						"url": {
-							"raw": "{{wx_url}}/rest/weatheradapter/openmeteo?longitude=17.3907&latitude=59.7156&interval=3600&ignoreErrors=true",
+							"raw": "{{wx_url}}/rest/weatheradapter/openmeteo?longitude=10&latitude=65&interval=3600&ignoreErrors=true&parameters=1002,3101,3002,2001",
+							"host": [
+								"{{wx_url}}"
+							],
+							"path": [
+								"rest",
+								"weatheradapter",
+								"openmeteo"
+							],
+							"query": [
+								{
+									"key": "longitude",
+									"value": "10"
+								},
+								{
+									"key": "latitude",
+									"value": "65"
+								},
+								{
+									"key": "interval",
+									"value": "3600"
+								},
+								{
+									"key": "ignoreErrors",
+									"value": "true"
+								},
+								{
+									"key": "timeStart",
+									"value": "2023-04-01",
+									"description": "See pre-request script",
+									"disabled": true
+								},
+								{
+									"key": "timeEnd",
+									"value": "",
+									"description": "See pre-request script",
+									"disabled": true
+								},
+								{
+									"key": "parameters",
+									"value": "1002,3101,3002,2001"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Open-Meteo fixed hourly data",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.sendRequest(pm.environment.get(\"wx_url\") + \"/rest/schema/weatherdata\",function(err,res){",
+									"    pm.test(\"Data is valid WeatherData\", function(){",
+									"        var schema = res.json();",
+									"        pm.expect(tv4.validate(pm.response.json(), schema)).to.be.true;",
+									"    });",
+									"    ",
+									"});",
+									"",
+									"pm.test(\"Data has correct length\", function(){",
+									"    let weatherdata = pm.response.json();",
+									"    pm.expect(weatherdata.locationWeatherData[0].length).to.eql(168);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"var moment = require('moment');",
+									"var timeStart =moment().add(-3,'days').format('YYYY-MM-DD'); ",
+									"var timeEnd = moment().add(3,'days').format('YYYY-MM-DD');",
+									"pm.request.url.query.add({key: 'timeStart', value: timeStart});",
+									"pm.request.url.query.add({key: 'timeEnd', value: timeEnd});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": []
+						},
+						"url": {
+							"raw": "{{wx_url}}/rest/weatheradapter/openmeteo?longitude=17.3907&latitude=59.7156&interval=3600&ignoreErrors=true&timeStart=2025-04-12&timeEnd=2025-04-14&parameters=1002",
 							"host": [
 								"{{wx_url}}"
 							],
@@ -1065,20 +1281,17 @@
 								},
 								{
 									"key": "timeStart",
-									"value": "2023-04-01",
-									"description": "See pre-request script",
-									"disabled": true
+									"value": "2025-04-12",
+									"description": "See pre-request script"
 								},
 								{
 									"key": "timeEnd",
-									"value": "",
-									"description": "See pre-request script",
-									"disabled": true
+									"value": "2025-04-14",
+									"description": "See pre-request script"
 								},
 								{
 									"key": "parameters",
-									"value": "3101,3002,2001",
-									"disabled": true
+									"value": "1002"
 								}
 							]
 						}
@@ -1989,7 +2202,8 @@
 									"    pm.response.to.have.status(200);",
 									"});"
 								],
-								"type": "text/javascript"
+								"type": "text/javascript",
+								"packages": {}
 							}
 						}
 					],
@@ -2006,7 +2220,7 @@
 							}
 						},
 						"url": {
-							"raw": "{{wx_url}}/rest/amalgamation/amalgamate/private?longitude=10.8303&latitude=59.6473&timeStart=2024-01-25&timeEnd=2024-01-28&interval=3600&parameters=2001,1002,3002",
+							"raw": "{{wx_url}}/rest/amalgamation/amalgamate/private?longitude=10.8303&latitude=59.6473&timeStart=2024-01-25&timeEnd=2024-01-28&interval=3600&parameters=2001,1002,3002,5001",
 							"host": [
 								"{{wx_url}}"
 							],
@@ -2039,7 +2253,76 @@
 								},
 								{
 									"key": "parameters",
-									"value": "2001,1002,3002"
+									"value": "2001,1002,3002,5001"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Amalgamation with private station (MeteoBot test in Bjørkelangen, NOR)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"weatherSourceId\": \"com.meteobot\",\n    \"weatherStationId\": \"18150030\",\n    \"weatherStationReference\":\"My main weather source\",\n    \"userName\":\"3138313530303330\",\n    \"password\":\"Sm0q476z_2n8Ejao5\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{wx_url}}/rest/amalgamation/amalgamate/private?longitude=11.541258&latitude=59.873537&timeStart=2024-01-25&timeEnd=2024-01-28&interval=3600&parameters=2001,1002,3002,5001",
+							"host": [
+								"{{wx_url}}"
+							],
+							"path": [
+								"rest",
+								"amalgamation",
+								"amalgamate",
+								"private"
+							],
+							"query": [
+								{
+									"key": "longitude",
+									"value": "11.541258"
+								},
+								{
+									"key": "latitude",
+									"value": "59.873537"
+								},
+								{
+									"key": "timeStart",
+									"value": "2024-01-25"
+								},
+								{
+									"key": "timeEnd",
+									"value": "2024-01-28"
+								},
+								{
+									"key": "interval",
+									"value": "3600"
+								},
+								{
+									"key": "parameters",
+									"value": "2001,1002,3002,5001"
 								}
 							]
 						}
@@ -2261,7 +2544,8 @@
 									"    pm.response.to.have.status(200);",
 									"});"
 								],
-								"type": "text/javascript"
+								"type": "text/javascript",
+								"packages": {}
 							}
 						}
 					],
@@ -2269,7 +2553,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{wx_url}}/rest/amalgamation/amalgamate?longitude=-3.11369&latitude=48.3939&timeStart=2023-01-01&timeEnd=2023-01-31&interval=3600&parameters=2001,1002,3002,3101",
+							"raw": "{{wx_url}}/rest/amalgamation/amalgamate?longitude=-3.11369&latitude=48.3939&timeStart=2024-01-01&timeEnd=2024-01-31&interval=3600&parameters=2001,1002,3002,3101",
 							"host": [
 								"{{wx_url}}"
 							],
@@ -2289,11 +2573,11 @@
 								},
 								{
 									"key": "timeStart",
-									"value": "2023-01-01"
+									"value": "2024-01-01"
 								},
 								{
 									"key": "timeEnd",
-									"value": "2023-01-31"
+									"value": "2024-01-31"
 								},
 								{
 									"key": "interval",
@@ -2421,6 +2705,77 @@
 								{
 									"key": "parameters",
 									"value": "1002"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Amalgamation test leaf wetness ground level fallback parameter",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Only one parameter is returned\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.weatherParameters.length).to.equal(1);",
+									"});",
+									"",
+									"pm.test(\"Param 3103 is returned\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.weatherParameters.indexOf(3103)).greaterThan(-1);",
+									"});",
+									"",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{wx_url}}/rest/amalgamation/amalgamate?longitude=6.17485&latitude=60.36428&timeStart=2024-05-01&timeEnd=2024-05-23&interval=3600&parameters=3103",
+							"host": [
+								"{{wx_url}}"
+							],
+							"path": [
+								"rest",
+								"amalgamation",
+								"amalgamate"
+							],
+							"query": [
+								{
+									"key": "longitude",
+									"value": "6.17485"
+								},
+								{
+									"key": "latitude",
+									"value": "60.36428"
+								},
+								{
+									"key": "timeStart",
+									"value": "2024-05-01"
+								},
+								{
+									"key": "timeEnd",
+									"value": "2024-05-23"
+								},
+								{
+									"key": "interval",
+									"value": "3600"
+								},
+								{
+									"key": "parameters",
+									"value": "3103"
 								}
 							]
 						}
@@ -2590,7 +2945,8 @@
 									"",
 									""
 								],
-								"type": "text/javascript"
+								"type": "text/javascript",
+								"packages": {}
 							}
 						}
 					],
@@ -2598,7 +2954,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{wx_url}}/rest/amalgamation/amalgamate?longitude=10.961&latitude=56.109&timeStart=2024-01-01&timeEnd=2024-01-23&interval=3600&parameters=3101",
+							"raw": "{{wx_url}}/rest/amalgamation/amalgamate?longitude=11.582&latitude=59.886&timeStart=2024-06-01&timeEnd=2024-06-05&interval=3600&parameters=3101",
 							"host": [
 								"{{wx_url}}"
 							],
@@ -2610,19 +2966,19 @@
 							"query": [
 								{
 									"key": "longitude",
-									"value": "10.961"
+									"value": "11.582"
 								},
 								{
 									"key": "latitude",
-									"value": "56.109"
+									"value": "59.886"
 								},
 								{
 									"key": "timeStart",
-									"value": "2024-01-01"
+									"value": "2024-06-01"
 								},
 								{
 									"key": "timeEnd",
-									"value": "2024-01-23"
+									"value": "2024-06-05"
 								},
 								{
 									"key": "interval",

@@ -1,0 +1,1224 @@
+From e75d68a25122148787057a80913b5032f00fcc15 Mon Sep 17 00:00:00 2001
+From: Jack Bindin <jack.bindin@nibio.no>
+Date: Wed, 15 Oct 2025 13:47:52 +0200
+Subject: [PATCH] migrating from wildfly to quarkus
+
+---
+ Dockerfile                                    |  54 +--
+ pom.xml                                       |  96 ++--
+ ... Weather API tests.postman_collection.json | 438 ++++++++++++++++--
+ .../amalgamation/indices/IndicesBean.java     |   4 +-
+ .../weather/controller/AmalgamationBean.java  |  14 +-
+ .../weather/controller/MetaDataBean.java      |   4 +-
+ .../controller/WeatherDataSourceBean.java     |   4 +-
+ .../weather/services/AmalgamationService.java |  12 +-
+ .../weather/services/JAXActivator.java        | 102 ----
+ .../services/WeatherAdapterService.java       |   4 +-
+ .../services/WeatherDataSourceService.java    |  10 +-
+ src/main/webapp/WEB-INF/web.xml               |  20 -
+ 12 files changed, 481 insertions(+), 281 deletions(-)
+ delete mode 100644 src/main/java/net/ipmdecisions/weather/services/JAXActivator.java
+ delete mode 100644 src/main/webapp/WEB-INF/web.xml
+
+diff --git a/Dockerfile b/Dockerfile
+index aa16bb1..9c348b9 100644
+--- a/Dockerfile
++++ b/Dockerfile
+@@ -1,61 +1,37 @@
+-# the first stage of our build will use a maven 3.6 parent image
+ FROM maven:3.8-openjdk-17 AS MAVEN_BUILD
+-
+-# copy the pom and src code to the container
+ COPY ./ ./
+-
+-# package our application code
+-RUN mvn clean install
+-
++RUN mvn clean install -DskipTests
+ RUN git clone --single-branch --branch main https://github.com/datasets/geo-countries.git
+ 
+-# Used this as a template: https://github.com/jboss-dockerfiles/wildfly/blob/master/Dockerfile 
+-# Use latest jboss/base-jdk:11 image as the base
+ FROM eclipse-temurin:17-jammy
+ 
+-
+-RUN groupadd -r jboss -g 1000 && useradd -u 1000 -r -g jboss -m -d /opt/jboss -s /sbin/nologin -c "JBoss user" jboss && \
++RUN groupadd -r jboss -g 1000 && useradd -u 1000 -r -g jboss -m -d /opt/jboss -s /sbin/nologin -c "App user" jboss && \
+     chmod 755 /opt/jboss
+ 
+-# Set the WILDFLY_VERSION env variable
+-ENV WILDFLY_VERSION 26.1.3.Final
+-ENV WILDFLY_SHA1 b9f52ba41df890e09bb141d72947d2510caf758c
+-ENV JBOSS_HOME /opt/jboss/wildfly
+-
+ USER root
+ 
+-# Add the WildFly distribution to /opt, and make wildfly the owner of the extracted tar content
+-# Make sure the distribution is available from a well-known place
+-RUN cd $HOME \
+-    && curl -O -L https://github.com/wildfly/wildfly/releases/download/$WILDFLY_VERSION/wildfly-$WILDFLY_VERSION.tar.gz \
+-    && sha1sum wildfly-$WILDFLY_VERSION.tar.gz | grep $WILDFLY_SHA1 \
+-    && tar xf wildfly-$WILDFLY_VERSION.tar.gz \
+-    && mv $HOME/wildfly-$WILDFLY_VERSION $JBOSS_HOME \
+-    && rm wildfly-$WILDFLY_VERSION.tar.gz \
+-    && chown -R jboss:0 ${JBOSS_HOME} \
+-    && chmod -R g+rw ${JBOSS_HOME}
++RUN mkdir -p /opt/app
++COPY --from=MAVEN_BUILD /target/quarkus-app/lib/ /opt/app/lib/
++COPY --from=MAVEN_BUILD /target/quarkus-app/*.jar /opt/app/
++COPY --from=MAVEN_BUILD /target/quarkus-app/app/ /opt/app/app/
++COPY --from=MAVEN_BUILD /target/quarkus-app/quarkus/ /opt/app/quarkus/
+ 
+-# Replace standalone.xml (the main WildFly config file)
+-COPY ./wildfly_config/standalone.xml_${WILDFLY_VERSION} ${JBOSS_HOME}/standalone/configuration/standalone.xml  
+-
+-ENV APP_VERSION=1.1.1
+-
+-# copy only the artifacts we need from the first stage and discard the rest
+ COPY --from=MAVEN_BUILD /target/IPMDecisionsWeatherService-$APP_VERSION.war /IPMDecisionsWeatherService-$APP_VERSION.war
+ COPY --from=MAVEN_BUILD /geo-countries/data/countries.geojson /countries.geojson
+-RUN ln -s /IPMDecisionsWeatherService-$APP_VERSION.war ${JBOSS_HOME}/standalone/deployments/IPMDecisionsWeatherService.war
+ 
+-# Ensure signals are forwarded to the JVM process correctly for graceful shutdown
++ENV APP_VERSION=1.1.1
+ ENV LAUNCH_JBOSS_IN_BACKGROUND true
+ 
+ USER jboss
+ 
+-# Increase RAM for WildFly
+ ENV JBOSS_JAVA_SIZING="-Xms256m -Xmx8192m -XX:MetaspaceSize=96M -XX:MaxMetaspaceSize=4096M"
+ 
+-# Expose the ports we're interested in
+ EXPOSE 8080
+ 
+-# Set the default command to run on boot
+-# This will boot WildFly in the standalone mode and bind to all interfaces
+-CMD /opt/jboss/wildfly/bin/standalone.sh -b 0.0.0.0 -Dnet.ipmdecisions.weatherservice.COUNTRY_BOUNDARIES_FILE=/countries.geojson -Dnet.ipmdecisions.weatherservice.WEATHER_API_URL=${WEATHER_API_URL} -Dnet.ipmdecisions.weatherservice.BEARER_TOKEN_fr.meteo-concept.api=${BEARER_TOKEN_fr_meteo-concept_api} -Dnet.ipmdecisions.weatherservice.SLU_LANTMET_ADAPTER_CREDENTIALS_PARAMSTRING=${SLU_LANTMET_ADAPTER_CREDENTIALS_PARAMSTRING} -Dnet.ipmdecisions.weatherservice.LWD_LSTM_HOSTNAME=${LWD_LSTM_HOSTNAME}
++CMD java $JBOSS_JAVA_SIZING \
++  -Dnet.ipmdecisions.weatherservice.COUNTRY_BOUNDARIES_FILE=/countries.geojson \
++  -Dnet.ipmdecisions.weatherservice.WEATHER_API_URL=${WEATHER_API_URL} \
++  -Dnet.ipmdecisions.weatherservice.BEARER_TOKEN_fr.meteo-concept.api=${BEARER_TOKEN_fr_meteo-concept_api} \
++  -Dnet.ipmdecisions.weatherservice.SLU_LANTMET_ADAPTER_CREDENTIALS_PARAMSTRING=${SLU_LANTMET_ADAPTER_CREDENTIALS_PARAMSTRING} \
++  -Dnet.ipmdecisions.weatherservice.LWD_LSTM_HOSTNAME=${LWD_LSTM_HOSTNAME} \
++  -jar /opt/app/quarkus-run.jar
+diff --git a/pom.xml b/pom.xml
+index b40ec2e..dbf6af2 100644
+--- a/pom.xml
++++ b/pom.xml
+@@ -5,7 +5,7 @@
+     <groupId>net.ipmdecisions</groupId>
+     <artifactId>IPMDecisionsWeatherService</artifactId>
+     <version>1.1.1</version>
+-    <packaging>war</packaging>
++    <packaging>jar</packaging>
+ 
+     <name>IPM Decisions Weather Service</name>
+     
+@@ -20,7 +20,23 @@
+     <properties>
+         <endorsed.dir>${project.build.directory}/endorsed</endorsed.dir>
+         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
++        <maven.compiler.release>17</maven.compiler.release>
++        <quarkus.platform.group-id>io.quarkus.platform</quarkus.platform.group-id>
++        <quarkus.platform.artifact-id>quarkus-bom</quarkus.platform.artifact-id>
++        <quarkus.platform.version>2.16.11.Final</quarkus.platform.version>
+     </properties>
++
++    <dependencyManagement>
++        <dependencies>
++            <dependency>
++                <groupId>${quarkus.platform.group-id}</groupId>
++                <artifactId>${quarkus.platform.artifact-id}</artifactId>
++                <version>${quarkus.platform.version}</version>
++                <type>pom</type>
++                <scope>import</scope>
++            </dependency>
++        </dependencies>
++    </dependencyManagement>
+     <repositories>
+     <repository>
+       <id>github</id>
+@@ -31,10 +47,25 @@
+     
+     <dependencies>
+         <dependency>
+-            <groupId>org.jboss.resteasy</groupId>
+-            <artifactId>resteasy-core</artifactId>
+-            <version>4.7.2.Final</version>
+-            <scope>provided</scope>
++            <groupId>io.quarkus</groupId>
++            <artifactId>quarkus-arc</artifactId>
++        </dependency>
++        <dependency>
++            <groupId>io.quarkus</groupId>
++            <artifactId>quarkus-resteasy-jackson</artifactId>
++        </dependency>
++        <dependency>
++            <groupId>io.quarkus</groupId>
++            <artifactId>quarkus-jsonb</artifactId>
++        </dependency>
++        <dependency>
++            <groupId>io.quarkus</groupId>
++            <artifactId>quarkus-undertow</artifactId>
++        </dependency>
++        <dependency>
++            <groupId>com.squareup.okio</groupId>
++            <artifactId>okio</artifactId>
++            <version>3.7.0</version>
+         </dependency>
+         <dependency>
+             <groupId>com.fasterxml.jackson.core</groupId>
+@@ -100,12 +131,6 @@
+             <version>2.3.3</version>
+             <type>jar</type>
+         </dependency>
+-        <dependency>
+-            <groupId>javax</groupId>
+-            <artifactId>javaee-web-api</artifactId>
+-            <version>8.0.1</version>
+-            <scope>provided</scope>
+-        </dependency>
+         <!-- Don't upgrade Enunciate until we've refactored from javax.* to jakarta.* -->
+         <dependency>
+             <groupId>com.webcohesion.enunciate</groupId>
+@@ -178,52 +203,17 @@
+                 </configuration>
+             </plugin>
+             <plugin>
+-                <groupId>org.apache.maven.plugins</groupId>
+-                <artifactId>maven-war-plugin</artifactId>
+-                <version>3.4.0</version>
+-                <configuration>
+-                    <failOnMissingWebXml>false</failOnMissingWebXml>
+-                </configuration>
+-            </plugin>
+-            <plugin>
+-                <groupId>org.apache.maven.plugins</groupId>
+-                <artifactId>maven-dependency-plugin</artifactId>
+-                <version>2.6</version>
+-                <executions>
+-                    <execution>
+-                        <phase>validate</phase>
+-                        <goals>
+-                            <goal>copy</goal>
+-                        </goals>
+-                        <configuration>
+-                            <outputDirectory>${endorsed.dir}</outputDirectory>
+-                            <silent>true</silent>
+-                            <artifactItems>
+-                                <artifactItem>
+-                                    <groupId>javax</groupId>
+-                                    <artifactId>javaee-endorsed-api</artifactId>
+-                                    <version>7.0</version>
+-                                    <type>jar</type>
+-                                </artifactItem>
+-                            </artifactItems>
+-                        </configuration>
+-                    </execution>
+-                </executions>
+-            </plugin>
+-            <plugin>
+-                <groupId>com.webcohesion.enunciate</groupId>
+-                <artifactId>enunciate-maven-plugin</artifactId>
+-                <!-- Don't upgrade Enunciate until we've refactored from javax.* to jakarta.* -->
+-                <version>2.15.1</version>
++                <groupId>io.quarkus</groupId>
++                <artifactId>quarkus-maven-plugin</artifactId>
++                <version>${quarkus.platform.version}</version>
++                <extensions>true</extensions>
+                 <executions>
+                     <execution>
+                         <goals>
+-                            <!--goal>assemble</goal-->
+-                            <goal>docs</goal>
++                            <goal>build</goal>
++                            <goal>generate-code</goal>
++                            <goal>generate-code-tests</goal>
+                         </goals>
+-                        <configuration>
+-                            <docsDir>${project.build.directory}/${project.build.finalName}</docsDir>
+-                        </configuration>
+                     </execution>
+                 </executions>
+             </plugin>
+diff --git a/postman_tests/IPM Decisions Weather API tests.postman_collection.json b/postman_tests/IPM Decisions Weather API tests.postman_collection.json
+index 8125480..2080d3a 100644
+--- a/postman_tests/IPM Decisions Weather API tests.postman_collection.json	
++++ b/postman_tests/IPM Decisions Weather API tests.postman_collection.json	
+@@ -4,7 +4,8 @@
+ 		"name": "IPM Decisions Weather API tests",
+ 		"description": "This is the test suite for the IPM Decisions Weather API",
+ 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+-		"_exporter_id": "5789128"
++		"_exporter_id": "5789128",
++		"_collection_link": "https://grey-eclipse-463120.postman.co/workspace/My-Workspace~6b58be42-cd43-40ed-8053-51ab1d8655fb/collection/5789128-3febfc92-66df-4e6f-9626-609621038503?action=share&source=collection_link&creator=5789128"
+ 	},
+ 	"item": [
+ 		{
+@@ -244,7 +245,9 @@
+ 									"    });",
+ 									"});"
+ 								],
+-								"type": "text/javascript"
++								"type": "text/javascript",
++								"packages": {},
++								"requests": {}
+ 							}
+ 						}
+ 					],
+@@ -292,14 +295,15 @@
+ 							]
+ 						},
+ 						"url": {
+-							"raw": "{{wx_url}}/rest/weatheradapter/davisfruitweb",
++							"raw": "{{wx_url}}/rest/weatheradapter/davisfruitweb/",
+ 							"host": [
+ 								"{{wx_url}}"
+ 							],
+ 							"path": [
+ 								"rest",
+ 								"weatheradapter",
+-								"davisfruitweb"
++								"davisfruitweb",
++								""
+ 							],
+ 							"query": [
+ 								{
+@@ -360,7 +364,9 @@
+ 									"    });",
+ 									"});"
+ 								],
+-								"type": "text/javascript"
++								"type": "text/javascript",
++								"packages": {},
++								"requests": {}
+ 							}
+ 						}
+ 					],
+@@ -408,14 +414,15 @@
+ 							]
+ 						},
+ 						"url": {
+-							"raw": "{{wx_url}}/rest/weatheradapter/meteobot",
++							"raw": "{{wx_url}}/rest/weatheradapter/meteobot/",
+ 							"host": [
+ 								"{{wx_url}}"
+ 							],
+ 							"path": [
+ 								"rest",
+ 								"weatheradapter",
+-								"meteobot"
++								"meteobot",
++								""
+ 							],
+ 							"query": [
+ 								{
+@@ -479,7 +486,119 @@
+ 									"    });",
+ 									"}"
+ 								],
+-								"type": "text/javascript"
++								"type": "text/javascript",
++								"packages": {}
++							}
++						}
++					],
++					"request": {
++						"method": "POST",
++						"header": [],
++						"body": {
++							"mode": "urlencoded",
++							"urlencoded": [
++								{
++									"key": "weatherStationId",
++									"value": "000012DE",
++									"type": "text"
++								},
++								{
++									"key": "interval",
++									"value": "3600",
++									"type": "text"
++								},
++								{
++									"key": "ignoreErrors",
++									"value": "true",
++									"type": "text"
++								},
++								{
++									"key": "timeStart",
++									"value": "2025-01-01",
++									"type": "text"
++								},
++								{
++									"key": "timeEnd",
++									"value": "2025-01-10",
++									"type": "text"
++								},
++								{
++									"key": "parameters",
++									"value": "1002,3002",
++									"type": "text"
++								},
++								{
++									"key": "credentials",
++									"value": "{\"userName\":\"c511e7d5ddcafe7d49941a016d897f2425c852cba7436cc3\",\"password\":\"3fda3e0ce8c6c768d48b80ace10e544ab282b3965345d81e\"}",
++									"type": "text"
++								}
++							]
++						},
++						"url": {
++							"raw": "{{wx_url}}/rest/weatheradapter/metos",
++							"host": [
++								"{{wx_url}}"
++							],
++							"path": [
++								"rest",
++								"weatheradapter",
++								"metos"
++							],
++							"query": [
++								{
++									"key": "weatherStationId",
++									"value": "18150029",
++									"disabled": true
++								},
++								{
++									"key": "interval",
++									"value": "3600",
++									"disabled": true
++								},
++								{
++									"key": "ignoreErrors",
++									"value": "true",
++									"disabled": true
++								},
++								{
++									"key": "timeStart",
++									"value": "2020-06-12",
++									"disabled": true
++								},
++								{
++									"key": "timeEnd",
++									"value": "2020-07-03",
++									"disabled": true
++								},
++								{
++									"key": "parameters",
++									"value": "1002,3002",
++									"disabled": true
++								},
++								{
++									"key": "credentials",
++									"value": "{\"username\":\"3138313530303239\",\"password\":\"Y3Nw_48aNe4y1Z0Wj\"}",
++									"disabled": true
++								}
++							]
++						}
++					},
++					"response": []
++				},
++				{
++					"name": "Metos (FieldClimate) Unauthorized",
++					"event": [
++						{
++							"listen": "test",
++							"script": {
++								"exec": [
++									"pm.test(\"Status code is 401 (Unauthorized)\", function () {",
++									"    pm.expect(pm.response.code).to.be.oneOf([401]);",
++									"});",
++									""
++								],
++								"type": "text/javascript",
++								"packages": {}
+ 							}
+ 						}
+ 					],
+@@ -521,7 +640,7 @@
+ 								},
+ 								{
+ 									"key": "credentials",
+-									"value": "{\"userName\":\"c511e7d5ddcafe7d49941a016d897f2425c852cba7436cc3\",\"password\":\"3fda3e0ce8c6c768d48b80ace10e544ab282b3965345d81e\"}",
++									"value": "{\"userName\":\"FooBar\",\"password\":\"ACME\"}",
+ 									"type": "text"
+ 								}
+ 							]
+@@ -927,22 +1046,16 @@
+ 									"    });",
+ 									"});"
+ 								],
+-								"type": "text/javascript"
++								"type": "text/javascript",
++								"packages": {}
+ 							}
+ 						}
+ 					],
+-					"protocolProfileBehavior": {
+-						"disableBodyPruning": true
+-					},
+ 					"request": {
+ 						"method": "GET",
+ 						"header": [],
+-						"body": {
+-							"mode": "urlencoded",
+-							"urlencoded": []
+-						},
+ 						"url": {
+-							"raw": "{{wx_url}}/rest/weatheradapter/lantmet?longitude=17.3907&latitude=59.7156&interval=3600&ignoreErrors=true&timeStart=2023-04-01&timeEnd=2023-10-25&parameters=3101,3002,2001",
++							"raw": "{{wx_url}}/rest/weatheradapter/lantmet?longitude=17.3907&latitude=59.7156&interval=3600&ignoreErrors=true&timeStart=2025-03-01&timeEnd=2025-06-01&parameters=3101,3002,2001",
+ 							"host": [
+ 								"{{wx_url}}"
+ 							],
+@@ -970,11 +1083,11 @@
+ 								},
+ 								{
+ 									"key": "timeStart",
+-									"value": "2023-04-01"
++									"value": "2025-03-01"
+ 								},
+ 								{
+ 									"key": "timeEnd",
+-									"value": "2023-10-25"
++									"value": "2025-06-01"
+ 								},
+ 								{
+ 									"key": "parameters",
+@@ -986,7 +1099,7 @@
+ 					"response": []
+ 				},
+ 				{
+-					"name": "Open-Meteo hourly data",
++					"name": "Open-Meteo current hourly data",
+ 					"event": [
+ 						{
+ 							"listen": "test",
+@@ -1009,7 +1122,8 @@
+ 									"    pm.expect(weatherdata.locationWeatherData[0].length).to.eql(168);",
+ 									"});"
+ 								],
+-								"type": "text/javascript"
++								"type": "text/javascript",
++								"packages": {}
+ 							}
+ 						},
+ 						{
+@@ -1022,7 +1136,8 @@
+ 									"pm.request.url.query.add({key: 'timeStart', value: timeStart});",
+ 									"pm.request.url.query.add({key: 'timeEnd', value: timeEnd});"
+ 								],
+-								"type": "text/javascript"
++								"type": "text/javascript",
++								"packages": {}
+ 							}
+ 						}
+ 					],
+@@ -1037,7 +1152,7 @@
+ 							"urlencoded": []
+ 						},
+ 						"url": {
+-							"raw": "{{wx_url}}/rest/weatheradapter/openmeteo?longitude=17.3907&latitude=59.7156&interval=3600&ignoreErrors=true",
++							"raw": "{{wx_url}}/rest/weatheradapter/openmeteo?longitude=10&latitude=65&interval=3600&ignoreErrors=true&parameters=1002,3101,3002,2001",
+ 							"host": [
+ 								"{{wx_url}}"
+ 							],
+@@ -1049,11 +1164,11 @@
+ 							"query": [
+ 								{
+ 									"key": "longitude",
+-									"value": "17.3907"
++									"value": "10"
+ 								},
+ 								{
+ 									"key": "latitude",
+-									"value": "59.7156"
++									"value": "65"
+ 								},
+ 								{
+ 									"key": "interval",
+@@ -1077,8 +1192,106 @@
+ 								},
+ 								{
+ 									"key": "parameters",
+-									"value": "3101,3002,2001",
+-									"disabled": true
++									"value": "1002,3101,3002,2001"
++								}
++							]
++						}
++					},
++					"response": []
++				},
++				{
++					"name": "Open-Meteo fixed hourly data",
++					"event": [
++						{
++							"listen": "test",
++							"script": {
++								"exec": [
++									"pm.test(\"Status code is 200\", function () {",
++									"    pm.response.to.have.status(200);",
++									"});",
++									"",
++									"pm.sendRequest(pm.environment.get(\"wx_url\") + \"/rest/schema/weatherdata\",function(err,res){",
++									"    pm.test(\"Data is valid WeatherData\", function(){",
++									"        var schema = res.json();",
++									"        pm.expect(tv4.validate(pm.response.json(), schema)).to.be.true;",
++									"    });",
++									"    ",
++									"});",
++									"",
++									"pm.test(\"Data has correct length\", function(){",
++									"    let weatherdata = pm.response.json();",
++									"    pm.expect(weatherdata.locationWeatherData[0].length).to.eql(168);",
++									"});"
++								],
++								"type": "text/javascript",
++								"packages": {}
++							}
++						},
++						{
++							"listen": "prerequest",
++							"script": {
++								"exec": [
++									"var moment = require('moment');",
++									"var timeStart =moment().add(-3,'days').format('YYYY-MM-DD'); ",
++									"var timeEnd = moment().add(3,'days').format('YYYY-MM-DD');",
++									"pm.request.url.query.add({key: 'timeStart', value: timeStart});",
++									"pm.request.url.query.add({key: 'timeEnd', value: timeEnd});"
++								],
++								"type": "text/javascript",
++								"packages": {}
++							}
++						}
++					],
++					"protocolProfileBehavior": {
++						"disableBodyPruning": true
++					},
++					"request": {
++						"method": "GET",
++						"header": [],
++						"body": {
++							"mode": "urlencoded",
++							"urlencoded": []
++						},
++						"url": {
++							"raw": "{{wx_url}}/rest/weatheradapter/openmeteo?longitude=17.3907&latitude=59.7156&interval=3600&ignoreErrors=true&timeStart=2025-04-12&timeEnd=2025-04-14&parameters=1002",
++							"host": [
++								"{{wx_url}}"
++							],
++							"path": [
++								"rest",
++								"weatheradapter",
++								"openmeteo"
++							],
++							"query": [
++								{
++									"key": "longitude",
++									"value": "17.3907"
++								},
++								{
++									"key": "latitude",
++									"value": "59.7156"
++								},
++								{
++									"key": "interval",
++									"value": "3600"
++								},
++								{
++									"key": "ignoreErrors",
++									"value": "true"
++								},
++								{
++									"key": "timeStart",
++									"value": "2025-04-12",
++									"description": "See pre-request script"
++								},
++								{
++									"key": "timeEnd",
++									"value": "2025-04-14",
++									"description": "See pre-request script"
++								},
++								{
++									"key": "parameters",
++									"value": "1002"
+ 								}
+ 							]
+ 						}
+@@ -1989,7 +2202,8 @@
+ 									"    pm.response.to.have.status(200);",
+ 									"});"
+ 								],
+-								"type": "text/javascript"
++								"type": "text/javascript",
++								"packages": {}
+ 							}
+ 						}
+ 					],
+@@ -2006,7 +2220,7 @@
+ 							}
+ 						},
+ 						"url": {
+-							"raw": "{{wx_url}}/rest/amalgamation/amalgamate/private?longitude=10.8303&latitude=59.6473&timeStart=2024-01-25&timeEnd=2024-01-28&interval=3600&parameters=2001,1002,3002",
++							"raw": "{{wx_url}}/rest/amalgamation/amalgamate/private?longitude=10.8303&latitude=59.6473&timeStart=2024-01-25&timeEnd=2024-01-28&interval=3600&parameters=2001,1002,3002,5001",
+ 							"host": [
+ 								"{{wx_url}}"
+ 							],
+@@ -2039,7 +2253,76 @@
+ 								},
+ 								{
+ 									"key": "parameters",
+-									"value": "2001,1002,3002"
++									"value": "2001,1002,3002,5001"
++								}
++							]
++						}
++					},
++					"response": []
++				},
++				{
++					"name": "Amalgamation with private station (MeteoBot test in Bjørkelangen, NOR)",
++					"event": [
++						{
++							"listen": "test",
++							"script": {
++								"exec": [
++									"pm.test(\"Status code is 200\", function () {",
++									"    pm.response.to.have.status(200);",
++									"});"
++								],
++								"type": "text/javascript",
++								"packages": {}
++							}
++						}
++					],
++					"request": {
++						"method": "POST",
++						"header": [],
++						"body": {
++							"mode": "raw",
++							"raw": "{\n    \"weatherSourceId\": \"com.meteobot\",\n    \"weatherStationId\": \"18150030\",\n    \"weatherStationReference\":\"My main weather source\",\n    \"userName\":\"3138313530303330\",\n    \"password\":\"Sm0q476z_2n8Ejao5\"\n}",
++							"options": {
++								"raw": {
++									"language": "json"
++								}
++							}
++						},
++						"url": {
++							"raw": "{{wx_url}}/rest/amalgamation/amalgamate/private?longitude=11.541258&latitude=59.873537&timeStart=2024-01-25&timeEnd=2024-01-28&interval=3600&parameters=2001,1002,3002,5001",
++							"host": [
++								"{{wx_url}}"
++							],
++							"path": [
++								"rest",
++								"amalgamation",
++								"amalgamate",
++								"private"
++							],
++							"query": [
++								{
++									"key": "longitude",
++									"value": "11.541258"
++								},
++								{
++									"key": "latitude",
++									"value": "59.873537"
++								},
++								{
++									"key": "timeStart",
++									"value": "2024-01-25"
++								},
++								{
++									"key": "timeEnd",
++									"value": "2024-01-28"
++								},
++								{
++									"key": "interval",
++									"value": "3600"
++								},
++								{
++									"key": "parameters",
++									"value": "2001,1002,3002,5001"
+ 								}
+ 							]
+ 						}
+@@ -2261,7 +2544,8 @@
+ 									"    pm.response.to.have.status(200);",
+ 									"});"
+ 								],
+-								"type": "text/javascript"
++								"type": "text/javascript",
++								"packages": {}
+ 							}
+ 						}
+ 					],
+@@ -2269,7 +2553,7 @@
+ 						"method": "GET",
+ 						"header": [],
+ 						"url": {
+-							"raw": "{{wx_url}}/rest/amalgamation/amalgamate?longitude=-3.11369&latitude=48.3939&timeStart=2023-01-01&timeEnd=2023-01-31&interval=3600&parameters=2001,1002,3002,3101",
++							"raw": "{{wx_url}}/rest/amalgamation/amalgamate?longitude=-3.11369&latitude=48.3939&timeStart=2024-01-01&timeEnd=2024-01-31&interval=3600&parameters=2001,1002,3002,3101",
+ 							"host": [
+ 								"{{wx_url}}"
+ 							],
+@@ -2289,11 +2573,11 @@
+ 								},
+ 								{
+ 									"key": "timeStart",
+-									"value": "2023-01-01"
++									"value": "2024-01-01"
+ 								},
+ 								{
+ 									"key": "timeEnd",
+-									"value": "2023-01-31"
++									"value": "2024-01-31"
+ 								},
+ 								{
+ 									"key": "interval",
+@@ -2427,6 +2711,77 @@
+ 					},
+ 					"response": []
+ 				},
++				{
++					"name": "Amalgamation test leaf wetness ground level fallback parameter",
++					"event": [
++						{
++							"listen": "test",
++							"script": {
++								"exec": [
++									"pm.test(\"Status code is 200\", function () {",
++									"    pm.response.to.have.status(200);",
++									"});",
++									"",
++									"pm.test(\"Only one parameter is returned\", function () {",
++									"    var jsonData = pm.response.json();",
++									"    pm.expect(jsonData.weatherParameters.length).to.equal(1);",
++									"});",
++									"",
++									"pm.test(\"Param 3103 is returned\", function () {",
++									"    var jsonData = pm.response.json();",
++									"    pm.expect(jsonData.weatherParameters.indexOf(3103)).greaterThan(-1);",
++									"});",
++									"",
++									""
++								],
++								"type": "text/javascript",
++								"packages": {}
++							}
++						}
++					],
++					"request": {
++						"method": "GET",
++						"header": [],
++						"url": {
++							"raw": "{{wx_url}}/rest/amalgamation/amalgamate?longitude=6.17485&latitude=60.36428&timeStart=2024-05-01&timeEnd=2024-05-23&interval=3600&parameters=3103",
++							"host": [
++								"{{wx_url}}"
++							],
++							"path": [
++								"rest",
++								"amalgamation",
++								"amalgamate"
++							],
++							"query": [
++								{
++									"key": "longitude",
++									"value": "6.17485"
++								},
++								{
++									"key": "latitude",
++									"value": "60.36428"
++								},
++								{
++									"key": "timeStart",
++									"value": "2024-05-01"
++								},
++								{
++									"key": "timeEnd",
++									"value": "2024-05-23"
++								},
++								{
++									"key": "interval",
++									"value": "3600"
++								},
++								{
++									"key": "parameters",
++									"value": "3103"
++								}
++							]
++						}
++					},
++					"response": []
++				},
+ 				{
+ 					"name": "Amalgamation test Open-Meteo max min dailies",
+ 					"event": [
+@@ -2590,7 +2945,8 @@
+ 									"",
+ 									""
+ 								],
+-								"type": "text/javascript"
++								"type": "text/javascript",
++								"packages": {}
+ 							}
+ 						}
+ 					],
+@@ -2598,7 +2954,7 @@
+ 						"method": "GET",
+ 						"header": [],
+ 						"url": {
+-							"raw": "{{wx_url}}/rest/amalgamation/amalgamate?longitude=10.961&latitude=56.109&timeStart=2024-01-01&timeEnd=2024-01-23&interval=3600&parameters=3101",
++							"raw": "{{wx_url}}/rest/amalgamation/amalgamate?longitude=11.582&latitude=59.886&timeStart=2024-06-01&timeEnd=2024-06-05&interval=3600&parameters=3101",
+ 							"host": [
+ 								"{{wx_url}}"
+ 							],
+@@ -2610,19 +2966,19 @@
+ 							"query": [
+ 								{
+ 									"key": "longitude",
+-									"value": "10.961"
++									"value": "11.582"
+ 								},
+ 								{
+ 									"key": "latitude",
+-									"value": "56.109"
++									"value": "59.886"
+ 								},
+ 								{
+ 									"key": "timeStart",
+-									"value": "2024-01-01"
++									"value": "2024-06-01"
+ 								},
+ 								{
+ 									"key": "timeEnd",
+-									"value": "2024-01-23"
++									"value": "2024-06-05"
+ 								},
+ 								{
+ 									"key": "interval",
+diff --git a/src/main/java/net/ipmdecisions/weather/amalgamation/indices/IndicesBean.java b/src/main/java/net/ipmdecisions/weather/amalgamation/indices/IndicesBean.java
+index 09934c0..bc75269 100644
+--- a/src/main/java/net/ipmdecisions/weather/amalgamation/indices/IndicesBean.java
++++ b/src/main/java/net/ipmdecisions/weather/amalgamation/indices/IndicesBean.java
+@@ -22,7 +22,7 @@ package net.ipmdecisions.weather.amalgamation.indices;
+ 
+ import java.util.Set;
+ 
+-import javax.ejb.Stateless;
++import javax.enterprise.context.ApplicationScoped;
+ 
+ import net.ipmdecisions.weather.entity.WeatherData;
+ 
+@@ -31,7 +31,7 @@ import net.ipmdecisions.weather.entity.WeatherData;
+  * @author Tor-Einar Skog <tor-einar.skog@nibio.no>
+  *
+  */
+-@Stateless
++@ApplicationScoped
+ public class IndicesBean {
+ 	
+ 	public WeatherData calculateIndicesBestEffort(WeatherData weatherData, Set<Integer> indices)
+diff --git a/src/main/java/net/ipmdecisions/weather/controller/AmalgamationBean.java b/src/main/java/net/ipmdecisions/weather/controller/AmalgamationBean.java
+index 5ecfeef..d1de5bc 100644
+--- a/src/main/java/net/ipmdecisions/weather/controller/AmalgamationBean.java
++++ b/src/main/java/net/ipmdecisions/weather/controller/AmalgamationBean.java
+@@ -31,8 +31,8 @@ import java.util.Map;
+ import java.util.Set;
+ import java.util.stream.Collectors;
+ 
+-import javax.ejb.EJB;
+-import javax.ejb.Stateless;
++import javax.inject.Inject;
++import javax.enterprise.context.ApplicationScoped;
+ 
+ import com.fasterxml.jackson.databind.ObjectMapper;
+ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+@@ -49,7 +49,7 @@ import net.ipmdecisions.weather.entity.WeatherParameter;
+  * @author Tor-Einar Skog <tor-einar.skog@nibio.no>
+  *
+  */
+-@Stateless
++@ApplicationScoped
+ public class AmalgamationBean {
+ 
+     public AmalgamationBean() {
+@@ -68,11 +68,11 @@ public class AmalgamationBean {
+ 	
+ 	TimeZoneEngine tzEngine;
+ 	
+-	@EJB
+-	protected WeatherDataSourceBean weatherDataSourceBean;
++    @Inject
++    protected WeatherDataSourceBean weatherDataSourceBean;
+ 	
+-	@EJB
+-	protected MetaDataBean metaDataBean;
++    @Inject
++    protected MetaDataBean metaDataBean;
+ 	
+ 	// Interchangeable parameters (e.g. instantaneous and average temperatures)
+ 	// Temperature: 1001 (inst) - 1002 (avg) 
+diff --git a/src/main/java/net/ipmdecisions/weather/controller/MetaDataBean.java b/src/main/java/net/ipmdecisions/weather/controller/MetaDataBean.java
+index 148b0b3..b7a6fca 100644
+--- a/src/main/java/net/ipmdecisions/weather/controller/MetaDataBean.java
++++ b/src/main/java/net/ipmdecisions/weather/controller/MetaDataBean.java
+@@ -28,7 +28,7 @@ import java.util.Set;
+ import java.util.function.Function;
+ import java.util.stream.Collectors;
+ 
+-import javax.ejb.Stateless;
++import javax.enterprise.context.ApplicationScoped;
+ 
+ import com.fasterxml.jackson.core.type.TypeReference;
+ import com.fasterxml.jackson.databind.ObjectMapper;
+@@ -41,7 +41,7 @@ import net.ipmdecisions.weather.entity.WeatherParameter;
+  * @author Tor-Einar Skog <tor-einar.skog@nibio.no>
+  *
+  */
+-@Stateless
++@ApplicationScoped
+ public class MetaDataBean {
+ 	
+ 	private List<WeatherParameter> weatherParameterList;
+diff --git a/src/main/java/net/ipmdecisions/weather/controller/WeatherDataSourceBean.java b/src/main/java/net/ipmdecisions/weather/controller/WeatherDataSourceBean.java
+index d8a269d..4e79a61 100644
+--- a/src/main/java/net/ipmdecisions/weather/controller/WeatherDataSourceBean.java
++++ b/src/main/java/net/ipmdecisions/weather/controller/WeatherDataSourceBean.java
+@@ -29,7 +29,7 @@ import java.util.List;
+ import java.util.Map;
+ import java.util.stream.Collectors;
+ 
+-import javax.ejb.Stateless;
++import javax.enterprise.context.ApplicationScoped;
+ import javax.ws.rs.QueryParam;
+ import javax.ws.rs.core.Response;
+ 
+@@ -51,7 +51,7 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+ import net.ipmdecisions.weather.entity.WeatherDataSource;
+ import net.ipmdecisions.weather.util.GISUtils;
+ 
+-@Stateless
++@ApplicationScoped
+ public class WeatherDataSourceBean {
+ 	
+ 	/**
+diff --git a/src/main/java/net/ipmdecisions/weather/services/AmalgamationService.java b/src/main/java/net/ipmdecisions/weather/services/AmalgamationService.java
+index 42b9bf9..3c7aebb 100644
+--- a/src/main/java/net/ipmdecisions/weather/services/AmalgamationService.java
++++ b/src/main/java/net/ipmdecisions/weather/services/AmalgamationService.java
+@@ -36,7 +36,7 @@ import java.util.Map;
+ import java.util.Set;
+ import java.util.stream.Collectors;
+ 
+-import javax.ejb.EJB;
++import javax.inject.Inject;
+ import javax.ws.rs.Consumes;
+ import javax.ws.rs.GET;
+ import javax.ws.rs.POST;
+@@ -96,13 +96,13 @@ public class AmalgamationService {
+ 	}
+ 	
+ 	
+-	@EJB
+-	AmalgamationBean amalgamationBean;
++    @Inject
++    AmalgamationBean amalgamationBean;
+ 	
+-	@EJB
+-	IndicesBean indicesBean;
++    @Inject
++    IndicesBean indicesBean;
+         
+-        @EJB
++        @Inject
+         WeatherDataSourceBean weatherDataSourceBean;
+         
+         
+diff --git a/src/main/java/net/ipmdecisions/weather/services/JAXActivator.java b/src/main/java/net/ipmdecisions/weather/services/JAXActivator.java
+deleted file mode 100644
+index fc3e95c..0000000
+--- a/src/main/java/net/ipmdecisions/weather/services/JAXActivator.java
++++ /dev/null
+@@ -1,102 +0,0 @@
+-/*
+- * Copyright (c) 2020 NIBIO <http://www.nibio.no/>. 
+- * 
+- * This file is part of IPMDecisionsWeatherService.
+- * IPMDecisionsWeatherService is free software: you can redistribute it and/or modify
+- * it under the terms of the GNU Affero General Public License as published by
+- * the Free Software Foundation, either version 3 of the License, or
+- * (at your option) any later version.
+- * 
+- * IPMDecisionsWeatherService is distributed in the hope that it will be useful,
+- * but WITHOUT ANY WARRANTY; without even the implied warranty of
+- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+- * GNU Affero General Public License for more details.
+- * 
+- * You should have received a copy of the GNU Affero General Public License
+- * along with IPMDecisionsWeatherService.  If not, see <http://www.gnu.org/licenses/>.
+- * 
+- */
+-
+-package net.ipmdecisions.weather.services;
+-
+-import java.util.HashSet;
+-import java.util.Set;
+-import javax.ws.rs.ApplicationPath;
+-import javax.ws.rs.core.Application;
+-import org.jboss.resteasy.plugins.interceptors.CorsFilter;
+-
+-/**
+- * @copyright 2020 <a href="http://www.nibio.no/">NIBIO</a>
+- * @author Tor-Einar Skog <tor-einar.skog@nibio.no>
+- */
+-@ApplicationPath("")
+-public class JAXActivator extends Application{
+-     @Override
+-    public Set<Class<?>> getClasses() {
+-        Set<Class<?>> resources = new java.util.HashSet<>();
+-        addRestResourceClassesManual(resources);
+-        return resources;
+-    }
+-    
+-    @Override
+-    public Set<Object> getSingletons(){
+-        CorsFilter corsFilter = new CorsFilter();
+-        corsFilter.getAllowedOrigins().add("*");
+-        corsFilter.setAllowedMethods("OPTIONS, GET, POST, DELETE, PUT, PATCH");
+-        Set<Object> singletons = new HashSet<>();
+-        singletons.add(corsFilter);
+-        return singletons;
+-    }
+-    
+-    private void addRestResourceClassesManual(Set<Class<?>> resources) {
+-        resources.add(net.ipmdecisions.weather.services.AmalgamationService.class);
+-        resources.add(net.ipmdecisions.weather.services.JacksonConfig.class);
+-        resources.add(net.ipmdecisions.weather.services.MetaDataService.class);
+-        resources.add(net.ipmdecisions.weather.services.QualityControlService.class);
+-        resources.add(net.ipmdecisions.weather.services.TestDataService.class);
+-        resources.add(net.ipmdecisions.weather.services.WeatherAdapterService.class);
+-        resources.add(net.ipmdecisions.weather.services.WeatherDataSourceService.class);
+-    }
+-
+-    /**
+-     * This method is being auto populated by NetBeans, which often blows up the application
+-     * @param resources 
+-     */
+-    private void addRestResourceClasses(Set<Class<?>> resources) {
+-        resources.add(net.ipmdecisions.weather.services.AmalgamationService.class);
+-        resources.add(net.ipmdecisions.weather.services.JacksonConfig.class);
+-        resources.add(net.ipmdecisions.weather.services.MetaDataService.class);
+-        resources.add(net.ipmdecisions.weather.services.QualityControlService.class);
+-        resources.add(net.ipmdecisions.weather.services.TestDataService.class);
+-        resources.add(net.ipmdecisions.weather.services.WeatherAdapterService.class);
+-        resources.add(net.ipmdecisions.weather.services.WeatherDataSourceService.class);
+-        resources.add(org.jboss.resteasy.core.AcceptHeaderByFileSuffixFilter.class);
+-        resources.add(org.jboss.resteasy.core.AsynchronousDispatcher.class);
+-        resources.add(org.jboss.resteasy.plugins.interceptors.AcceptEncodingGZIPFilter.class);
+-        resources.add(org.jboss.resteasy.plugins.interceptors.GZIPDecodingInterceptor.class);
+-        resources.add(org.jboss.resteasy.plugins.interceptors.GZIPEncodingInterceptor.class);
+-        resources.add(org.jboss.resteasy.plugins.interceptors.MessageSanitizerContainerResponseFilter.class);
+-        resources.add(org.jboss.resteasy.plugins.providers.AsyncStreamingOutputProvider.class);
+-        resources.add(org.jboss.resteasy.plugins.providers.ByteArrayProvider.class);
+-        resources.add(org.jboss.resteasy.plugins.providers.DataSourceProvider.class);
+-        resources.add(org.jboss.resteasy.plugins.providers.DefaultBooleanWriter.class);
+-        resources.add(org.jboss.resteasy.plugins.providers.DefaultNumberWriter.class);
+-        resources.add(org.jboss.resteasy.plugins.providers.DefaultTextPlain.class);
+-        resources.add(org.jboss.resteasy.plugins.providers.DocumentProvider.class);
+-        resources.add(org.jboss.resteasy.plugins.providers.FileProvider.class);
+-        resources.add(org.jboss.resteasy.plugins.providers.FileRangeWriter.class);
+-        resources.add(org.jboss.resteasy.plugins.providers.FormUrlEncodedProvider.class);
+-        resources.add(org.jboss.resteasy.plugins.providers.IIOImageProvider.class);
+-        resources.add(org.jboss.resteasy.plugins.providers.InputStreamProvider.class);
+-        resources.add(org.jboss.resteasy.plugins.providers.JaxrsFormProvider.class);
+-        resources.add(org.jboss.resteasy.plugins.providers.JaxrsServerFormUrlEncodedProvider.class);
+-        resources.add(org.jboss.resteasy.plugins.providers.MultiValuedParamConverterProvider.class);
+-        resources.add(org.jboss.resteasy.plugins.providers.ReaderProvider.class);
+-        resources.add(org.jboss.resteasy.plugins.providers.SourceProvider.class);
+-        resources.add(org.jboss.resteasy.plugins.providers.StreamingOutputProvider.class);
+-        resources.add(org.jboss.resteasy.plugins.providers.StringTextStar.class);
+-        resources.add(org.jboss.resteasy.plugins.providers.sse.SseEventProvider.class);
+-        resources.add(org.jboss.resteasy.plugins.providers.sse.SseEventSinkInterceptor.class);
+-
+-    }
+-}
+diff --git a/src/main/java/net/ipmdecisions/weather/services/WeatherAdapterService.java b/src/main/java/net/ipmdecisions/weather/services/WeatherAdapterService.java
+index e17dde2..f266688 100644
+--- a/src/main/java/net/ipmdecisions/weather/services/WeatherAdapterService.java
++++ b/src/main/java/net/ipmdecisions/weather/services/WeatherAdapterService.java
+@@ -63,7 +63,7 @@ import org.slf4j.LoggerFactory;
+ 
+ import java.time.format.DateTimeFormatter;
+ import java.util.TimeZone;
+-import javax.ejb.EJB;
++import javax.inject.Inject;
+ import javax.xml.datatype.DatatypeConfigurationException;
+ import net.ipmdecisions.weather.controller.AmalgamationBean;
+ import net.ipmdecisions.weather.datasourceadapters.OpenMeteoAdapter;
+@@ -85,7 +85,7 @@ public class WeatherAdapterService {
+ 	
+     private static Logger LOGGER = LoggerFactory.getLogger(WeatherAdapterService.class);
+     
+-    @EJB
++    @Inject
+     AmalgamationBean amalgamationBean;
+     
+     private WeatherDataUtil weatherDataUtil;
+diff --git a/src/main/java/net/ipmdecisions/weather/services/WeatherDataSourceService.java b/src/main/java/net/ipmdecisions/weather/services/WeatherDataSourceService.java
+index b16acc1..4fb7926 100644
+--- a/src/main/java/net/ipmdecisions/weather/services/WeatherDataSourceService.java
++++ b/src/main/java/net/ipmdecisions/weather/services/WeatherDataSourceService.java
+@@ -35,7 +35,7 @@ import java.util.Map;
+ import java.util.Set;
+ import java.util.stream.Collectors;
+ 
+-import javax.ejb.EJB;
++import javax.inject.Inject;
+ import javax.ws.rs.Consumes;
+ import javax.ws.rs.GET;
+ import javax.ws.rs.POST;
+@@ -73,11 +73,11 @@ import org.wololo.jts2geojson.GeoJSONWriter;
+ @Path("rest")
+ public class WeatherDataSourceService {
+ 	
+-	@EJB
+-	WeatherDataSourceBean weatherDataSourceBean;
++    @Inject
++    WeatherDataSourceBean weatherDataSourceBean;
+ 	
+-	@EJB
+-	AmalgamationBean amalgamationBean;
++    @Inject
++    AmalgamationBean amalgamationBean;
+ 
+     /**
+      * Get a list of all the available weather data sources
+diff --git a/src/main/webapp/WEB-INF/web.xml b/src/main/webapp/WEB-INF/web.xml
+deleted file mode 100644
+index 041032d..0000000
+--- a/src/main/webapp/WEB-INF/web.xml
++++ /dev/null
+@@ -1,20 +0,0 @@
+-<web-app version="3.0" xmlns="http://java.sun.com/xml/ns/javaee"
+-        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+-        xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd">
+-    
+-<servlet>
+-        <servlet-name>Resteasy</servlet-name>
+-        <servlet-class>
+-            org.jboss.resteasy.plugins.server.servlet.HttpServletDispatcher
+-        </servlet-class>
+-        <init-param>
+-            <param-name>javax.ws.rs.Application</param-name>
+-            <param-value>net.ipmdecisions.weather.services.JAXActivator</param-value>
+-        </init-param>
+-    </servlet>
+-
+-    <servlet-mapping>
+-        <servlet-name>Resteasy</servlet-name>
+-        <url-pattern>/rest/*</url-pattern>
+-    </servlet-mapping>
+-</web-app>
+\ No newline at end of file
+-- 
+2.51.0
+

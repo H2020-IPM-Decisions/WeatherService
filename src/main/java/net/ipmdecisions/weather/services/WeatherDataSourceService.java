@@ -35,7 +35,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import javax.ejb.EJB;
+import javax.inject.Inject;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -73,11 +73,11 @@ import org.wololo.jts2geojson.GeoJSONWriter;
 @Path("rest")
 public class WeatherDataSourceService {
 	
-	@EJB
-	WeatherDataSourceBean weatherDataSourceBean;
+    @Inject
+    WeatherDataSourceBean weatherDataSourceBean;
 	
-	@EJB
-	AmalgamationBean amalgamationBean;
+    @Inject
+    AmalgamationBean amalgamationBean;
 
     /**
      * Get a list of all the available weather data sources
