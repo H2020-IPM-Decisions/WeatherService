@@ -10,16 +10,17 @@ RUN groupadd -r jboss -g 1000 && useradd -u 1000 -r -g jboss -m -d /opt/jboss -s
 
 USER root
 
+ENV APP_VERSION=1.1.1
+
 RUN mkdir -p /opt/app
 COPY --from=MAVEN_BUILD /target/quarkus-app/lib/ /opt/app/lib/
 COPY --from=MAVEN_BUILD /target/quarkus-app/*.jar /opt/app/
 COPY --from=MAVEN_BUILD /target/quarkus-app/app/ /opt/app/app/
 COPY --from=MAVEN_BUILD /target/quarkus-app/quarkus/ /opt/app/quarkus/
 
-COPY --from=MAVEN_BUILD /target/IPMDecisionsWeatherService-$APP_VERSION.war /IPMDecisionsWeatherService-$APP_VERSION.war
+COPY --from=MAVEN_BUILD /target/IPMDecisionsWeatherService-$APP_VERSION.jar /IPMDecisionsWeatherService-$APP_VERSION.jar
 COPY --from=MAVEN_BUILD /geo-countries/data/countries.geojson /countries.geojson
 
-ENV APP_VERSION=1.1.1
 ENV LAUNCH_JBOSS_IN_BACKGROUND true
 
 USER jboss
