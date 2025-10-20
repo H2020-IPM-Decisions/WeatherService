@@ -36,7 +36,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import javax.ejb.EJB;
+import javax.inject.Inject;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -96,13 +96,13 @@ public class AmalgamationService {
 	}
 	
 	
-	@EJB
-	AmalgamationBean amalgamationBean;
+    @Inject
+    AmalgamationBean amalgamationBean;
 	
-	@EJB
-	IndicesBean indicesBean;
+    @Inject
+    IndicesBean indicesBean;
         
-        @EJB
+        @Inject
         WeatherDataSourceBean weatherDataSourceBean;
         
         

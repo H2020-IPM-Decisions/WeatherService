@@ -22,7 +22,7 @@ package net.ipmdecisions.weather.amalgamation.indices;
 
 import java.util.Set;
 
-import javax.ejb.Stateless;
+import javax.enterprise.context.ApplicationScoped;
 
 import net.ipmdecisions.weather.entity.WeatherData;
 
@@ -31,7 +31,7 @@ import net.ipmdecisions.weather.entity.WeatherData;
  * @author Tor-Einar Skog <tor-einar.skog@nibio.no>
  *
  */
-@Stateless
+@ApplicationScoped
 public class IndicesBean {
 	
 	public WeatherData calculateIndicesBestEffort(WeatherData weatherData, Set<Integer> indices)

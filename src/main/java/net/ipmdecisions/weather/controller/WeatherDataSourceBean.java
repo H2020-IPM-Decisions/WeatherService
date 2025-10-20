@@ -29,7 +29,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import javax.ejb.Stateless;
+import javax.enterprise.context.ApplicationScoped;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 
@@ -51,7 +51,7 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import net.ipmdecisions.weather.entity.WeatherDataSource;
 import net.ipmdecisions.weather.util.GISUtils;
 
-@Stateless
+@ApplicationScoped
 public class WeatherDataSourceBean {
 	
 	/**

@@ -31,8 +31,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import javax.ejb.EJB;
-import javax.ejb.Stateless;
+import javax.inject.Inject;
+import javax.enterprise.context.ApplicationScoped;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
@@ -49,7 +49,7 @@ import net.ipmdecisions.weather.entity.WeatherParameter;
  * @author Tor-Einar Skog <tor-einar.skog@nibio.no>
  *
  */
-@Stateless
+@ApplicationScoped
 public class AmalgamationBean {
 
     public AmalgamationBean() {
@@ -68,11 +68,11 @@ public class AmalgamationBean {
 	
 	TimeZoneEngine tzEngine;
 	
-	@EJB
-	protected WeatherDataSourceBean weatherDataSourceBean;
+    @Inject
+    protected WeatherDataSourceBean weatherDataSourceBean;
 	
-	@EJB
-	protected MetaDataBean metaDataBean;
+    @Inject
+    protected MetaDataBean metaDataBean;
 	
 	// Interchangeable parameters (e.g. instantaneous and average temperatures)
 	// Temperature: 1001 (inst) - 1002 (avg) 
