@@ -54,7 +54,7 @@ public class MetIrelandWeatherForecastAdapterTest {
     /**
      * Test of getWeatherForecasts method, of class YrWeatherForecastAdapter.
      */
-    //@Test
+    @Test
     public void testGetWeatherForecasts() throws Exception {
         
         System.out.println("getWeatherForecasts");
@@ -62,9 +62,9 @@ public class MetIrelandWeatherForecastAdapterTest {
         Double latitude = 52.597709;
         Double altitude = 0.0;
         MetIrelandWeatherForecastAdapter instance = new MetIrelandWeatherForecastAdapter();
-        //WeatherData result = instance.getWeatherForecasts(longitude, latitude, altitude);
-        //assertNotNull(result);
-        //System.out.println(result.getLocationWeatherData().get(0).toString());
+        WeatherData result = instance.getWeatherForecasts(longitude, latitude, altitude);
+        assertNotNull(result);
+        System.out.println(result.getLocationWeatherData().get(0).toString());
         
     }
     
