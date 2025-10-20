@@ -58,9 +58,10 @@ public class MetIrelandWeatherForecastAdapter {
     // Make sure QC is just as long as parameters
     // This indicates that each parameter has been controlled by the supplier, and that everything's OK
     Integer[] QC = {1,1,1,1};
-    
 
-    private final static String IRELAND_API_URL = "http://metwdb-openaccess.ichec.ie/metno-wdb2ts/locationforecast?lat=%f&long=%f";
+    //the old url was replaced as mentioned here:
+    //https://data.gov.ie/dataset/fa9574c1-48f4-4a98-a22b-d1c23c433821/resource/5d156b15-38b8-4de9-921b-0ffc8704c88e
+    private final static String IRELAND_API_URL = "http://openaccess.pf.api.met.ie/metno-wdb2ts/locationforecast?lat=%f&long=%f";
     
 
     
