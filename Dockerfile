@@ -1,6 +1,6 @@
 FROM maven:3.8-openjdk-17 AS MAVEN_BUILD
 COPY ./ ./
-RUN mvn clean install -DskipTests
+RUN mvn clean install
 RUN git clone --single-branch --branch main https://github.com/datasets/geo-countries.git
 
 FROM eclipse-temurin:17-jammy
