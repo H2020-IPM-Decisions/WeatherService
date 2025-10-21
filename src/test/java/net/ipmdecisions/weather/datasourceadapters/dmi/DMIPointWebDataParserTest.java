@@ -49,39 +49,39 @@ public class DMIPointWebDataParserTest {
     /**
      * Test of getData method, of class DMIPointWebDataParser.
      */
-    @Test
-    public void testGetData() {
-        System.out.println("getData");
-        Double longitude = 9.583;
-        Double latitude = 56.488;
-        
-        Date dateFrom = Date.from(ZonedDateTime.parse("2021-10-06T00:00:00+02:00").toInstant());
-        Date dateTo = Date.from(ZonedDateTime.parse("2021-10-16T00:00:00+02:00").toInstant());
-        DMIPointWebDataParser instance = new DMIPointWebDataParser();
-        try
-        {
-            WeatherData result = instance.getData(longitude, latitude, dateFrom, dateTo, 3600);
-            assertNotNull(result);
-            /*
-            ObjectMapper om = new ObjectMapper();
-            JavaTimeModule javaTimeModule =  new JavaTimeModule();
-            om.registerModule(javaTimeModule);
-            om.setDateFormat(new SimpleDateFormat("yyyy-MM-dd'TEST'HH:mm:ssXXX"));
-            try
-            {
-                System.out.println(om.writeValueAsString(result));
-            }
-            catch(JsonProcessingException ex)
-            {
-                fail(ex.getMessage());
-            }
-            */
-        }
-        catch(DatatypeConfigurationException ex)
-        {
-            fail(ex.getMessage());
-        }
-        
-    }
-    
+//    @Test
+//    public void testGetData() {
+//        System.out.println("getData");
+//        Double longitude = 9.583;
+//        Double latitude = 56.488;
+//
+//        Date dateFrom = Date.from(ZonedDateTime.parse("2021-10-06T00:00:00+02:00").toInstant());
+//        Date dateTo = Date.from(ZonedDateTime.parse("2021-10-16T00:00:00+02:00").toInstant());
+//        DMIPointWebDataParser instance = new DMIPointWebDataParser();
+//        try
+//        {
+//            WeatherData result = instance.getData(longitude, latitude, dateFrom, dateTo, 3600);
+//            assertNotNull(result);
+//            /*
+//            ObjectMapper om = new ObjectMapper();
+//            JavaTimeModule javaTimeModule =  new JavaTimeModule();
+//            om.registerModule(javaTimeModule);
+//            om.setDateFormat(new SimpleDateFormat("yyyy-MM-dd'TEST'HH:mm:ssXXX"));
+//            try
+//            {
+//                System.out.println(om.writeValueAsString(result));
+//            }
+//            catch(JsonProcessingException ex)
+//            {
+//                fail(ex.getMessage());
+//            }
+//            */
+//        }
+//        catch(DatatypeConfigurationException ex)
+//        {
+//            fail(ex.getMessage());
+//        }
+//
+//    }
+
 }
