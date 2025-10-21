@@ -63,7 +63,7 @@ import org.slf4j.LoggerFactory;
 
 import java.time.format.DateTimeFormatter;
 import java.util.TimeZone;
-import javax.ejb.EJB;
+import javax.inject.Inject;
 import javax.xml.datatype.DatatypeConfigurationException;
 import net.ipmdecisions.weather.controller.AmalgamationBean;
 import net.ipmdecisions.weather.datasourceadapters.OpenMeteoAdapter;
@@ -85,7 +85,7 @@ public class WeatherAdapterService {
 	
     private static Logger LOGGER = LoggerFactory.getLogger(WeatherAdapterService.class);
     
-    @EJB
+    @Inject
     AmalgamationBean amalgamationBean;
     
     private WeatherDataUtil weatherDataUtil;
