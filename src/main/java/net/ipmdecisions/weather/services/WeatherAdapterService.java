@@ -29,11 +29,7 @@ import java.time.ZonedDateTime;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.format.DateTimeParseException;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.Date;
+import java.util.*;
 import java.util.stream.Collectors;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.FormParam;
@@ -54,6 +50,7 @@ import net.ipmdecisions.weather.datasourceadapters.ParseWeatherDataException;
 import net.ipmdecisions.weather.datasourceadapters.SLULantMetAdapter;
 import net.ipmdecisions.weather.datasourceadapters.YrWeatherForecastAdapter;
 import net.ipmdecisions.weather.datasourceadapters.finnishmeteorologicalinstitute.FinnishMeteorologicalInstituteAdapter;
+import net.ipmdecisions.weather.datasourceadapters.v2.service.WeatherDataService;
 import net.ipmdecisions.weather.entity.WeatherData;
 import net.ipmdecisions.weather.entity.WeatherDataSourceException;
 import net.ipmdecisions.weather.util.WeatherDataUtil;
@@ -62,7 +59,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.time.format.DateTimeFormatter;
-import java.util.TimeZone;
 import javax.inject.Inject;
 import javax.xml.datatype.DatatypeConfigurationException;
 import net.ipmdecisions.weather.controller.AmalgamationBean;
@@ -87,6 +83,9 @@ public class WeatherAdapterService {
     
     @Inject
     AmalgamationBean amalgamationBean;
+
+    @Inject
+    WeatherDataService weatherDataService;
     
     private WeatherDataUtil weatherDataUtil;
     
@@ -173,20 +172,13 @@ public class WeatherAdapterService {
         Set<Integer> ipmDecisionsParameters = parameters != null ? Arrays.asList(parameters.split(",")).stream()
                 .map(paramstr->Integer.parseInt(paramstr.strip())).collect(Collectors.toSet())
                 : null;
-        
-        try 
+
+        WeatherData theData = weatherDataService.getWeatherData("meteireann", Map.of("longitude", longitude, "latitude", latitude, "altitude", altitude));
+        if(ipmDecisionsParameters != null && ipmDecisionsParameters.size() > 0)
         {
-            WeatherData theData = new MetIrelandWeatherForecastAdapter().getWeatherForecasts(longitude, latitude, altitude);
-            if(ipmDecisionsParameters != null && ipmDecisionsParameters.size() > 0)
-            {
-            	theData = new WeatherDataUtil().filterParameters(theData, ipmDecisionsParameters);
-            }
-            return Response.ok().entity(theData).build();
-        } 
-        catch (ParseWeatherDataException ex) 
-        {
-            return Response.serverError().entity(ex.getMessage()).build();
+            theData = new WeatherDataUtil().filterParameters(theData, ipmDecisionsParameters);
         }
+        return Response.ok().entity(theData).build();
 
     }
     

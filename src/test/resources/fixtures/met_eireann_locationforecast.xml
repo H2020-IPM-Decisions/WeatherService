@@ -1,0 +1,2226 @@
+<weatherdata xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://www.met.ie/Open_Data/weatherapi-0.4.xsd" created="2025-10-21T06:56:16Z">
+    <meta>
+        <model name="harmonie" termin="2025-10-21T00:00:00Z" runended="2025-10-21T03:36:23Z" nextrun="2025-10-21T10:00:00Z" from="2025-10-21T07:00:00Z" to="2025-10-23T06:00:00Z" />
+        <model name="ec_n1280_1hr" termin="2025-10-20T12:00:00Z" runended="2025-10-21T03:36:23Z" nextrun="2025-10-21T18:00:00Z" from="2025-10-23T07:00:00Z" to="2025-10-24T06:00:00Z" />
+        <model name="ec_n1280_3hr" termin="2025-10-20T12:00:00Z" runended="2025-10-21T03:36:23Z" nextrun="2025-10-21T18:00:00Z" from="2025-10-24T09:00:00Z" to="2025-10-26T12:00:00Z" />
+        <model name="ec_n1280_6hr" termin="2025-10-20T12:00:00Z" runended="2025-10-21T03:36:23Z" nextrun="2025-10-21T18:00:00Z" from="2025-10-26T18:00:00Z" to="2025-10-30T12:00:00Z" />
+    </meta>
+    <product class="pointData">
+        <time datatype="forecast" from="2025-10-21T07:00:00Z" to="2025-10-21T07:00:00Z">
+            <location altitude="232" latitude="52.5977" longitude="-7.6444">
+                <temperature id="TTT" unit="celsius" value="9.5"/>
+                <windDirection id="dd" deg="257.8" name="W"/>
+                <windSpeed id="ff" mps="4.3" beaufort="3" name="Gentle breeze"/>
+                <windGust id="ff_gust" mps="8.8"/>
+                <globalRadiation value="0.0" unit="W/m^2"/>
+                <humidity value="96.8" unit="percent"/>
+                <pressure id="pr" unit="hPa" value="991.4"/>
+                <cloudiness id="NN" percent="86.5"/>
+                <lowClouds id="LOW" percent="86.5"/>
+                <mediumClouds id="MEDIUM" percent="0.2"/>
+                <highClouds id="HIGH" percent="0.0"/>
+                <dewpointTemperature id="TD" unit="celsius" value="9.1"/>
+            </location>
+        </time>
+        <time datatype="forecast" from="2025-10-21T06:00:00Z" to="2025-10-21T07:00:00Z">
+            <location altitude="232" latitude="52.5977" longitude="-7.6444">
+                <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.0" probability="3.3"/>
+                <symbol id="Cloud" number="4"/>
+            </location>
+        </time>
+        <time datatype="forecast" from="2025-10-21T08:00:00Z" to="2025-10-21T08:00:00Z">
+            <location altitude="232" latitude="52.5977" longitude="-7.6444">
+                <temperature id="TTT" unit="celsius" value="9.4"/>
+                <windDirection id="dd" deg="248.8" name="W"/>
+                <windSpeed id="ff" mps="4.9" beaufort="3" name="Gentle breeze"/>
+                <windGust id="ff_gust" mps="9.2"/>
+                <globalRadiation value="7.6" unit="W/m^2"/>
+                <humidity value="96.8" unit="percent"/>
+                <pressure id="pr" unit="hPa" value="991.7"/>
+                <cloudiness id="NN" percent="99.8"/>
+                <lowClouds id="LOW" percent="99.8"/>
+                <mediumClouds id="MEDIUM" percent="85.1"/>
+                <highClouds id="HIGH" percent="0.0"/>
+                <dewpointTemperature id="TD" unit="celsius" value="9.0"/>
+            </location>
+        </time>
+        <time datatype="forecast" from="2025-10-21T07:00:00Z" to="2025-10-21T08:00:00Z">
+            <location altitude="232" latitude="52.5977" longitude="-7.6444">
+                <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.1" probability="13.5"/>
+                <symbol id="Cloud" number="4"/>
+            </location>
+        </time>
+        <time datatype="forecast" from="2025-10-21T09:00:00Z" to="2025-10-21T09:00:00Z">
+            <location altitude="232" latitude="52.5977" longitude="-7.6444">
+                <temperature id="TTT" unit="celsius" value="9.3"/>
+                <windDirection id="dd" deg="280.4" name="W"/>
+                <windSpeed id="ff" mps="4.0" beaufort="3" name="Gentle breeze"/>
+                <windGust id="ff_gust" mps="9.8"/>
+                <globalRadiation value="39.4" unit="W/m^2"/>
+                <humidity value="99.0" unit="percent"/>
+                <pressure id="pr" unit="hPa" value="992.4"/>
+                <cloudiness id="NN" percent="100.0"/>
+                <lowClouds id="LOW" percent="100.0"/>
+                <mediumClouds id="MEDIUM" percent="100.0"/>
+                <highClouds id="HIGH" percent="0.0"/>
+                <dewpointTemperature id="TD" unit="celsius" value="9.2"/>
+            </location>
+        </time>
+        <time datatype="forecast" from="2025-10-21T08:00:00Z" to="2025-10-21T09:00:00Z">
+            <location altitude="232" latitude="52.5977" longitude="-7.6444">
+                <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.2" probability="18.1"/>
+                <symbol id="Cloud" number="4"/>
+            </location>
+        </time>
+        <time datatype="forecast" from="2025-10-21T10:00:00Z" to="2025-10-21T10:00:00Z">
+            <location altitude="232" latitude="52.5977" longitude="-7.6444">
+                <temperature id="TTT" unit="celsius" value="10.0"/>
+                <windDirection id="dd" deg="271.2" name="W"/>
+                <windSpeed id="ff" mps="4.5" beaufort="3" name="Gentle breeze"/>
+                <windGust id="ff_gust" mps="10.3"/>
+                <globalRadiation value="118.6" unit="W/m^2"/>
+                <humidity value="97.3" unit="percent"/>
+                <pressure id="pr" unit="hPa" value="992.8"/>
+                <cloudiness id="NN" percent="64.3"/>
+                <lowClouds id="LOW" percent="64.3"/>
+                <mediumClouds id="MEDIUM" percent="0.0"/>
+                <highClouds id="HIGH" percent="0.0"/>
+                <dewpointTemperature id="TD" unit="celsius" value="9.6"/>
+            </location>
+        </time>
+        <time datatype="forecast" from="2025-10-21T09:00:00Z" to="2025-10-21T10:00:00Z">
+            <location altitude="232" latitude="52.5977" longitude="-7.6444">
+                <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.1" probability="5.0"/>
+                <symbol id="PartlyCloud" number="3"/>
+            </location>
+        </time>
+        <time datatype="forecast" from="2025-10-21T11:00:00Z" to="2025-10-21T11:00:00Z">
+            <location altitude="232" latitude="52.5977" longitude="-7.6444">
+                <temperature id="TTT" unit="celsius" value="10.9"/>
+                <windDirection id="dd" deg="283.8" name="W"/>
+                <windSpeed id="ff" mps="5.8" beaufort="4" name="Moderate breeze"/>
+                <windGust id="ff_gust" mps="10.9"/>
+                <globalRadiation value="170.7" unit="W/m^2"/>
+                <humidity value="88.1" unit="percent"/>
+                <pressure id="pr" unit="hPa" value="993.1"/>
+                <cloudiness id="NN" percent="90.0"/>
+                <lowClouds id="LOW" percent="90.0"/>
+                <mediumClouds id="MEDIUM" percent="0.0"/>
+                <highClouds id="HIGH" percent="0.2"/>
+                <dewpointTemperature id="TD" unit="celsius" value="9.0"/>
+            </location>
+        </time>
+        <time datatype="forecast" from="2025-10-21T10:00:00Z" to="2025-10-21T11:00:00Z">
+            <location altitude="232" latitude="52.5977" longitude="-7.6444">
+                <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.0" probability="0.1"/>
+                <symbol id="Cloud" number="4"/>
+            </location>
+        </time>
+        <time datatype="forecast" from="2025-10-21T12:00:00Z" to="2025-10-21T12:00:00Z">
+            <location altitude="232" latitude="52.5977" longitude="-7.6444">
+                <temperature id="TTT" unit="celsius" value="11.3"/>
+                <windDirection id="dd" deg="274.9" name="W"/>
+                <windSpeed id="ff" mps="6.1" beaufort="4" name="Moderate breeze"/>
+                <windGust id="ff_gust" mps="10.8"/>
+                <globalRadiation value="201.4" unit="W/m^2"/>
+                <humidity value="82.5" unit="percent"/>
+                <pressure id="pr" unit="hPa" value="993.2"/>
+                <cloudiness id="NN" percent="94.3"/>
+                <lowClouds id="LOW" percent="94.2"/>
+                <mediumClouds id="MEDIUM" percent="0.0"/>
+                <highClouds id="HIGH" percent="0.6"/>
+                <dewpointTemperature id="TD" unit="celsius" value="8.5"/>
+            </location>
+        </time>
+        <time datatype="forecast" from="2025-10-21T11:00:00Z" to="2025-10-21T12:00:00Z">
+            <location altitude="232" latitude="52.5977" longitude="-7.6444">
+                <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.1" probability="2.7"/>
+                <symbol id="Cloud" number="4"/>
+            </location>
+        </time>
+        <time datatype="forecast" from="2025-10-21T13:00:00Z" to="2025-10-21T13:00:00Z">
+            <location altitude="232" latitude="52.5977" longitude="-7.6444">
+                <temperature id="TTT" unit="celsius" value="11.4"/>
+                <windDirection id="dd" deg="277.0" name="W"/>
+                <windSpeed id="ff" mps="5.7" beaufort="4" name="Moderate breeze"/>
+                <windGust id="ff_gust" mps="10.7"/>
+                <globalRadiation value="203.4" unit="W/m^2"/>
+                <humidity value="82.0" unit="percent"/>
+                <pressure id="pr" unit="hPa" value="993.4"/>
+                <cloudiness id="NN" percent="77.0"/>
+                <lowClouds id="LOW" percent="76.8"/>
+                <mediumClouds id="MEDIUM" percent="0.0"/>
+                <highClouds id="HIGH" percent="2.0"/>
+                <dewpointTemperature id="TD" unit="celsius" value="8.4"/>
+            </location>
+        </time>
+        <time datatype="forecast" from="2025-10-21T12:00:00Z" to="2025-10-21T13:00:00Z">
+            <location altitude="232" latitude="52.5977" longitude="-7.6444">
+                <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.1" probability="3.0"/>
+                <symbol id="PartlyCloud" number="3"/>
+            </location>
+        </time>
+        <time datatype="forecast" from="2025-10-21T14:00:00Z" to="2025-10-21T14:00:00Z">
+            <location altitude="232" latitude="52.5977" longitude="-7.6444">
+                <temperature id="TTT" unit="celsius" value="11.5"/>
+                <windDirection id="dd" deg="286.3" name="W"/>
+                <windSpeed id="ff" mps="5.7" beaufort="4" name="Moderate breeze"/>
+                <windGust id="ff_gust" mps="10.6"/>
+                <globalRadiation value="173.4" unit="W/m^2"/>
+                <humidity value="77.1" unit="percent"/>
+                <pressure id="pr" unit="hPa" value="993.3"/>
+                <cloudiness id="NN" percent="99.3"/>
+                <lowClouds id="LOW" percent="96.1"/>
+                <mediumClouds id="MEDIUM" percent="0.0"/>
+                <highClouds id="HIGH" percent="83.8"/>
+                <dewpointTemperature id="TD" unit="celsius" value="7.6"/>
+            </location>
+        </time>
+        <time datatype="forecast" from="2025-10-21T13:00:00Z" to="2025-10-21T14:00:00Z">
+            <location altitude="232" latitude="52.5977" longitude="-7.6444">
+                <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.1" probability="3.0"/>
+                <symbol id="Cloud" number="4"/>
+            </location>
+        </time>
+        <time datatype="forecast" from="2025-10-21T15:00:00Z" to="2025-10-21T15:00:00Z">
+            <location altitude="232" latitude="52.5977" longitude="-7.6444">
+                <temperature id="TTT" unit="celsius" value="11.3"/>
+                <windDirection id="dd" deg="282.3" name="W"/>
+                <windSpeed id="ff" mps="5.0" beaufort="3" name="Gentle breeze"/>
+                <windGust id="ff_gust" mps="10.2"/>
+                <globalRadiation value="143.9" unit="W/m^2"/>
+                <humidity value="78.1" unit="percent"/>
+                <pressure id="pr" unit="hPa" value="993.6"/>
+                <cloudiness id="NN" percent="96.8"/>
+                <lowClouds id="LOW" percent="93.1"/>
+                <mediumClouds id="MEDIUM" percent="0.0"/>
+                <highClouds id="HIGH" percent="53.3"/>
+                <dewpointTemperature id="TD" unit="celsius" value="7.6"/>
+            </location>
+        </time>
+        <time datatype="forecast" from="2025-10-21T14:00:00Z" to="2025-10-21T15:00:00Z">
+            <location altitude="232" latitude="52.5977" longitude="-7.6444">
+                <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.0" probability="1.8"/>
+                <symbol id="Cloud" number="4"/>
+            </location>
+        </time>
+        <time datatype="forecast" from="2025-10-21T16:00:00Z" to="2025-10-21T16:00:00Z">
+            <location altitude="232" latitude="52.5977" longitude="-7.6444">
+                <temperature id="TTT" unit="celsius" value="10.9"/>
+                <windDirection id="dd" deg="280.3" name="W"/>
+                <windSpeed id="ff" mps="5.0" beaufort="3" name="Gentle breeze"/>
+                <windGust id="ff_gust" mps="9.6"/>
+                <globalRadiation value="103.4" unit="W/m^2"/>
+                <humidity value="77.6" unit="percent"/>
+                <pressure id="pr" unit="hPa" value="994.0"/>
+                <cloudiness id="NN" percent="98.9"/>
+                <lowClouds id="LOW" percent="98.6"/>
+                <mediumClouds id="MEDIUM" percent="0.0"/>
+                <highClouds id="HIGH" percent="23.3"/>
+                <dewpointTemperature id="TD" unit="celsius" value="7.1"/>
+            </location>
+        </time>
+        <time datatype="forecast" from="2025-10-21T15:00:00Z" to="2025-10-21T16:00:00Z">
+            <location altitude="232" latitude="52.5977" longitude="-7.6444">
+                <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.1" probability="6.3"/>
+                <symbol id="Cloud" number="4"/>
+            </location>
+        </time>
+        <time datatype="forecast" from="2025-10-21T17:00:00Z" to="2025-10-21T17:00:00Z">
+            <location altitude="232" latitude="52.5977" longitude="-7.6444">
+                <temperature id="TTT" unit="celsius" value="9.9"/>
+                <windDirection id="dd" deg="288.9" name="W"/>
+                <windSpeed id="ff" mps="3.8" beaufort="3" name="Gentle breeze"/>
+                <windGust id="ff_gust" mps="8.9"/>
+                <globalRadiation value="42.1" unit="W/m^2"/>
+                <humidity value="86.0" unit="percent"/>
+                <pressure id="pr" unit="hPa" value="994.6"/>
+                <cloudiness id="NN" percent="88.8"/>
+                <lowClouds id="LOW" percent="88.8"/>
+                <mediumClouds id="MEDIUM" percent="0.0"/>
+                <highClouds id="HIGH" percent="1.2"/>
+                <dewpointTemperature id="TD" unit="celsius" value="7.7"/>
+            </location>
+        </time>
+        <time datatype="forecast" from="2025-10-21T16:00:00Z" to="2025-10-21T17:00:00Z">
+            <location altitude="232" latitude="52.5977" longitude="-7.6444">
+                <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.0" probability="4.5"/>
+                <symbol id="Cloud" number="4"/>
+            </location>
+        </time>
+        <time datatype="forecast" from="2025-10-21T18:00:00Z" to="2025-10-21T18:00:00Z">
+            <location altitude="232" latitude="52.5977" longitude="-7.6444">
+                <temperature id="TTT" unit="celsius" value="8.9"/>
+                <windDirection id="dd" deg="272.2" name="W"/>
+                <windSpeed id="ff" mps="4.0" beaufort="3" name="Gentle breeze"/>
+                <windGust id="ff_gust" mps="7.4"/>
+                <globalRadiation value="1.9" unit="W/m^2"/>
+                <humidity value="87.8" unit="percent"/>
+                <pressure id="pr" unit="hPa" value="995.0"/>
+                <cloudiness id="NN" percent="89.2"/>
+                <lowClouds id="LOW" percent="31.5"/>
+                <mediumClouds id="MEDIUM" percent="0.0"/>
+                <highClouds id="HIGH" percent="83.7"/>
+                <dewpointTemperature id="TD" unit="celsius" value="7.0"/>
+            </location>
+        </time>
+        <time datatype="forecast" from="2025-10-21T17:00:00Z" to="2025-10-21T18:00:00Z">
+            <location altitude="232" latitude="52.5977" longitude="-7.6444">
+                <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.0" probability="1.6"/>
+                <symbol id="Cloud" number="4"/>
+            </location>
+        </time>
+        <time datatype="forecast" from="2025-10-21T19:00:00Z" to="2025-10-21T19:00:00Z">
+            <location altitude="232" latitude="52.5977" longitude="-7.6444">
+                <temperature id="TTT" unit="celsius" value="7.9"/>
+                <windDirection id="dd" deg="266.0" name="W"/>
+                <windSpeed id="ff" mps="3.5" beaufort="3" name="Gentle breeze"/>
+                <windGust id="ff_gust" mps="6.1"/>
+                <globalRadiation value="0.0" unit="W/m^2"/>
+                <humidity value="90.3" unit="percent"/>
+                <pressure id="pr" unit="hPa" value="995.7"/>
+                <cloudiness id="NN" percent="91.7"/>
+                <lowClouds id="LOW" percent="50.0"/>
+                <mediumClouds id="MEDIUM" percent="0.1"/>
+                <highClouds id="HIGH" percent="89.6"/>
+                <dewpointTemperature id="TD" unit="celsius" value="6.4"/>
+            </location>
+        </time>
+        <time datatype="forecast" from="2025-10-21T18:00:00Z" to="2025-10-21T19:00:00Z">
+            <location altitude="232" latitude="52.5977" longitude="-7.6444">
+                <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.0" probability="1.2"/>
+                <symbol id="Cloud" number="4"/>
+            </location>
+        </time>
+        <time datatype="forecast" from="2025-10-21T20:00:00Z" to="2025-10-21T20:00:00Z">
+            <location altitude="232" latitude="52.5977" longitude="-7.6444">
+                <temperature id="TTT" unit="celsius" value="7.5"/>
+                <windDirection id="dd" deg="271.0" name="W"/>
+                <windSpeed id="ff" mps="2.5" beaufort="2" name="Light breeze"/>
+                <windGust id="ff_gust" mps="5.4"/>
+                <globalRadiation value="0.0" unit="W/m^2"/>
+                <humidity value="92.4" unit="percent"/>
+                <pressure id="pr" unit="hPa" value="996.4"/>
+                <cloudiness id="NN" percent="52.1"/>
+                <lowClouds id="LOW" percent="0.1"/>
+                <mediumClouds id="MEDIUM" percent="0.2"/>
+                <highClouds id="HIGH" percent="51.9"/>
+                <dewpointTemperature id="TD" unit="celsius" value="6.3"/>
+            </location>
+        </time>
+        <time datatype="forecast" from="2025-10-21T19:00:00Z" to="2025-10-21T20:00:00Z">
+            <location altitude="232" latitude="52.5977" longitude="-7.6444">
+                <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.0" probability="0.3"/>
+                <symbol id="PartlyCloud" number="3"/>
+            </location>
+        </time>
+        <time datatype="forecast" from="2025-10-21T21:00:00Z" to="2025-10-21T21:00:00Z">
+            <location altitude="232" latitude="52.5977" longitude="-7.6444">
+                <temperature id="TTT" unit="celsius" value="6.3"/>
+                <windDirection id="dd" deg="266.1" name="W"/>
+                <windSpeed id="ff" mps="2.9" beaufort="2" name="Light breeze"/>
+                <windGust id="ff_gust" mps="4.9"/>
+                <globalRadiation value="0.0" unit="W/m^2"/>
+                <humidity value="95.1" unit="percent"/>
+                <pressure id="pr" unit="hPa" value="996.7"/>
+                <cloudiness id="NN" percent="37.5"/>
+                <lowClouds id="LOW" percent="26.8"/>
+                <mediumClouds id="MEDIUM" percent="0.0"/>
+                <highClouds id="HIGH" percent="13.4"/>
+                <dewpointTemperature id="TD" unit="celsius" value="5.5"/>
+            </location>
+        </time>
+        <time datatype="forecast" from="2025-10-21T20:00:00Z" to="2025-10-21T21:00:00Z">
+            <location altitude="232" latitude="52.5977" longitude="-7.6444">
+                <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.0" probability="0.8"/>
+                <symbol id="LightCloud" number="2"/>
+            </location>
+        </time>
+        <time datatype="forecast" from="2025-10-21T22:00:00Z" to="2025-10-21T22:00:00Z">
+            <location altitude="232" latitude="52.5977" longitude="-7.6444">
+                <temperature id="TTT" unit="celsius" value="5.4"/>
+                <windDirection id="dd" deg="245.6" name="SW"/>
+                <windSpeed id="ff" mps="2.6" beaufort="2" name="Light breeze"/>
+                <windGust id="ff_gust" mps="4.4"/>
+                <globalRadiation value="0.0" unit="W/m^2"/>
+                <humidity value="95.8" unit="percent"/>
+                <pressure id="pr" unit="hPa" value="997.2"/>
+                <cloudiness id="NN" percent="15.7"/>
+                <lowClouds id="LOW" percent="4.7"/>
+                <mediumClouds id="MEDIUM" percent="0.0"/>
+                <highClouds id="HIGH" percent="11.3"/>
+                <dewpointTemperature id="TD" unit="celsius" value="4.7"/>
+            </location>
+        </time>
+        <time datatype="forecast" from="2025-10-21T21:00:00Z" to="2025-10-21T22:00:00Z">
+            <location altitude="232" latitude="52.5977" longitude="-7.6444">
+                <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.0" probability="0.0"/>
+                <symbol id="LightCloud" number="2"/>
+            </location>
+        </time>
+        <time datatype="forecast" from="2025-10-21T23:00:00Z" to="2025-10-21T23:00:00Z">
+            <location altitude="232" latitude="52.5977" longitude="-7.6444">
+                <temperature id="TTT" unit="celsius" value="5.1"/>
+                <windDirection id="dd" deg="234.6" name="SW"/>
+                <windSpeed id="ff" mps="2.8" beaufort="2" name="Light breeze"/>
+                <windGust id="ff_gust" mps="4.4"/>
+                <globalRadiation value="0.0" unit="W/m^2"/>
+                <humidity value="95.4" unit="percent"/>
+                <pressure id="pr" unit="hPa" value="997.5"/>
+                <cloudiness id="NN" percent="85.3"/>
+                <lowClouds id="LOW" percent="0.0"/>
+                <mediumClouds id="MEDIUM" percent="0.8"/>
+                <highClouds id="HIGH" percent="85.1"/>
+                <dewpointTemperature id="TD" unit="celsius" value="4.3"/>
+            </location>
+        </time>
+        <time datatype="forecast" from="2025-10-21T22:00:00Z" to="2025-10-21T23:00:00Z">
+            <location altitude="232" latitude="52.5977" longitude="-7.6444">
+                <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.0" probability="0.0"/>
+                <symbol id="PartlyCloud" number="3"/>
+            </location>
+        </time>
+        <time datatype="forecast" from="2025-10-22T00:00:00Z" to="2025-10-22T00:00:00Z">
+            <location altitude="232" latitude="52.5977" longitude="-7.6444">
+                <temperature id="TTT" unit="celsius" value="5.2"/>
+                <windDirection id="dd" deg="231.5" name="SW"/>
+                <windSpeed id="ff" mps="2.8" beaufort="2" name="Light breeze"/>
+                <windGust id="ff_gust" mps="4.6"/>
+                <globalRadiation value="0.0" unit="W/m^2"/>
+                <humidity value="96.0" unit="percent"/>
+                <pressure id="pr" unit="hPa" value="997.5"/>
+                <cloudiness id="NN" percent="37.0"/>
+                <lowClouds id="LOW" percent="0.0"/>
+                <mediumClouds id="MEDIUM" percent="1.7"/>
+                <highClouds id="HIGH" percent="35.8"/>
+                <dewpointTemperature id="TD" unit="celsius" value="4.5"/>
+            </location>
+        </time>
+        <time datatype="forecast" from="2025-10-21T23:00:00Z" to="2025-10-22T00:00:00Z">
+            <location altitude="232" latitude="52.5977" longitude="-7.6444">
+                <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.0" probability="0.1"/>
+                <symbol id="LightCloud" number="2"/>
+            </location>
+        </time>
+        <time datatype="forecast" from="2025-10-22T01:00:00Z" to="2025-10-22T01:00:00Z">
+            <location altitude="232" latitude="52.5977" longitude="-7.6444">
+                <temperature id="TTT" unit="celsius" value="5.4"/>
+                <windDirection id="dd" deg="224.4" name="SW"/>
+                <windSpeed id="ff" mps="3.1" beaufort="2" name="Light breeze"/>
+                <windGust id="ff_gust" mps="4.8"/>
+                <globalRadiation value="0.0" unit="W/m^2"/>
+                <humidity value="97.4" unit="percent"/>
+                <pressure id="pr" unit="hPa" value="997.7"/>
+                <cloudiness id="NN" percent="100.0"/>
+                <lowClouds id="LOW" percent="100.0"/>
+                <mediumClouds id="MEDIUM" percent="55.1"/>
+                <highClouds id="HIGH" percent="0.0"/>
+                <dewpointTemperature id="TD" unit="celsius" value="4.9"/>
+            </location>
+        </time>
+        <time datatype="forecast" from="2025-10-22T00:00:00Z" to="2025-10-22T01:00:00Z">
+            <location altitude="232" latitude="52.5977" longitude="-7.6444">
+                <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.0" probability="0.5"/>
+                <symbol id="Cloud" number="4"/>
+            </location>
+        </time>
+        <time datatype="forecast" from="2025-10-22T02:00:00Z" to="2025-10-22T02:00:00Z">
+            <location altitude="232" latitude="52.5977" longitude="-7.6444">
+                <temperature id="TTT" unit="celsius" value="6.7"/>
+                <windDirection id="dd" deg="240.6" name="SW"/>
+                <windSpeed id="ff" mps="3.1" beaufort="2" name="Light breeze"/>
+                <windGust id="ff_gust" mps="4.8"/>
+                <globalRadiation value="0.0" unit="W/m^2"/>
+                <humidity value="97.9" unit="percent"/>
+                <pressure id="pr" unit="hPa" value="997.5"/>
+                <cloudiness id="NN" percent="99.9"/>
+                <lowClouds id="LOW" percent="97.6"/>
+                <mediumClouds id="MEDIUM" percent="96.3"/>
+                <highClouds id="HIGH" percent="0.0"/>
+                <dewpointTemperature id="TD" unit="celsius" value="6.4"/>
+            </location>
+        </time>
+        <time datatype="forecast" from="2025-10-22T01:00:00Z" to="2025-10-22T02:00:00Z">
+            <location altitude="232" latitude="52.5977" longitude="-7.6444">
+                <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.0" probability="3.0"/>
+                <symbol id="Cloud" number="4"/>
+            </location>
+        </time>
+        <time datatype="forecast" from="2025-10-22T03:00:00Z" to="2025-10-22T03:00:00Z">
+            <location altitude="232" latitude="52.5977" longitude="-7.6444">
+                <temperature id="TTT" unit="celsius" value="6.6"/>
+                <windDirection id="dd" deg="232.0" name="SW"/>
+                <windSpeed id="ff" mps="3.2" beaufort="2" name="Light breeze"/>
+                <windGust id="ff_gust" mps="4.8"/>
+                <globalRadiation value="0.0" unit="W/m^2"/>
+                <humidity value="98.7" unit="percent"/>
+                <pressure id="pr" unit="hPa" value="997.3"/>
+                <cloudiness id="NN" percent="88.9"/>
+                <lowClouds id="LOW" percent="88.1"/>
+                <mediumClouds id="MEDIUM" percent="70.6"/>
+                <highClouds id="HIGH" percent="0.0"/>
+                <dewpointTemperature id="TD" unit="celsius" value="6.4"/>
+            </location>
+        </time>
+        <time datatype="forecast" from="2025-10-22T02:00:00Z" to="2025-10-22T03:00:00Z">
+            <location altitude="232" latitude="52.5977" longitude="-7.6444">
+                <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.0" probability="3.2"/>
+                <symbol id="Cloud" number="4"/>
+            </location>
+        </time>
+        <time datatype="forecast" from="2025-10-22T04:00:00Z" to="2025-10-22T04:00:00Z">
+            <location altitude="232" latitude="52.5977" longitude="-7.6444">
+                <temperature id="TTT" unit="celsius" value="6.1"/>
+                <windDirection id="dd" deg="214.8" name="SW"/>
+                <windSpeed id="ff" mps="2.7" beaufort="2" name="Light breeze"/>
+                <windGust id="ff_gust" mps="4.6"/>
+                <globalRadiation value="0.0" unit="W/m^2"/>
+                <humidity value="98.9" unit="percent"/>
+                <pressure id="pr" unit="hPa" value="997.3"/>
+                <cloudiness id="NN" percent="23.6"/>
+                <lowClouds id="LOW" percent="23.0"/>
+                <mediumClouds id="MEDIUM" percent="5.8"/>
+                <highClouds id="HIGH" percent="0.0"/>
+                <dewpointTemperature id="TD" unit="celsius" value="5.9"/>
+            </location>
+        </time>
+        <time datatype="forecast" from="2025-10-22T03:00:00Z" to="2025-10-22T04:00:00Z">
+            <location altitude="232" latitude="52.5977" longitude="-7.6444">
+                <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.0" probability="1.9"/>
+                <symbol id="LightCloud" number="2"/>
+            </location>
+        </time>
+        <time datatype="forecast" from="2025-10-22T05:00:00Z" to="2025-10-22T05:00:00Z">
+            <location altitude="232" latitude="52.5977" longitude="-7.6444">
+                <temperature id="TTT" unit="celsius" value="4.5"/>
+                <windDirection id="dd" deg="193.6" name="S"/>
+                <windSpeed id="ff" mps="2.7" beaufort="2" name="Light breeze"/>
+                <windGust id="ff_gust" mps="4.4"/>
+                <globalRadiation value="0.0" unit="W/m^2"/>
+                <humidity value="99.2" unit="percent"/>
+                <pressure id="pr" unit="hPa" value="997.4"/>
+                <cloudiness id="NN" percent="70.1"/>
+                <lowClouds id="LOW" percent="65.1"/>
+                <mediumClouds id="MEDIUM" percent="3.6"/>
+                <highClouds id="HIGH" percent="0.0"/>
+                <dewpointTemperature id="TD" unit="celsius" value="4.4"/>
+            </location>
+        </time>
+        <time datatype="forecast" from="2025-10-22T04:00:00Z" to="2025-10-22T05:00:00Z">
+            <location altitude="232" latitude="52.5977" longitude="-7.6444">
+                <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.0" probability="1.1"/>
+                <symbol id="PartlyCloud" number="3"/>
+            </location>
+        </time>
+        <time datatype="forecast" from="2025-10-22T06:00:00Z" to="2025-10-22T06:00:00Z">
+            <location altitude="232" latitude="52.5977" longitude="-7.6444">
+                <temperature id="TTT" unit="celsius" value="3.8"/>
+                <windDirection id="dd" deg="171.4" name="S"/>
+                <windSpeed id="ff" mps="2.5" beaufort="2" name="Light breeze"/>
+                <windGust id="ff_gust" mps="4.5"/>
+                <globalRadiation value="0.0" unit="W/m^2"/>
+                <humidity value="100.0" unit="percent"/>
+                <pressure id="pr" unit="hPa" value="997.6"/>
+                <cloudiness id="NN" percent="40.0"/>
+                <lowClouds id="LOW" percent="31.2"/>
+                <mediumClouds id="MEDIUM" percent="0.0"/>
+                <highClouds id="HIGH" percent="0.0"/>
+                <dewpointTemperature id="TD" unit="celsius" value="3.7"/>
+            </location>
+        </time>
+        <time datatype="forecast" from="2025-10-22T05:00:00Z" to="2025-10-22T06:00:00Z">
+            <location altitude="232" latitude="52.5977" longitude="-7.6444">
+                <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.1" probability="5.7"/>
+                <symbol id="PartlyCloud" number="3"/>
+            </location>
+        </time>
+        <time datatype="forecast" from="2025-10-22T07:00:00Z" to="2025-10-22T07:00:00Z">
+            <location altitude="232" latitude="52.5977" longitude="-7.6444">
+                <temperature id="TTT" unit="celsius" value="4.2"/>
+                <windDirection id="dd" deg="178.4" name="S"/>
+                <windSpeed id="ff" mps="2.4" beaufort="2" name="Light breeze"/>
+                <windGust id="ff_gust" mps="4.3"/>
+                <globalRadiation value="0.0" unit="W/m^2"/>
+                <humidity value="98.1" unit="percent"/>
+                <pressure id="pr" unit="hPa" value="997.4"/>
+                <cloudiness id="NN" percent="32.5"/>
+                <lowClouds id="LOW" percent="1.0"/>
+                <mediumClouds id="MEDIUM" percent="1.1"/>
+                <highClouds id="HIGH" percent="28.0"/>
+                <dewpointTemperature id="TD" unit="celsius" value="3.8"/>
+            </location>
+        </time>
+        <time datatype="forecast" from="2025-10-22T06:00:00Z" to="2025-10-22T07:00:00Z">
+            <location altitude="232" latitude="52.5977" longitude="-7.6444">
+                <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.1" probability="9.3"/>
+                <symbol id="PartlyCloud" number="3"/>
+            </location>
+        </time>
+        <time datatype="forecast" from="2025-10-22T08:00:00Z" to="2025-10-22T08:00:00Z">
+            <location altitude="232" latitude="52.5977" longitude="-7.6444">
+                <temperature id="TTT" unit="celsius" value="4.9"/>
+                <windDirection id="dd" deg="180.7" name="S"/>
+                <windSpeed id="ff" mps="2.9" beaufort="2" name="Light breeze"/>
+                <windGust id="ff_gust" mps="4.1"/>
+                <globalRadiation value="17.8" unit="W/m^2"/>
+                <humidity value="95.8" unit="percent"/>
+                <pressure id="pr" unit="hPa" value="997.4"/>
+                <cloudiness id="NN" percent="95.5"/>
+                <lowClouds id="LOW" percent="0.6"/>
+                <mediumClouds id="MEDIUM" percent="95.5"/>
+                <highClouds id="HIGH" percent="0.0"/>
+                <dewpointTemperature id="TD" unit="celsius" value="4.3"/>
+            </location>
+        </time>
+        <time datatype="forecast" from="2025-10-22T07:00:00Z" to="2025-10-22T08:00:00Z">
+            <location altitude="232" latitude="52.5977" longitude="-7.6444">
+                <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.1" probability="6.5"/>
+                <symbol id="Cloud" number="4"/>
+            </location>
+        </time>
+        <time datatype="forecast" from="2025-10-22T09:00:00Z" to="2025-10-22T09:00:00Z">
+            <location altitude="232" latitude="52.5977" longitude="-7.6444">
+                <temperature id="TTT" unit="celsius" value="5.9"/>
+                <windDirection id="dd" deg="195.4" name="S"/>
+                <windSpeed id="ff" mps="3.5" beaufort="3" name="Gentle breeze"/>
+                <windGust id="ff_gust" mps="4.5"/>
+                <globalRadiation value="103.9" unit="W/m^2"/>
+                <humidity value="95.3" unit="percent"/>
+                <pressure id="pr" unit="hPa" value="997.4"/>
+                <cloudiness id="NN" percent="68.0"/>
+                <lowClouds id="LOW" percent="0.3"/>
+                <mediumClouds id="MEDIUM" percent="67.9"/>
+                <highClouds id="HIGH" percent="0.0"/>
+                <dewpointTemperature id="TD" unit="celsius" value="5.2"/>
+            </location>
+        </time>
+        <time datatype="forecast" from="2025-10-22T08:00:00Z" to="2025-10-22T09:00:00Z">
+            <location altitude="232" latitude="52.5977" longitude="-7.6444">
+                <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.0" probability="1.1"/>
+                <symbol id="PartlyCloud" number="3"/>
+            </location>
+        </time>
+        <time datatype="forecast" from="2025-10-22T10:00:00Z" to="2025-10-22T10:00:00Z">
+            <location altitude="232" latitude="52.5977" longitude="-7.6444">
+                <temperature id="TTT" unit="celsius" value="8.1"/>
+                <windDirection id="dd" deg="197.2" name="S"/>
+                <windSpeed id="ff" mps="3.0" beaufort="2" name="Light breeze"/>
+                <windGust id="ff_gust" mps="5.0"/>
+                <globalRadiation value="227.3" unit="W/m^2"/>
+                <humidity value="91.9" unit="percent"/>
+                <pressure id="pr" unit="hPa" value="997.3"/>
+                <cloudiness id="NN" percent="2.9"/>
+                <lowClouds id="LOW" percent="0.0"/>
+                <mediumClouds id="MEDIUM" percent="2.8"/>
+                <highClouds id="HIGH" percent="0.0"/>
+                <dewpointTemperature id="TD" unit="celsius" value="6.8"/>
+            </location>
+        </time>
+        <time datatype="forecast" from="2025-10-22T09:00:00Z" to="2025-10-22T10:00:00Z">
+            <location altitude="232" latitude="52.5977" longitude="-7.6444">
+                <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.0" probability="0.1"/>
+                <symbol id="Sun" number="1"/>
+            </location>
+        </time>
+        <time datatype="forecast" from="2025-10-22T11:00:00Z" to="2025-10-22T11:00:00Z">
+            <location altitude="232" latitude="52.5977" longitude="-7.6444">
+                <temperature id="TTT" unit="celsius" value="10.0"/>
+                <windDirection id="dd" deg="192.1" name="S"/>
+                <windSpeed id="ff" mps="3.2" beaufort="2" name="Light breeze"/>
+                <windGust id="ff_gust" mps="5.3"/>
+                <globalRadiation value="317.9" unit="W/m^2"/>
+                <humidity value="83.7" unit="percent"/>
+                <pressure id="pr" unit="hPa" value="996.7"/>
+                <cloudiness id="NN" percent="3.3"/>
+                <lowClouds id="LOW" percent="0.7"/>
+                <mediumClouds id="MEDIUM" percent="2.6"/>
+                <highClouds id="HIGH" percent="0.0"/>
+                <dewpointTemperature id="TD" unit="celsius" value="7.3"/>
+            </location>
+        </time>
+        <time datatype="forecast" from="2025-10-22T10:00:00Z" to="2025-10-22T11:00:00Z">
+            <location altitude="232" latitude="52.5977" longitude="-7.6444">
+                <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.0" probability="3.2"/>
+                <symbol id="Sun" number="1"/>
+            </location>
+        </time>
+        <time datatype="forecast" from="2025-10-22T12:00:00Z" to="2025-10-22T12:00:00Z">
+            <location altitude="232" latitude="52.5977" longitude="-7.6444">
+                <temperature id="TTT" unit="celsius" value="10.4"/>
+                <windDirection id="dd" deg="194.0" name="S"/>
+                <windSpeed id="ff" mps="3.5" beaufort="3" name="Gentle breeze"/>
+                <windGust id="ff_gust" mps="5.5"/>
+                <globalRadiation value="352.6" unit="W/m^2"/>
+                <humidity value="82.7" unit="percent"/>
+                <pressure id="pr" unit="hPa" value="996.1"/>
+                <cloudiness id="NN" percent="47.5"/>
+                <lowClouds id="LOW" percent="30.2"/>
+                <mediumClouds id="MEDIUM" percent="26.1"/>
+                <highClouds id="HIGH" percent="0.0"/>
+                <dewpointTemperature id="TD" unit="celsius" value="7.5"/>
+            </location>
+        </time>
+        <time datatype="forecast" from="2025-10-22T11:00:00Z" to="2025-10-22T12:00:00Z">
+            <location altitude="232" latitude="52.5977" longitude="-7.6444">
+                <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.0" probability="2.4"/>
+                <symbol id="PartlyCloud" number="3"/>
+            </location>
+        </time>
+        <time datatype="forecast" from="2025-10-22T13:00:00Z" to="2025-10-22T13:00:00Z">
+            <location altitude="232" latitude="52.5977" longitude="-7.6444">
+                <temperature id="TTT" unit="celsius" value="10.8"/>
+                <windDirection id="dd" deg="212.8" name="SW"/>
+                <windSpeed id="ff" mps="2.4" beaufort="2" name="Light breeze"/>
+                <windGust id="ff_gust" mps="5.5"/>
+                <globalRadiation value="325.9" unit="W/m^2"/>
+                <humidity value="79.7" unit="percent"/>
+                <pressure id="pr" unit="hPa" value="995.2"/>
+                <cloudiness id="NN" percent="58.2"/>
+                <lowClouds id="LOW" percent="39.1"/>
+                <mediumClouds id="MEDIUM" percent="30.6"/>
+                <highClouds id="HIGH" percent="0.0"/>
+                <dewpointTemperature id="TD" unit="celsius" value="7.5"/>
+            </location>
+        </time>
+        <time datatype="forecast" from="2025-10-22T12:00:00Z" to="2025-10-22T13:00:00Z">
+            <location altitude="232" latitude="52.5977" longitude="-7.6444">
+                <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.1" probability="4.3"/>
+                <symbol id="PartlyCloud" number="3"/>
+            </location>
+        </time>
+        <time datatype="forecast" from="2025-10-22T14:00:00Z" to="2025-10-22T14:00:00Z">
+            <location altitude="232" latitude="52.5977" longitude="-7.6444">
+                <temperature id="TTT" unit="celsius" value="10.8"/>
+                <windDirection id="dd" deg="242.7" name="SW"/>
+                <windSpeed id="ff" mps="1.8" beaufort="2" name="Light breeze"/>
+                <windGust id="ff_gust" mps="5.3"/>
+                <globalRadiation value="234.8" unit="W/m^2"/>
+                <humidity value="75.6" unit="percent"/>
+                <pressure id="pr" unit="hPa" value="994.5"/>
+                <cloudiness id="NN" percent="99.1"/>
+                <lowClouds id="LOW" percent="8.8"/>
+                <mediumClouds id="MEDIUM" percent="99.0"/>
+                <highClouds id="HIGH" percent="0.0"/>
+                <dewpointTemperature id="TD" unit="celsius" value="6.7"/>
+            </location>
+        </time>
+        <time datatype="forecast" from="2025-10-22T13:00:00Z" to="2025-10-22T14:00:00Z">
+            <location altitude="232" latitude="52.5977" longitude="-7.6444">
+                <precipitation unit="mm" value="0.1" minvalue="0.1" maxvalue="0.2" probability="10.7"/>
+                <symbol id="Drizzle" number="46"/>
+            </location>
+        </time>
+        <time datatype="forecast" from="2025-10-22T15:00:00Z" to="2025-10-22T15:00:00Z">
+            <location altitude="232" latitude="52.5977" longitude="-7.6444">
+                <temperature id="TTT" unit="celsius" value="10.9"/>
+                <windDirection id="dd" deg="251.0" name="W"/>
+                <windSpeed id="ff" mps="1.5" beaufort="1" name="Light air"/>
+                <windGust id="ff_gust" mps="4.8"/>
+                <globalRadiation value="188.2" unit="W/m^2"/>
+                <humidity value="72.4" unit="percent"/>
+                <pressure id="pr" unit="hPa" value="993.6"/>
+                <cloudiness id="NN" percent="43.8"/>
+                <lowClouds id="LOW" percent="4.9"/>
+                <mediumClouds id="MEDIUM" percent="41.3"/>
+                <highClouds id="HIGH" percent="0.0"/>
+                <dewpointTemperature id="TD" unit="celsius" value="6.1"/>
+            </location>
+        </time>
+        <time datatype="forecast" from="2025-10-22T14:00:00Z" to="2025-10-22T15:00:00Z">
+            <location altitude="232" latitude="52.5977" longitude="-7.6444">
+                <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.2" probability="10.7"/>
+                <symbol id="PartlyCloud" number="3"/>
+            </location>
+        </time>
+        <time datatype="forecast" from="2025-10-22T16:00:00Z" to="2025-10-22T16:00:00Z">
+            <location altitude="232" latitude="52.5977" longitude="-7.6444">
+                <temperature id="TTT" unit="celsius" value="10.7"/>
+                <windDirection id="dd" deg="254.4" name="W"/>
+                <windSpeed id="ff" mps="1.2" beaufort="1" name="Light air"/>
+                <windGust id="ff_gust" mps="4.4"/>
+                <globalRadiation value="139.5" unit="W/m^2"/>
+                <humidity value="71.2" unit="percent"/>
+                <pressure id="pr" unit="hPa" value="992.9"/>
+                <cloudiness id="NN" percent="96.1"/>
+                <lowClouds id="LOW" percent="10.6"/>
+                <mediumClouds id="MEDIUM" percent="96.0"/>
+                <highClouds id="HIGH" percent="0.0"/>
+                <dewpointTemperature id="TD" unit="celsius" value="5.6"/>
+            </location>
+        </time>
+        <time datatype="forecast" from="2025-10-22T15:00:00Z" to="2025-10-22T16:00:00Z">
+            <location altitude="232" latitude="52.5977" longitude="-7.6444">
+                <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.2" probability="9.7"/>
+                <symbol id="Cloud" number="4"/>
+            </location>
+        </time>
+        <time datatype="forecast" from="2025-10-22T17:00:00Z" to="2025-10-22T17:00:00Z">
+            <location altitude="232" latitude="52.5977" longitude="-7.6444">
+                <temperature id="TTT" unit="celsius" value="9.7"/>
+                <windDirection id="dd" deg="267.1" name="W"/>
+                <windSpeed id="ff" mps="0.6" beaufort="1" name="Light air"/>
+                <windGust id="ff_gust" mps="3.7"/>
+                <globalRadiation value="49.3" unit="W/m^2"/>
+                <humidity value="82.1" unit="percent"/>
+                <pressure id="pr" unit="hPa" value="992.4"/>
+                <cloudiness id="NN" percent="100.0"/>
+                <lowClouds id="LOW" percent="71.6"/>
+                <mediumClouds id="MEDIUM" percent="100.0"/>
+                <highClouds id="HIGH" percent="0.3"/>
+                <dewpointTemperature id="TD" unit="celsius" value="6.8"/>
+            </location>
+        </time>
+        <time datatype="forecast" from="2025-10-22T16:00:00Z" to="2025-10-22T17:00:00Z">
+            <location altitude="232" latitude="52.5977" longitude="-7.6444">
+                <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.1" probability="8.2"/>
+                <symbol id="Cloud" number="4"/>
+            </location>
+        </time>
+        <time datatype="forecast" from="2025-10-22T18:00:00Z" to="2025-10-22T18:00:00Z">
+            <location altitude="232" latitude="52.5977" longitude="-7.6444">
+                <temperature id="TTT" unit="celsius" value="8.8"/>
+                <windDirection id="dd" deg="134.4" name="SE"/>
+                <windSpeed id="ff" mps="0.5" beaufort="1" name="Light air"/>
+                <windGust id="ff_gust" mps="3.6"/>
+                <globalRadiation value="1.2" unit="W/m^2"/>
+                <humidity value="84.4" unit="percent"/>
+                <pressure id="pr" unit="hPa" value="991.9"/>
+                <cloudiness id="NN" percent="100.0"/>
+                <lowClouds id="LOW" percent="92.0"/>
+                <mediumClouds id="MEDIUM" percent="100.0"/>
+                <highClouds id="HIGH" percent="89.2"/>
+                <dewpointTemperature id="TD" unit="celsius" value="6.3"/>
+            </location>
+        </time>
+        <time datatype="forecast" from="2025-10-22T17:00:00Z" to="2025-10-22T18:00:00Z">
+            <location altitude="232" latitude="52.5977" longitude="-7.6444">
+                <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.2" probability="12.9"/>
+                <symbol id="Cloud" number="4"/>
+            </location>
+        </time>
+        <time datatype="forecast" from="2025-10-22T19:00:00Z" to="2025-10-22T19:00:00Z">
+            <location altitude="232" latitude="52.5977" longitude="-7.6444">
+                <temperature id="TTT" unit="celsius" value="8.2"/>
+                <windDirection id="dd" deg="3.0" name="N"/>
+                <windSpeed id="ff" mps="0.9" beaufort="1" name="Light air"/>
+                <windGust id="ff_gust" mps="3.4"/>
+                <globalRadiation value="0.0" unit="W/m^2"/>
+                <humidity value="88.5" unit="percent"/>
+                <pressure id="pr" unit="hPa" value="991.5"/>
+                <cloudiness id="NN" percent="100.0"/>
+                <lowClouds id="LOW" percent="91.8"/>
+                <mediumClouds id="MEDIUM" percent="100.0"/>
+                <highClouds id="HIGH" percent="99.7"/>
+                <dewpointTemperature id="TD" unit="celsius" value="6.4"/>
+            </location>
+        </time>
+        <time datatype="forecast" from="2025-10-22T18:00:00Z" to="2025-10-22T19:00:00Z">
+            <location altitude="232" latitude="52.5977" longitude="-7.6444">
+                <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.2" probability="13.9"/>
+                <symbol id="Cloud" number="4"/>
+            </location>
+        </time>
+        <time datatype="forecast" from="2025-10-22T20:00:00Z" to="2025-10-22T20:00:00Z">
+            <location altitude="232" latitude="52.5977" longitude="-7.6444">
+                <temperature id="TTT" unit="celsius" value="7.8"/>
+                <windDirection id="dd" deg="344.7" name="N"/>
+                <windSpeed id="ff" mps="2.5" beaufort="2" name="Light breeze"/>
+                <windGust id="ff_gust" mps="3.5"/>
+                <globalRadiation value="0.0" unit="W/m^2"/>
+                <humidity value="95.2" unit="percent"/>
+                <pressure id="pr" unit="hPa" value="991.3"/>
+                <cloudiness id="NN" percent="100.0"/>
+                <lowClouds id="LOW" percent="92.6"/>
+                <mediumClouds id="MEDIUM" percent="100.0"/>
+                <highClouds id="HIGH" percent="100.0"/>
+                <dewpointTemperature id="TD" unit="celsius" value="7.1"/>
+            </location>
+        </time>
+        <time datatype="forecast" from="2025-10-22T19:00:00Z" to="2025-10-22T20:00:00Z">
+            <location altitude="232" latitude="52.5977" longitude="-7.6444">
+                <precipitation unit="mm" value="0.1" minvalue="0.1" maxvalue="0.2" probability="23.3"/>
+                <symbol id="Drizzle" number="46"/>
+            </location>
+        </time>
+        <time datatype="forecast" from="2025-10-22T21:00:00Z" to="2025-10-22T21:00:00Z">
+            <location altitude="232" latitude="52.5977" longitude="-7.6444">
+                <temperature id="TTT" unit="celsius" value="7.5"/>
+                <windDirection id="dd" deg="353.1" name="N"/>
+                <windSpeed id="ff" mps="2.1" beaufort="2" name="Light breeze"/>
+                <windGust id="ff_gust" mps="3.6"/>
+                <globalRadiation value="0.0" unit="W/m^2"/>
+                <humidity value="97.2" unit="percent"/>
+                <pressure id="pr" unit="hPa" value="991.3"/>
+                <cloudiness id="NN" percent="100.0"/>
+                <lowClouds id="LOW" percent="97.3"/>
+                <mediumClouds id="MEDIUM" percent="100.0"/>
+                <highClouds id="HIGH" percent="100.0"/>
+                <dewpointTemperature id="TD" unit="celsius" value="7.0"/>
+            </location>
+        </time>
+        <time datatype="forecast" from="2025-10-22T20:00:00Z" to="2025-10-22T21:00:00Z">
+            <location altitude="232" latitude="52.5977" longitude="-7.6444">
+                <precipitation unit="mm" value="0.2" minvalue="0.1" maxvalue="0.4" probability="27.7"/>
+                <symbol id="Drizzle" number="46"/>
+            </location>
+        </time>
+        <time datatype="forecast" from="2025-10-22T22:00:00Z" to="2025-10-22T22:00:00Z">
+            <location altitude="232" latitude="52.5977" longitude="-7.6444">
+                <temperature id="TTT" unit="celsius" value="7.1"/>
+                <windDirection id="dd" deg="337.6" name="N"/>
+                <windSpeed id="ff" mps="3.3" beaufort="2" name="Light breeze"/>
+                <windGust id="ff_gust" mps="4.3"/>
+                <globalRadiation value="0.0" unit="W/m^2"/>
+                <humidity value="97.8" unit="percent"/>
+                <pressure id="pr" unit="hPa" value="991.3"/>
+                <cloudiness id="NN" percent="100.0"/>
+                <lowClouds id="LOW" percent="64.4"/>
+                <mediumClouds id="MEDIUM" percent="100.0"/>
+                <highClouds id="HIGH" percent="100.0"/>
+                <dewpointTemperature id="TD" unit="celsius" value="6.8"/>
+            </location>
+        </time>
+        <time datatype="forecast" from="2025-10-22T21:00:00Z" to="2025-10-22T22:00:00Z">
+            <location altitude="232" latitude="52.5977" longitude="-7.6444">
+                <precipitation unit="mm" value="0.3" minvalue="0.2" maxvalue="0.5" probability="32.2"/>
+                <symbol id="LightRain" number="9"/>
+            </location>
+        </time>
+        <time datatype="forecast" from="2025-10-22T23:00:00Z" to="2025-10-22T23:00:00Z">
+            <location altitude="232" latitude="52.5977" longitude="-7.6444">
+                <temperature id="TTT" unit="celsius" value="6.9"/>
+                <windDirection id="dd" deg="334.0" name="NW"/>
+                <windSpeed id="ff" mps="3.8" beaufort="3" name="Gentle breeze"/>
+                <windGust id="ff_gust" mps="4.6"/>
+                <globalRadiation value="0.0" unit="W/m^2"/>
+                <humidity value="97.9" unit="percent"/>
+                <pressure id="pr" unit="hPa" value="991.2"/>
+                <cloudiness id="NN" percent="100.0"/>
+                <lowClouds id="LOW" percent="81.1"/>
+                <mediumClouds id="MEDIUM" percent="100.0"/>
+                <highClouds id="HIGH" percent="100.0"/>
+                <dewpointTemperature id="TD" unit="celsius" value="6.5"/>
+            </location>
+        </time>
+        <time datatype="forecast" from="2025-10-22T22:00:00Z" to="2025-10-22T23:00:00Z">
+            <location altitude="232" latitude="52.5977" longitude="-7.6444">
+                <precipitation unit="mm" value="0.3" minvalue="0.2" maxvalue="0.3" probability="28.8"/>
+                <symbol id="LightRain" number="9"/>
+            </location>
+        </time>
+        <time datatype="forecast" from="2025-10-23T00:00:00Z" to="2025-10-23T00:00:00Z">
+            <location altitude="232" latitude="52.5977" longitude="-7.6444">
+                <temperature id="TTT" unit="celsius" value="6.6"/>
+                <windDirection id="dd" deg="322.9" name="NW"/>
+                <windSpeed id="ff" mps="3.6" beaufort="3" name="Gentle breeze"/>
+                <windGust id="ff_gust" mps="5.0"/>
+                <globalRadiation value="0.0" unit="W/m^2"/>
+                <humidity value="98.0" unit="percent"/>
+                <pressure id="pr" unit="hPa" value="991.0"/>
+                <cloudiness id="NN" percent="100.0"/>
+                <lowClouds id="LOW" percent="51.1"/>
+                <mediumClouds id="MEDIUM" percent="100.0"/>
+                <highClouds id="HIGH" percent="100.0"/>
+                <dewpointTemperature id="TD" unit="celsius" value="6.3"/>
+            </location>
+        </time>
+        <time datatype="forecast" from="2025-10-22T23:00:00Z" to="2025-10-23T00:00:00Z">
+            <location altitude="232" latitude="52.5977" longitude="-7.6444">
+                <precipitation unit="mm" value="0.2" minvalue="0.1" maxvalue="0.3" probability="28.7"/>
+                <symbol id="Drizzle" number="46"/>
+            </location>
+        </time>
+        <time datatype="forecast" from="2025-10-23T01:00:00Z" to="2025-10-23T01:00:00Z">
+            <location altitude="232" latitude="52.5977" longitude="-7.6444">
+                <temperature id="TTT" unit="celsius" value="6.3"/>
+                <windDirection id="dd" deg="323.8" name="NW"/>
+                <windSpeed id="ff" mps="4.1" beaufort="3" name="Gentle breeze"/>
+                <windGust id="ff_gust" mps="5.4"/>
+                <globalRadiation value="0.0" unit="W/m^2"/>
+                <humidity value="98.7" unit="percent"/>
+                <pressure id="pr" unit="hPa" value="990.7"/>
+                <cloudiness id="NN" percent="100.0"/>
+                <lowClouds id="LOW" percent="29.0"/>
+                <mediumClouds id="MEDIUM" percent="99.8"/>
+                <highClouds id="HIGH" percent="100.0"/>
+                <dewpointTemperature id="TD" unit="celsius" value="6.1"/>
+            </location>
+        </time>
+        <time datatype="forecast" from="2025-10-23T00:00:00Z" to="2025-10-23T01:00:00Z">
+            <location altitude="232" latitude="52.5977" longitude="-7.6444">
+                <precipitation unit="mm" value="0.2" minvalue="0.1" maxvalue="0.2" probability="23.9"/>
+                <symbol id="Drizzle" number="46"/>
+            </location>
+        </time>
+        <time datatype="forecast" from="2025-10-23T02:00:00Z" to="2025-10-23T02:00:00Z">
+            <location altitude="232" latitude="52.5977" longitude="-7.6444">
+                <temperature id="TTT" unit="celsius" value="6.1"/>
+                <windDirection id="dd" deg="321.2" name="NW"/>
+                <windSpeed id="ff" mps="5.0" beaufort="3" name="Gentle breeze"/>
+                <windGust id="ff_gust" mps="6.4"/>
+                <globalRadiation value="0.0" unit="W/m^2"/>
+                <humidity value="96.7" unit="percent"/>
+                <pressure id="pr" unit="hPa" value="991.3"/>
+                <cloudiness id="NN" percent="100.0"/>
+                <lowClouds id="LOW" percent="7.5"/>
+                <mediumClouds id="MEDIUM" percent="97.7"/>
+                <highClouds id="HIGH" percent="100.0"/>
+                <dewpointTemperature id="TD" unit="celsius" value="5.6"/>
+            </location>
+        </time>
+        <time datatype="forecast" from="2025-10-23T01:00:00Z" to="2025-10-23T02:00:00Z">
+            <location altitude="232" latitude="52.5977" longitude="-7.6444">
+                <precipitation unit="mm" value="0.1" minvalue="0.1" maxvalue="0.2" probability="23.6"/>
+                <symbol id="Drizzle" number="46"/>
+            </location>
+        </time>
+        <time datatype="forecast" from="2025-10-23T03:00:00Z" to="2025-10-23T03:00:00Z">
+            <location altitude="232" latitude="52.5977" longitude="-7.6444">
+                <temperature id="TTT" unit="celsius" value="5.7"/>
+                <windDirection id="dd" deg="314.4" name="NW"/>
+                <windSpeed id="ff" mps="5.2" beaufort="3" name="Gentle breeze"/>
+                <windGust id="ff_gust" mps="7.0"/>
+                <globalRadiation value="0.0" unit="W/m^2"/>
+                <humidity value="97.1" unit="percent"/>
+                <pressure id="pr" unit="hPa" value="992.1"/>
+                <cloudiness id="NN" percent="100.0"/>
+                <lowClouds id="LOW" percent="3.7"/>
+                <mediumClouds id="MEDIUM" percent="61.0"/>
+                <highClouds id="HIGH" percent="100.0"/>
+                <dewpointTemperature id="TD" unit="celsius" value="5.2"/>
+            </location>
+        </time>
+        <time datatype="forecast" from="2025-10-23T02:00:00Z" to="2025-10-23T03:00:00Z">
+            <location altitude="232" latitude="52.5977" longitude="-7.6444">
+                <precipitation unit="mm" value="0.1" minvalue="0.1" maxvalue="0.2" probability="15.9"/>
+                <symbol id="Drizzle" number="46"/>
+            </location>
+        </time>
+        <time datatype="forecast" from="2025-10-23T04:00:00Z" to="2025-10-23T04:00:00Z">
+            <location altitude="232" latitude="52.5977" longitude="-7.6444">
+                <temperature id="TTT" unit="celsius" value="5.2"/>
+                <windDirection id="dd" deg="309.4" name="NW"/>
+                <windSpeed id="ff" mps="5.3" beaufort="3" name="Gentle breeze"/>
+                <windGust id="ff_gust" mps="7.5"/>
+                <globalRadiation value="0.0" unit="W/m^2"/>
+                <humidity value="97.2" unit="percent"/>
+                <pressure id="pr" unit="hPa" value="992.8"/>
+                <cloudiness id="NN" percent="100.0"/>
+                <lowClouds id="LOW" percent="56.2"/>
+                <mediumClouds id="MEDIUM" percent="9.4"/>
+                <highClouds id="HIGH" percent="100.0"/>
+                <dewpointTemperature id="TD" unit="celsius" value="4.7"/>
+            </location>
+        </time>
+        <time datatype="forecast" from="2025-10-23T03:00:00Z" to="2025-10-23T04:00:00Z">
+            <location altitude="232" latitude="52.5977" longitude="-7.6444">
+                <precipitation unit="mm" value="0.1" minvalue="0.1" maxvalue="0.2" probability="14.7"/>
+                <symbol id="Drizzle" number="46"/>
+            </location>
+        </time>
+        <time datatype="forecast" from="2025-10-23T05:00:00Z" to="2025-10-23T05:00:00Z">
+            <location altitude="232" latitude="52.5977" longitude="-7.6444">
+                <temperature id="TTT" unit="celsius" value="4.9"/>
+                <windDirection id="dd" deg="322.2" name="NW"/>
+                <windSpeed id="ff" mps="5.9" beaufort="4" name="Moderate breeze"/>
+                <windGust id="ff_gust" mps="8.9"/>
+                <globalRadiation value="0.0" unit="W/m^2"/>
+                <humidity value="97.6" unit="percent"/>
+                <pressure id="pr" unit="hPa" value="994.1"/>
+                <cloudiness id="NN" percent="99.9"/>
+                <lowClouds id="LOW" percent="30.9"/>
+                <mediumClouds id="MEDIUM" percent="3.9"/>
+                <highClouds id="HIGH" percent="99.9"/>
+                <dewpointTemperature id="TD" unit="celsius" value="4.5"/>
+            </location>
+        </time>
+        <time datatype="forecast" from="2025-10-23T04:00:00Z" to="2025-10-23T05:00:00Z">
+            <location altitude="232" latitude="52.5977" longitude="-7.6444">
+                <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.1" probability="12.8"/>
+                <symbol id="Cloud" number="4"/>
+            </location>
+        </time>
+        <time datatype="forecast" from="2025-10-23T06:00:00Z" to="2025-10-23T06:00:00Z">
+            <location altitude="232" latitude="52.5977" longitude="-7.6444">
+                <temperature id="TTT" unit="celsius" value="4.2"/>
+                <windDirection id="dd" deg="307.9" name="NW"/>
+                <windSpeed id="ff" mps="4.8" beaufort="3" name="Gentle breeze"/>
+                <windGust id="ff_gust" mps="9.4"/>
+                <globalRadiation value="0.0" unit="W/m^2"/>
+                <humidity value="97.4" unit="percent"/>
+                <pressure id="pr" unit="hPa" value="995.3"/>
+                <cloudiness id="NN" percent="50.9"/>
+                <lowClouds id="LOW" percent="33.5"/>
+                <mediumClouds id="MEDIUM" percent="7.5"/>
+                <highClouds id="HIGH" percent="15.7"/>
+                <dewpointTemperature id="TD" unit="celsius" value="3.8"/>
+            </location>
+        </time>
+        <time datatype="forecast" from="2025-10-23T05:00:00Z" to="2025-10-23T06:00:00Z">
+            <location altitude="232" latitude="52.5977" longitude="-7.6444">
+                <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.0" probability="2.6"/>
+                <symbol id="PartlyCloud" number="3"/>
+            </location>
+        </time>
+        <time datatype="forecast" from="2025-10-23T07:00:00Z" to="2025-10-23T07:00:00Z">
+            <location altitude="232" latitude="52.5977" longitude="-7.6444">
+                <temperature id="TTT" unit="celsius" value="5.0"/>
+                <windDirection id="dd" deg="326.9" name="NW"/>
+                <windSpeed id="ff" mps="6.5" beaufort="4" name="Moderate breeze"/>
+                <windGust id="ff_gust" mps="10.8"/>
+                <globalRadiation value="0.0" unit="W/m^2"/>
+                <humidity value="93.2" unit="percent"/>
+                <pressure id="pr" unit="hPa" value="995.4"/>
+                <cloudiness id="NN" percent="11.2"/>
+                <lowClouds id="LOW" percent="2.4"/>
+                <dewpointTemperature id="TD" unit="celsius" value="3.9"/>
+            </location>
+        </time>
+        <time datatype="forecast" from="2025-10-23T06:00:00Z" to="2025-10-23T07:00:00Z">
+            <location altitude="232" latitude="52.5977" longitude="-7.6444">
+                <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.1" probability="13.4"/>
+                <symbol id="Sun" number="1"/>
+            </location>
+        </time>
+        <time datatype="forecast" from="2025-10-23T08:00:00Z" to="2025-10-23T08:00:00Z">
+            <location altitude="232" latitude="52.5977" longitude="-7.6444">
+                <temperature id="TTT" unit="celsius" value="5.0"/>
+                <windDirection id="dd" deg="317.0" name="NW"/>
+                <windSpeed id="ff" mps="6.2" beaufort="4" name="Moderate breeze"/>
+                <windGust id="ff_gust" mps="10.7"/>
+                <globalRadiation value="15.5" unit="W/m^2"/>
+                <humidity value="93.0" unit="percent"/>
+                <pressure id="pr" unit="hPa" value="996.9"/>
+                <cloudiness id="NN" percent="8.0"/>
+                <lowClouds id="LOW" percent="5.7"/>
+                <dewpointTemperature id="TD" unit="celsius" value="3.9"/>
+            </location>
+        </time>
+        <time datatype="forecast" from="2025-10-23T07:00:00Z" to="2025-10-23T08:00:00Z">
+            <location altitude="232" latitude="52.5977" longitude="-7.6444">
+                <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.0" probability="10.7"/>
+                <symbol id="Sun" number="1"/>
+            </location>
+        </time>
+        <time datatype="forecast" from="2025-10-23T09:00:00Z" to="2025-10-23T09:00:00Z">
+            <location altitude="232" latitude="52.5977" longitude="-7.6444">
+                <temperature id="TTT" unit="celsius" value="6.0"/>
+                <windDirection id="dd" deg="307.0" name="NW"/>
+                <windSpeed id="ff" mps="6.4" beaufort="4" name="Moderate breeze"/>
+                <windGust id="ff_gust" mps="11.4"/>
+                <globalRadiation value="98.4" unit="W/m^2"/>
+                <humidity value="88.9" unit="percent"/>
+                <pressure id="pr" unit="hPa" value="998.3"/>
+                <cloudiness id="NN" percent="8.0"/>
+                <lowClouds id="LOW" percent="2.9"/>
+                <dewpointTemperature id="TD" unit="celsius" value="4.3"/>
+            </location>
+        </time>
+        <time datatype="forecast" from="2025-10-23T08:00:00Z" to="2025-10-23T09:00:00Z">
+            <location altitude="232" latitude="52.5977" longitude="-7.6444">
+                <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.0" probability="8.8"/>
+                <symbol id="Sun" number="1"/>
+            </location>
+        </time>
+        <time datatype="forecast" from="2025-10-23T10:00:00Z" to="2025-10-23T10:00:00Z">
+            <location altitude="232" latitude="52.5977" longitude="-7.6444">
+                <temperature id="TTT" unit="celsius" value="7.6"/>
+                <windDirection id="dd" deg="307.2" name="NW"/>
+                <windSpeed id="ff" mps="6.0" beaufort="4" name="Moderate breeze"/>
+                <windGust id="ff_gust" mps="12.9"/>
+                <globalRadiation value="202.9" unit="W/m^2"/>
+                <humidity value="80.8" unit="percent"/>
+                <pressure id="pr" unit="hPa" value="999.0"/>
+                <cloudiness id="NN" percent="5.8"/>
+                <lowClouds id="LOW" percent="3.7"/>
+                <dewpointTemperature id="TD" unit="celsius" value="4.4"/>
+            </location>
+        </time>
+        <time datatype="forecast" from="2025-10-23T09:00:00Z" to="2025-10-23T10:00:00Z">
+            <location altitude="232" latitude="52.5977" longitude="-7.6444">
+                <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.0" probability="7.3"/>
+                <symbol id="Sun" number="1"/>
+            </location>
+        </time>
+        <time datatype="forecast" from="2025-10-23T11:00:00Z" to="2025-10-23T11:00:00Z">
+            <location altitude="232" latitude="52.5977" longitude="-7.6444">
+                <temperature id="TTT" unit="celsius" value="8.4"/>
+                <windDirection id="dd" deg="308.0" name="NW"/>
+                <windSpeed id="ff" mps="6.5" beaufort="4" name="Moderate breeze"/>
+                <windGust id="ff_gust" mps="13.7"/>
+                <globalRadiation value="287.0" unit="W/m^2"/>
+                <humidity value="73.3" unit="percent"/>
+                <pressure id="pr" unit="hPa" value="999.6"/>
+                <cloudiness id="NN" percent="39.6"/>
+                <lowClouds id="LOW" percent="15.6"/>
+                <dewpointTemperature id="TD" unit="celsius" value="3.8"/>
+            </location>
+        </time>
+        <time datatype="forecast" from="2025-10-23T10:00:00Z" to="2025-10-23T11:00:00Z">
+            <location altitude="232" latitude="52.5977" longitude="-7.6444">
+                <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.1" probability="7.1"/>
+                <symbol id="PartlyCloud" number="3"/>
+            </location>
+        </time>
+        <time datatype="forecast" from="2025-10-23T12:00:00Z" to="2025-10-23T12:00:00Z">
+            <location altitude="232" latitude="52.5977" longitude="-7.6444">
+                <temperature id="TTT" unit="celsius" value="8.8"/>
+                <windDirection id="dd" deg="301.5" name="NW"/>
+                <windSpeed id="ff" mps="6.5" beaufort="4" name="Moderate breeze"/>
+                <windGust id="ff_gust" mps="14.3"/>
+                <globalRadiation value="318.8" unit="W/m^2"/>
+                <humidity value="67.7" unit="percent"/>
+                <pressure id="pr" unit="hPa" value="1000.0"/>
+                <cloudiness id="NN" percent="71.5"/>
+                <lowClouds id="LOW" percent="10.6"/>
+                <dewpointTemperature id="TD" unit="celsius" value="3.0"/>
+            </location>
+        </time>
+        <time datatype="forecast" from="2025-10-23T11:00:00Z" to="2025-10-23T12:00:00Z">
+            <location altitude="232" latitude="52.5977" longitude="-7.6444">
+                <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.1" probability="11.9"/>
+                <symbol id="PartlyCloud" number="3"/>
+            </location>
+        </time>
+        <time datatype="forecast" from="2025-10-23T13:00:00Z" to="2025-10-23T13:00:00Z">
+            <location altitude="232" latitude="52.5977" longitude="-7.6444">
+                <temperature id="TTT" unit="celsius" value="7.9"/>
+                <windDirection id="dd" deg="290.5" name="W"/>
+                <windSpeed id="ff" mps="6.3" beaufort="4" name="Moderate breeze"/>
+                <windGust id="ff_gust" mps="14.5"/>
+                <globalRadiation value="327.6" unit="W/m^2"/>
+                <humidity value="72.1" unit="percent"/>
+                <pressure id="pr" unit="hPa" value="1000.4"/>
+                <cloudiness id="NN" percent="98.8"/>
+                <lowClouds id="LOW" percent="27.0"/>
+                <dewpointTemperature id="TD" unit="celsius" value="3.1"/>
+            </location>
+        </time>
+        <time datatype="forecast" from="2025-10-23T12:00:00Z" to="2025-10-23T13:00:00Z">
+            <location altitude="232" latitude="52.5977" longitude="-7.6444">
+                <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.1" probability="12.5"/>
+                <symbol id="Cloud" number="4"/>
+            </location>
+        </time>
+        <time datatype="forecast" from="2025-10-23T14:00:00Z" to="2025-10-23T14:00:00Z">
+            <location altitude="232" latitude="52.5977" longitude="-7.6444">
+                <temperature id="TTT" unit="celsius" value="7.2"/>
+                <windDirection id="dd" deg="282.8" name="W"/>
+                <windSpeed id="ff" mps="6.0" beaufort="4" name="Moderate breeze"/>
+                <windGust id="ff_gust" mps="14.6"/>
+                <globalRadiation value="299.2" unit="W/m^2"/>
+                <humidity value="75.6" unit="percent"/>
+                <pressure id="pr" unit="hPa" value="1000.8"/>
+                <cloudiness id="NN" percent="98.8"/>
+                <lowClouds id="LOW" percent="19.3"/>
+                <dewpointTemperature id="TD" unit="celsius" value="3.1"/>
+            </location>
+        </time>
+        <time datatype="forecast" from="2025-10-23T13:00:00Z" to="2025-10-23T14:00:00Z">
+            <location altitude="232" latitude="52.5977" longitude="-7.6444">
+                <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.2" probability="17.9"/>
+                <symbol id="Cloud" number="4"/>
+            </location>
+        </time>
+        <time datatype="forecast" from="2025-10-23T15:00:00Z" to="2025-10-23T15:00:00Z">
+            <location altitude="232" latitude="52.5977" longitude="-7.6444">
+                <temperature id="TTT" unit="celsius" value="6.1"/>
+                <windDirection id="dd" deg="281.8" name="W"/>
+                <windSpeed id="ff" mps="6.6" beaufort="4" name="Moderate breeze"/>
+                <windGust id="ff_gust" mps="14.2"/>
+                <globalRadiation value="238.0" unit="W/m^2"/>
+                <humidity value="82.3" unit="percent"/>
+                <pressure id="pr" unit="hPa" value="1001.3"/>
+                <cloudiness id="NN" percent="90.5"/>
+                <lowClouds id="LOW" percent="20.5"/>
+                <dewpointTemperature id="TD" unit="celsius" value="3.2"/>
+            </location>
+        </time>
+        <time datatype="forecast" from="2025-10-23T14:00:00Z" to="2025-10-23T15:00:00Z">
+            <location altitude="232" latitude="52.5977" longitude="-7.6444">
+                <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.1" probability="14.4"/>
+                <symbol id="Cloud" number="4"/>
+            </location>
+        </time>
+        <time datatype="forecast" from="2025-10-23T16:00:00Z" to="2025-10-23T16:00:00Z">
+            <location altitude="232" latitude="52.5977" longitude="-7.6444">
+                <temperature id="TTT" unit="celsius" value="6.0"/>
+                <windDirection id="dd" deg="273.9" name="W"/>
+                <windSpeed id="ff" mps="6.9" beaufort="4" name="Moderate breeze"/>
+                <windGust id="ff_gust" mps="12.9"/>
+                <globalRadiation value="150.7" unit="W/m^2"/>
+                <humidity value="84.3" unit="percent"/>
+                <pressure id="pr" unit="hPa" value="1001.6"/>
+                <cloudiness id="NN" percent="40.3"/>
+                <lowClouds id="LOW" percent="18.9"/>
+                <dewpointTemperature id="TD" unit="celsius" value="3.4"/>
+            </location>
+        </time>
+        <time datatype="forecast" from="2025-10-23T15:00:00Z" to="2025-10-23T16:00:00Z">
+            <location altitude="232" latitude="52.5977" longitude="-7.6444">
+                <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.1" probability="11.8"/>
+                <symbol id="PartlyCloud" number="3"/>
+            </location>
+        </time>
+        <time datatype="forecast" from="2025-10-23T17:00:00Z" to="2025-10-23T17:00:00Z">
+            <location altitude="232" latitude="52.5977" longitude="-7.6444">
+                <temperature id="TTT" unit="celsius" value="5.0"/>
+                <windDirection id="dd" deg="273.9" name="W"/>
+                <windSpeed id="ff" mps="6.1" beaufort="4" name="Moderate breeze"/>
+                <windGust id="ff_gust" mps="11.5"/>
+                <globalRadiation value="56.9" unit="W/m^2"/>
+                <humidity value="85.3" unit="percent"/>
+                <pressure id="pr" unit="hPa" value="1001.8"/>
+                <cloudiness id="NN" percent="13.9"/>
+                <lowClouds id="LOW" percent="11.9"/>
+                <dewpointTemperature id="TD" unit="celsius" value="2.6"/>
+            </location>
+        </time>
+        <time datatype="forecast" from="2025-10-23T16:00:00Z" to="2025-10-23T17:00:00Z">
+            <location altitude="232" latitude="52.5977" longitude="-7.6444">
+                <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.0" probability="3.9"/>
+                <symbol id="LightCloud" number="2"/>
+            </location>
+        </time>
+        <time datatype="forecast" from="2025-10-23T18:00:00Z" to="2025-10-23T18:00:00Z">
+            <location altitude="232" latitude="52.5977" longitude="-7.6444">
+                <temperature id="TTT" unit="celsius" value="4.3"/>
+                <windDirection id="dd" deg="268.7" name="W"/>
+                <windSpeed id="ff" mps="6.0" beaufort="4" name="Moderate breeze"/>
+                <windGust id="ff_gust" mps="10.7"/>
+                <globalRadiation value="1.2" unit="W/m^2"/>
+                <humidity value="88.0" unit="percent"/>
+                <pressure id="pr" unit="hPa" value="1002.0"/>
+                <cloudiness id="NN" percent="3.1"/>
+                <lowClouds id="LOW" percent="2.7"/>
+                <dewpointTemperature id="TD" unit="celsius" value="2.4"/>
+            </location>
+        </time>
+        <time datatype="forecast" from="2025-10-23T17:00:00Z" to="2025-10-23T18:00:00Z">
+            <location altitude="232" latitude="52.5977" longitude="-7.6444">
+                <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.0" probability="5.8"/>
+                <symbol id="Sun" number="1"/>
+            </location>
+        </time>
+        <time datatype="forecast" from="2025-10-23T19:00:00Z" to="2025-10-23T19:00:00Z">
+            <location altitude="232" latitude="52.5977" longitude="-7.6444">
+                <temperature id="TTT" unit="celsius" value="4.0"/>
+                <windDirection id="dd" deg="265.5" name="W"/>
+                <windSpeed id="ff" mps="5.9" beaufort="4" name="Moderate breeze"/>
+                <windGust id="ff_gust" mps="10.5"/>
+                <globalRadiation value="0.0" unit="W/m^2"/>
+                <humidity value="88.3" unit="percent"/>
+                <pressure id="pr" unit="hPa" value="1002.2"/>
+                <cloudiness id="NN" percent="1.4"/>
+                <lowClouds id="LOW" percent="1.4"/>
+                <dewpointTemperature id="TD" unit="celsius" value="2.1"/>
+            </location>
+        </time>
+        <time datatype="forecast" from="2025-10-23T18:00:00Z" to="2025-10-23T19:00:00Z">
+            <location altitude="232" latitude="52.5977" longitude="-7.6444">
+                <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.0" probability="6.7"/>
+                <symbol id="Sun" number="1"/>
+            </location>
+        </time>
+        <time datatype="forecast" from="2025-10-23T20:00:00Z" to="2025-10-23T20:00:00Z">
+            <location altitude="232" latitude="52.5977" longitude="-7.6444">
+                <temperature id="TTT" unit="celsius" value="3.9"/>
+                <windDirection id="dd" deg="263.5" name="W"/>
+                <windSpeed id="ff" mps="5.9" beaufort="4" name="Moderate breeze"/>
+                <windGust id="ff_gust" mps="10.7"/>
+                <globalRadiation value="0.0" unit="W/m^2"/>
+                <humidity value="85.4" unit="percent"/>
+                <pressure id="pr" unit="hPa" value="1002.2"/>
+                <cloudiness id="NN" percent="0.8"/>
+                <lowClouds id="LOW" percent="0.8"/>
+                <dewpointTemperature id="TD" unit="celsius" value="1.5"/>
+            </location>
+        </time>
+        <time datatype="forecast" from="2025-10-23T19:00:00Z" to="2025-10-23T20:00:00Z">
+            <location altitude="232" latitude="52.5977" longitude="-7.6444">
+                <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.0" probability="6.1"/>
+                <symbol id="Sun" number="1"/>
+            </location>
+        </time>
+        <time datatype="forecast" from="2025-10-23T21:00:00Z" to="2025-10-23T21:00:00Z">
+            <location altitude="232" latitude="52.5977" longitude="-7.6444">
+                <temperature id="TTT" unit="celsius" value="3.9"/>
+                <windDirection id="dd" deg="258.1" name="W"/>
+                <windSpeed id="ff" mps="6.2" beaufort="4" name="Moderate breeze"/>
+                <windGust id="ff_gust" mps="11.0"/>
+                <globalRadiation value="0.0" unit="W/m^2"/>
+                <humidity value="82.5" unit="percent"/>
+                <pressure id="pr" unit="hPa" value="1002.0"/>
+                <cloudiness id="NN" percent="9.2"/>
+                <lowClouds id="LOW" percent="9.2"/>
+                <dewpointTemperature id="TD" unit="celsius" value="1.1"/>
+            </location>
+        </time>
+        <time datatype="forecast" from="2025-10-23T20:00:00Z" to="2025-10-23T21:00:00Z">
+            <location altitude="232" latitude="52.5977" longitude="-7.6444">
+                <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.0" probability="7.8"/>
+                <symbol id="Sun" number="1"/>
+            </location>
+        </time>
+        <time datatype="forecast" from="2025-10-23T22:00:00Z" to="2025-10-23T22:00:00Z">
+            <location altitude="232" latitude="52.5977" longitude="-7.6444">
+                <temperature id="TTT" unit="celsius" value="4.2"/>
+                <windDirection id="dd" deg="254.1" name="W"/>
+                <windSpeed id="ff" mps="6.6" beaufort="4" name="Moderate breeze"/>
+                <windGust id="ff_gust" mps="11.3"/>
+                <globalRadiation value="0.1" unit="W/m^2"/>
+                <humidity value="80.2" unit="percent"/>
+                <pressure id="pr" unit="hPa" value="1001.9"/>
+                <cloudiness id="NN" percent="18.4"/>
+                <lowClouds id="LOW" percent="15.2"/>
+                <dewpointTemperature id="TD" unit="celsius" value="1.0"/>
+            </location>
+        </time>
+        <time datatype="forecast" from="2025-10-23T21:00:00Z" to="2025-10-23T22:00:00Z">
+            <location altitude="232" latitude="52.5977" longitude="-7.6444">
+                <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.0" probability="4.6"/>
+                <symbol id="LightCloud" number="2"/>
+            </location>
+        </time>
+        <time datatype="forecast" from="2025-10-23T23:00:00Z" to="2025-10-23T23:00:00Z">
+            <location altitude="232" latitude="52.5977" longitude="-7.6444">
+                <temperature id="TTT" unit="celsius" value="4.6"/>
+                <windDirection id="dd" deg="251.9" name="W"/>
+                <windSpeed id="ff" mps="7.5" beaufort="4" name="Moderate breeze"/>
+                <windGust id="ff_gust" mps="11.5"/>
+                <globalRadiation value="0.0" unit="W/m^2"/>
+                <humidity value="78.9" unit="percent"/>
+                <pressure id="pr" unit="hPa" value="1001.6"/>
+                <cloudiness id="NN" percent="27.6"/>
+                <lowClouds id="LOW" percent="25.5"/>
+                <dewpointTemperature id="TD" unit="celsius" value="1.2"/>
+            </location>
+        </time>
+        <time datatype="forecast" from="2025-10-23T22:00:00Z" to="2025-10-23T23:00:00Z">
+            <location altitude="232" latitude="52.5977" longitude="-7.6444">
+                <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.0" probability="4.2"/>
+                <symbol id="LightCloud" number="2"/>
+            </location>
+        </time>
+        <time datatype="forecast" from="2025-10-24T00:00:00Z" to="2025-10-24T00:00:00Z">
+            <location altitude="232" latitude="52.5977" longitude="-7.6444">
+                <temperature id="TTT" unit="celsius" value="4.9"/>
+                <windDirection id="dd" deg="249.4" name="W"/>
+                <windSpeed id="ff" mps="8.2" beaufort="5" name="Fresh breeze"/>
+                <windGust id="ff_gust" mps="11.9"/>
+                <globalRadiation value="0.0" unit="W/m^2"/>
+                <humidity value="77.5" unit="percent"/>
+                <pressure id="pr" unit="hPa" value="1000.9"/>
+                <cloudiness id="NN" percent="28.2"/>
+                <lowClouds id="LOW" percent="28.0"/>
+                <dewpointTemperature id="TD" unit="celsius" value="1.2"/>
+            </location>
+        </time>
+        <time datatype="forecast" from="2025-10-23T23:00:00Z" to="2025-10-24T00:00:00Z">
+            <location altitude="232" latitude="52.5977" longitude="-7.6444">
+                <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.0" probability="4.9"/>
+                <symbol id="LightCloud" number="2"/>
+            </location>
+        </time>
+        <time datatype="forecast" from="2025-10-24T01:00:00Z" to="2025-10-24T01:00:00Z">
+            <location altitude="232" latitude="52.5977" longitude="-7.6444">
+                <temperature id="TTT" unit="celsius" value="5.4"/>
+                <windDirection id="dd" deg="250.9" name="W"/>
+                <windSpeed id="ff" mps="8.4" beaufort="5" name="Fresh breeze"/>
+                <windGust id="ff_gust" mps="12.2"/>
+                <globalRadiation value="0.0" unit="W/m^2"/>
+                <humidity value="80.1" unit="percent"/>
+                <pressure id="pr" unit="hPa" value="1000.3"/>
+                <cloudiness id="NN" percent="39.0"/>
+                <lowClouds id="LOW" percent="28.2"/>
+                <dewpointTemperature id="TD" unit="celsius" value="2.1"/>
+            </location>
+        </time>
+        <time datatype="forecast" from="2025-10-24T00:00:00Z" to="2025-10-24T01:00:00Z">
+            <location altitude="232" latitude="52.5977" longitude="-7.6444">
+                <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.0" probability="3.7"/>
+                <symbol id="PartlyCloud" number="3"/>
+            </location>
+        </time>
+        <time datatype="forecast" from="2025-10-24T02:00:00Z" to="2025-10-24T02:00:00Z">
+            <location altitude="232" latitude="52.5977" longitude="-7.6444">
+                <temperature id="TTT" unit="celsius" value="5.7"/>
+                <windDirection id="dd" deg="252.2" name="W"/>
+                <windSpeed id="ff" mps="8.7" beaufort="5" name="Fresh breeze"/>
+                <windGust id="ff_gust" mps="12.4"/>
+                <globalRadiation value="0.0" unit="W/m^2"/>
+                <humidity value="80.3" unit="percent"/>
+                <pressure id="pr" unit="hPa" value="999.7"/>
+                <cloudiness id="NN" percent="47.0"/>
+                <lowClouds id="LOW" percent="41.7"/>
+                <dewpointTemperature id="TD" unit="celsius" value="2.5"/>
+            </location>
+        </time>
+        <time datatype="forecast" from="2025-10-24T01:00:00Z" to="2025-10-24T02:00:00Z">
+            <location altitude="232" latitude="52.5977" longitude="-7.6444">
+                <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.0" probability="5.4"/>
+                <symbol id="PartlyCloud" number="3"/>
+            </location>
+        </time>
+        <time datatype="forecast" from="2025-10-24T03:00:00Z" to="2025-10-24T03:00:00Z">
+            <location altitude="232" latitude="52.5977" longitude="-7.6444">
+                <temperature id="TTT" unit="celsius" value="6.3"/>
+                <windDirection id="dd" deg="252.4" name="W"/>
+                <windSpeed id="ff" mps="9.2" beaufort="5" name="Fresh breeze"/>
+                <windGust id="ff_gust" mps="12.8"/>
+                <globalRadiation value="0.0" unit="W/m^2"/>
+                <humidity value="76.8" unit="percent"/>
+                <pressure id="pr" unit="hPa" value="998.8"/>
+                <cloudiness id="NN" percent="68.1"/>
+                <lowClouds id="LOW" percent="59.3"/>
+                <dewpointTemperature id="TD" unit="celsius" value="2.4"/>
+            </location>
+        </time>
+        <time datatype="forecast" from="2025-10-24T02:00:00Z" to="2025-10-24T03:00:00Z">
+            <location altitude="232" latitude="52.5977" longitude="-7.6444">
+                <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.0" probability="8.6"/>
+                <symbol id="PartlyCloud" number="3"/>
+            </location>
+        </time>
+        <time datatype="forecast" from="2025-10-24T04:00:00Z" to="2025-10-24T04:00:00Z">
+            <location altitude="232" latitude="52.5977" longitude="-7.6444">
+                <temperature id="TTT" unit="celsius" value="6.7"/>
+                <windDirection id="dd" deg="253.0" name="W"/>
+                <windSpeed id="ff" mps="9.5" beaufort="5" name="Fresh breeze"/>
+                <windGust id="ff_gust" mps="13.1"/>
+                <globalRadiation value="0.0" unit="W/m^2"/>
+                <humidity value="77.9" unit="percent"/>
+                <pressure id="pr" unit="hPa" value="998.1"/>
+                <cloudiness id="NN" percent="77.8"/>
+                <lowClouds id="LOW" percent="75.8"/>
+                <dewpointTemperature id="TD" unit="celsius" value="3.0"/>
+            </location>
+        </time>
+        <time datatype="forecast" from="2025-10-24T03:00:00Z" to="2025-10-24T04:00:00Z">
+            <location altitude="232" latitude="52.5977" longitude="-7.6444">
+                <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.1" probability="14.9"/>
+                <symbol id="PartlyCloud" number="3"/>
+            </location>
+        </time>
+        <time datatype="forecast" from="2025-10-24T05:00:00Z" to="2025-10-24T05:00:00Z">
+            <location altitude="232" latitude="52.5977" longitude="-7.6444">
+                <temperature id="TTT" unit="celsius" value="6.9"/>
+                <windDirection id="dd" deg="254.6" name="W"/>
+                <windSpeed id="ff" mps="9.4" beaufort="5" name="Fresh breeze"/>
+                <windGust id="ff_gust" mps="13.3"/>
+                <globalRadiation value="0.0" unit="W/m^2"/>
+                <humidity value="81.9" unit="percent"/>
+                <pressure id="pr" unit="hPa" value="997.5"/>
+                <cloudiness id="NN" percent="84.3"/>
+                <lowClouds id="LOW" percent="83.9"/>
+                <dewpointTemperature id="TD" unit="celsius" value="4.0"/>
+            </location>
+        </time>
+        <time datatype="forecast" from="2025-10-24T04:00:00Z" to="2025-10-24T05:00:00Z">
+            <location altitude="232" latitude="52.5977" longitude="-7.6444">
+                <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.0" probability="7.0"/>
+                <symbol id="PartlyCloud" number="3"/>
+            </location>
+        </time>
+        <time datatype="forecast" from="2025-10-24T06:00:00Z" to="2025-10-24T06:00:00Z">
+            <location altitude="232" latitude="52.5977" longitude="-7.6444">
+                <temperature id="TTT" unit="celsius" value="7.2"/>
+                <windDirection id="dd" deg="257.5" name="W"/>
+                <windSpeed id="ff" mps="9.6" beaufort="5" name="Fresh breeze"/>
+                <windGust id="ff_gust" mps="13.3"/>
+                <globalRadiation value="0.0" unit="W/m^2"/>
+                <humidity value="84.0" unit="percent"/>
+                <pressure id="pr" unit="hPa" value="997.0"/>
+                <cloudiness id="NN" percent="73.1"/>
+                <lowClouds id="LOW" percent="71.5"/>
+                <dewpointTemperature id="TD" unit="celsius" value="4.6"/>
+            </location>
+        </time>
+        <time datatype="forecast" from="2025-10-24T05:00:00Z" to="2025-10-24T06:00:00Z">
+            <location altitude="232" latitude="52.5977" longitude="-7.6444">
+                <precipitation unit="mm" value="0.0" minvalue="0.0" maxvalue="0.1" probability="6.6"/>
+                <symbol id="PartlyCloud" number="3"/>
+            </location>
+        </time>
+        <time datatype="forecast" from="2025-10-24T09:00:00Z" to="2025-10-24T09:00:00Z">
+            <location altitude="232" latitude="52.5977" longitude="-7.6444">
+                <temperature id="TTT" unit="celsius" value="8.5"/>
+                <windDirection id="dd" deg="267.3" name="W"/>
+                <windSpeed id="ff" mps="10.1" beaufort="5" name="Fresh breeze"/>
+                <windGust id="ff_gust" mps="14.0"/>
+                <globalRadiation value="35.0" unit="W/m^2"/>
+                <humidity value="84.8" unit="percent"/>
+                <pressure id="pr" unit="hPa" value="996.2"/>
+                <cloudiness id="NN" percent="54.3"/>
+                <lowClouds id="LOW" percent="46.1"/>
+                <dewpointTemperature id="TD" unit="celsius" value="6.1"/>
+            </location>
+        </time>
+        <time datatype="forecast" from="2025-10-24T06:00:00Z" to="2025-10-24T09:00:00Z">
+            <location altitude="232" latitude="52.5977" longitude="-7.6444">
+                <precipitation unit="mm" value="0.0"/>
+                <symbol id="PartlyCloud" number="3"/>
+            </location>
+        </time>
+        <time datatype="forecast" from="2025-10-24T12:00:00Z" to="2025-10-24T12:00:00Z">
+            <location altitude="232" latitude="52.5977" longitude="-7.6444">
+                <temperature id="TTT" unit="celsius" value="10.5"/>
+                <windDirection id="dd" deg="293.7" name="NW"/>
+                <windSpeed id="ff" mps="10.8" beaufort="6" name="Strong breeze"/>
+                <windGust id="ff_gust" mps="15.9"/>
+                <globalRadiation value="226.6" unit="W/m^2"/>
+                <humidity value="74.5" unit="percent"/>
+                <pressure id="pr" unit="hPa" value="997.0"/>
+                <cloudiness id="NN" percent="64.3"/>
+                <lowClouds id="LOW" percent="53.7"/>
+                <dewpointTemperature id="TD" unit="celsius" value="6.1"/>
+            </location>
+        </time>
+        <time datatype="forecast" from="2025-10-24T09:00:00Z" to="2025-10-24T12:00:00Z">
+            <location altitude="232" latitude="52.5977" longitude="-7.6444">
+                <precipitation unit="mm" value="0.0"/>
+                <symbol id="PartlyCloud" number="3"/>
+            </location>
+        </time>
+        <time datatype="forecast" from="2025-10-24T15:00:00Z" to="2025-10-24T15:00:00Z">
+            <location altitude="232" latitude="52.5977" longitude="-7.6444">
+                <temperature id="TTT" unit="celsius" value="9.3"/>
+                <windDirection id="dd" deg="320.0" name="NW"/>
+                <windSpeed id="ff" mps="9.5" beaufort="5" name="Fresh breeze"/>
+                <windGust id="ff_gust" mps="15.5"/>
+                <globalRadiation value="242.3" unit="W/m^2"/>
+                <humidity value="82.6" unit="percent"/>
+                <pressure id="pr" unit="hPa" value="999.5"/>
+                <cloudiness id="NN" percent="75.7"/>
+                <lowClouds id="LOW" percent="30.1"/>
+                <dewpointTemperature id="TD" unit="celsius" value="6.4"/>
+            </location>
+        </time>
+        <time datatype="forecast" from="2025-10-24T12:00:00Z" to="2025-10-24T15:00:00Z">
+            <location altitude="232" latitude="52.5977" longitude="-7.6444">
+                <precipitation unit="mm" value="0.3"/>
+                <symbol id="DrizzleSun" number="40"/>
+            </location>
+        </time>
+        <time datatype="forecast" from="2025-10-24T18:00:00Z" to="2025-10-24T18:00:00Z">
+            <location altitude="232" latitude="52.5977" longitude="-7.6444">
+                <temperature id="TTT" unit="celsius" value="7.7"/>
+                <windDirection id="dd" deg="327.1" name="NW"/>
+                <windSpeed id="ff" mps="6.7" beaufort="4" name="Moderate breeze"/>
+                <windGust id="ff_gust" mps="13.6"/>
+                <globalRadiation value="60.1" unit="W/m^2"/>
+                <humidity value="85.3" unit="percent"/>
+                <pressure id="pr" unit="hPa" value="1002.8"/>
+                <cloudiness id="NN" percent="44.7"/>
+                <lowClouds id="LOW" percent="34.5"/>
+                <dewpointTemperature id="TD" unit="celsius" value="5.3"/>
+            </location>
+        </time>
+        <time datatype="forecast" from="2025-10-24T15:00:00Z" to="2025-10-24T18:00:00Z">
+            <location altitude="232" latitude="52.5977" longitude="-7.6444">
+                <precipitation unit="mm" value="0.0"/>
+                <symbol id="PartlyCloud" number="3"/>
+            </location>
+        </time>
+        <time datatype="forecast" from="2025-10-24T21:00:00Z" to="2025-10-24T21:00:00Z">
+            <location altitude="232" latitude="52.5977" longitude="-7.6444">
+                <temperature id="TTT" unit="celsius" value="6.3"/>
+                <windDirection id="dd" deg="330.6" name="NW"/>
+                <windSpeed id="ff" mps="6.3" beaufort="4" name="Moderate breeze"/>
+                <windGust id="ff_gust" mps="11.8"/>
+                <globalRadiation value="0.0" unit="W/m^2"/>
+                <humidity value="89.7" unit="percent"/>
+                <pressure id="pr" unit="hPa" value="1005.9"/>
+                <cloudiness id="NN" percent="3.7"/>
+                <lowClouds id="LOW" percent="3.1"/>
+                <dewpointTemperature id="TD" unit="celsius" value="4.6"/>
+            </location>
+        </time>
+        <time datatype="forecast" from="2025-10-24T18:00:00Z" to="2025-10-24T21:00:00Z">
+            <location altitude="232" latitude="52.5977" longitude="-7.6444">
+                <precipitation unit="mm" value="0.0"/>
+                <symbol id="Sun" number="1"/>
+            </location>
+        </time>
+        <time datatype="forecast" from="2025-10-25T00:00:00Z" to="2025-10-25T00:00:00Z">
+            <location altitude="232" latitude="52.5977" longitude="-7.6444">
+                <temperature id="TTT" unit="celsius" value="5.9"/>
+                <windDirection id="dd" deg="327.6" name="NW"/>
+                <windSpeed id="ff" mps="6.0" beaufort="4" name="Moderate breeze"/>
+                <windGust id="ff_gust" mps="11.5"/>
+                <globalRadiation value="0.0" unit="W/m^2"/>
+                <humidity value="92.1" unit="percent"/>
+                <pressure id="pr" unit="hPa" value="1008.3"/>
+                <cloudiness id="NN" percent="15.6"/>
+                <lowClouds id="LOW" percent="13.7"/>
+                <dewpointTemperature id="TD" unit="celsius" value="4.6"/>
+            </location>
+        </time>
+        <time datatype="forecast" from="2025-10-24T21:00:00Z" to="2025-10-25T00:00:00Z">
+            <location altitude="232" latitude="52.5977" longitude="-7.6444">
+                <precipitation unit="mm" value="0.0"/>
+                <symbol id="LightCloud" number="2"/>
+            </location>
+        </time>
+        <time datatype="forecast" from="2025-10-25T03:00:00Z" to="2025-10-25T03:00:00Z">
+            <location altitude="232" latitude="52.5977" longitude="-7.6444">
+                <temperature id="TTT" unit="celsius" value="5.7"/>
+                <windDirection id="dd" deg="334.7" name="NW"/>
+                <windSpeed id="ff" mps="5.9" beaufort="4" name="Moderate breeze"/>
+                <windGust id="ff_gust" mps="11.3"/>
+                <globalRadiation value="0.0" unit="W/m^2"/>
+                <humidity value="92.2" unit="percent"/>
+                <pressure id="pr" unit="hPa" value="1010.2"/>
+                <cloudiness id="NN" percent="56.9"/>
+                <lowClouds id="LOW" percent="4.1"/>
+                <dewpointTemperature id="TD" unit="celsius" value="4.5"/>
+            </location>
+        </time>
+        <time datatype="forecast" from="2025-10-25T00:00:00Z" to="2025-10-25T03:00:00Z">
+            <location altitude="232" latitude="52.5977" longitude="-7.6444">
+                <precipitation unit="mm" value="0.0"/>
+                <symbol id="PartlyCloud" number="3"/>
+            </location>
+        </time>
+        <time datatype="forecast" from="2025-10-25T06:00:00Z" to="2025-10-25T06:00:00Z">
+            <location altitude="232" latitude="52.5977" longitude="-7.6444">
+                <temperature id="TTT" unit="celsius" value="5.1"/>
+                <windDirection id="dd" deg="323.4" name="NW"/>
+                <windSpeed id="ff" mps="6.0" beaufort="4" name="Moderate breeze"/>
+                <windGust id="ff_gust" mps="10.9"/>
+                <globalRadiation value="0.0" unit="W/m^2"/>
+                <humidity value="91.7" unit="percent"/>
+                <pressure id="pr" unit="hPa" value="1012.4"/>
+                <cloudiness id="NN" percent="22.8"/>
+                <lowClouds id="LOW" percent="21.5"/>
+                <dewpointTemperature id="TD" unit="celsius" value="3.8"/>
+            </location>
+        </time>
+        <time datatype="forecast" from="2025-10-25T03:00:00Z" to="2025-10-25T06:00:00Z">
+            <location altitude="232" latitude="52.5977" longitude="-7.6444">
+                <precipitation unit="mm" value="0.0"/>
+                <symbol id="LightCloud" number="2"/>
+            </location>
+        </time>
+        <time datatype="forecast" from="2025-10-25T09:00:00Z" to="2025-10-25T09:00:00Z">
+            <location altitude="232" latitude="52.5977" longitude="-7.6444">
+                <temperature id="TTT" unit="celsius" value="5.8"/>
+                <windDirection id="dd" deg="323.5" name="NW"/>
+                <windSpeed id="ff" mps="6.8" beaufort="4" name="Moderate breeze"/>
+                <windGust id="ff_gust" mps="10.9"/>
+                <globalRadiation value="39.0" unit="W/m^2"/>
+                <humidity value="84.0" unit="percent"/>
+                <pressure id="pr" unit="hPa" value="1014.1"/>
+                <cloudiness id="NN" percent="23.2"/>
+                <lowClouds id="LOW" percent="22.8"/>
+                <dewpointTemperature id="TD" unit="celsius" value="3.3"/>
+            </location>
+        </time>
+        <time datatype="forecast" from="2025-10-25T06:00:00Z" to="2025-10-25T09:00:00Z">
+            <location altitude="232" latitude="52.5977" longitude="-7.6444">
+                <precipitation unit="mm" value="0.0"/>
+                <symbol id="LightCloud" number="2"/>
+            </location>
+        </time>
+        <time datatype="forecast" from="2025-10-25T12:00:00Z" to="2025-10-25T12:00:00Z">
+            <location altitude="232" latitude="52.5977" longitude="-7.6444">
+                <temperature id="TTT" unit="celsius" value="7.3"/>
+                <windDirection id="dd" deg="323.0" name="NW"/>
+                <windSpeed id="ff" mps="7.8" beaufort="4" name="Moderate breeze"/>
+                <windGust id="ff_gust" mps="13.9"/>
+                <globalRadiation value="277.9" unit="W/m^2"/>
+                <humidity value="74.5" unit="percent"/>
+                <pressure id="pr" unit="hPa" value="1015.0"/>
+                <cloudiness id="NN" percent="79.3"/>
+                <lowClouds id="LOW" percent="44.8"/>
+                <dewpointTemperature id="TD" unit="celsius" value="2.9"/>
+            </location>
+        </time>
+        <time datatype="forecast" from="2025-10-25T09:00:00Z" to="2025-10-25T12:00:00Z">
+            <location altitude="232" latitude="52.5977" longitude="-7.6444">
+                <precipitation unit="mm" value="0.0"/>
+                <symbol id="PartlyCloud" number="3"/>
+            </location>
+        </time>
+        <time datatype="forecast" from="2025-10-25T15:00:00Z" to="2025-10-25T15:00:00Z">
+            <location altitude="232" latitude="52.5977" longitude="-7.6444">
+                <temperature id="TTT" unit="celsius" value="6.7"/>
+                <windDirection id="dd" deg="325.0" name="NW"/>
+                <windSpeed id="ff" mps="7.8" beaufort="4" name="Moderate breeze"/>
+                <windGust id="ff_gust" mps="14.2"/>
+                <globalRadiation value="252.0" unit="W/m^2"/>
+                <humidity value="73.2" unit="percent"/>
+                <pressure id="pr" unit="hPa" value="1015.1"/>
+                <cloudiness id="NN" percent="8.9"/>
+                <lowClouds id="LOW" percent="8.3"/>
+                <dewpointTemperature id="TD" unit="celsius" value="2.1"/>
+            </location>
+        </time>
+        <time datatype="forecast" from="2025-10-25T12:00:00Z" to="2025-10-25T15:00:00Z">
+            <location altitude="232" latitude="52.5977" longitude="-7.6444">
+                <precipitation unit="mm" value="0.0"/>
+                <symbol id="Sun" number="1"/>
+            </location>
+        </time>
+        <time datatype="forecast" from="2025-10-25T18:00:00Z" to="2025-10-25T18:00:00Z">
+            <location altitude="232" latitude="52.5977" longitude="-7.6444">
+                <temperature id="TTT" unit="celsius" value="5.1"/>
+                <windDirection id="dd" deg="321.3" name="NW"/>
+                <windSpeed id="ff" mps="6.7" beaufort="4" name="Moderate breeze"/>
+                <windGust id="ff_gust" mps="12.4"/>
+                <globalRadiation value="57.1" unit="W/m^2"/>
+                <humidity value="72.6" unit="percent"/>
+                <pressure id="pr" unit="hPa" value="1016.0"/>
+                <cloudiness id="NN" percent="27.3"/>
+                <lowClouds id="LOW" percent="27.1"/>
+                <dewpointTemperature id="TD" unit="celsius" value="0.4"/>
+            </location>
+        </time>
+        <time datatype="forecast" from="2025-10-25T15:00:00Z" to="2025-10-25T18:00:00Z">
+            <location altitude="232" latitude="52.5977" longitude="-7.6444">
+                <precipitation unit="mm" value="0.0"/>
+                <symbol id="LightCloud" number="2"/>
+            </location>
+        </time>
+        <time datatype="forecast" from="2025-10-25T21:00:00Z" to="2025-10-25T21:00:00Z">
+            <location altitude="232" latitude="52.5977" longitude="-7.6444">
+                <temperature id="TTT" unit="celsius" value="4.1"/>
+                <windDirection id="dd" deg="314.0" name="NW"/>
+                <windSpeed id="ff" mps="5.8" beaufort="4" name="Moderate breeze"/>
+                <windGust id="ff_gust" mps="9.6"/>
+                <globalRadiation value="0.0" unit="W/m^2"/>
+                <humidity value="76.6" unit="percent"/>
+                <pressure id="pr" unit="hPa" value="1017.3"/>
+                <cloudiness id="NN" percent="27.7"/>
+                <lowClouds id="LOW" percent="27.8"/>
+                <dewpointTemperature id="TD" unit="celsius" value="0.2"/>
+            </location>
+        </time>
+        <time datatype="forecast" from="2025-10-25T18:00:00Z" to="2025-10-25T21:00:00Z">
+            <location altitude="232" latitude="52.5977" longitude="-7.6444">
+                <precipitation unit="mm" value="0.0"/>
+                <symbol id="LightCloud" number="2"/>
+            </location>
+        </time>
+        <time datatype="forecast" from="2025-10-26T00:00:00Z" to="2025-10-26T00:00:00Z">
+            <location altitude="232" latitude="52.5977" longitude="-7.6444">
+                <temperature id="TTT" unit="celsius" value="4.0"/>
+                <windDirection id="dd" deg="310.1" name="NW"/>
+                <windSpeed id="ff" mps="5.5" beaufort="4" name="Moderate breeze"/>
+                <windGust id="ff_gust" mps="8.8"/>
+                <globalRadiation value="0.0" unit="W/m^2"/>
+                <humidity value="79.0" unit="percent"/>
+                <pressure id="pr" unit="hPa" value="1017.3"/>
+                <cloudiness id="NN" percent="83.7"/>
+                <lowClouds id="LOW" percent="33.1"/>
+                <dewpointTemperature id="TD" unit="celsius" value="0.5"/>
+            </location>
+        </time>
+        <time datatype="forecast" from="2025-10-25T21:00:00Z" to="2025-10-26T00:00:00Z">
+            <location altitude="232" latitude="52.5977" longitude="-7.6444">
+                <precipitation unit="mm" value="0.0"/>
+                <symbol id="PartlyCloud" number="3"/>
+            </location>
+        </time>
+        <time datatype="forecast" from="2025-10-26T03:00:00Z" to="2025-10-26T03:00:00Z">
+            <location altitude="232" latitude="52.5977" longitude="-7.6444">
+                <temperature id="TTT" unit="celsius" value="4.3"/>
+                <windDirection id="dd" deg="295.3" name="NW"/>
+                <windSpeed id="ff" mps="4.0" beaufort="3" name="Gentle breeze"/>
+                <windGust id="ff_gust" mps="8.2"/>
+                <globalRadiation value="0.0" unit="W/m^2"/>
+                <humidity value="84.1" unit="percent"/>
+                <pressure id="pr" unit="hPa" value="1016.9"/>
+                <cloudiness id="NN" percent="98.8"/>
+                <lowClouds id="LOW" percent="83.5"/>
+                <dewpointTemperature id="TD" unit="celsius" value="1.7"/>
+            </location>
+        </time>
+        <time datatype="forecast" from="2025-10-26T00:00:00Z" to="2025-10-26T03:00:00Z">
+            <location altitude="232" latitude="52.5977" longitude="-7.6444">
+                <precipitation unit="mm" value="0.0"/>
+                <symbol id="Cloud" number="4"/>
+            </location>
+        </time>
+        <time datatype="forecast" from="2025-10-26T06:00:00Z" to="2025-10-26T06:00:00Z">
+            <location altitude="232" latitude="52.5977" longitude="-7.6444">
+                <temperature id="TTT" unit="celsius" value="4.6"/>
+                <windDirection id="dd" deg="292.9" name="NW"/>
+                <windSpeed id="ff" mps="3.8" beaufort="3" name="Gentle breeze"/>
+                <windGust id="ff_gust" mps="7.9"/>
+                <globalRadiation value="0.0" unit="W/m^2"/>
+                <humidity value="87.1" unit="percent"/>
+                <pressure id="pr" unit="hPa" value="1016.5"/>
+                <cloudiness id="NN" percent="98.8"/>
+                <lowClouds id="LOW" percent="95.0"/>
+                <dewpointTemperature id="TD" unit="celsius" value="2.6"/>
+            </location>
+        </time>
+        <time datatype="forecast" from="2025-10-26T03:00:00Z" to="2025-10-26T06:00:00Z">
+            <location altitude="232" latitude="52.5977" longitude="-7.6444">
+                <precipitation unit="mm" value="0.0"/>
+                <symbol id="Cloud" number="4"/>
+            </location>
+        </time>
+        <time datatype="forecast" from="2025-10-26T09:00:00Z" to="2025-10-26T09:00:00Z">
+            <location altitude="232" latitude="52.5977" longitude="-7.6444">
+                <temperature id="TTT" unit="celsius" value="5.6"/>
+                <windDirection id="dd" deg="261.5" name="W"/>
+                <windSpeed id="ff" mps="4.2" beaufort="3" name="Gentle breeze"/>
+                <windGust id="ff_gust" mps="8.0"/>
+                <globalRadiation value="21.6" unit="W/m^2"/>
+                <humidity value="91.1" unit="percent"/>
+                <pressure id="pr" unit="hPa" value="1016.5"/>
+                <cloudiness id="NN" percent="98.8"/>
+                <lowClouds id="LOW" percent="95.0"/>
+                <dewpointTemperature id="TD" unit="celsius" value="4.2"/>
+            </location>
+        </time>
+        <time datatype="forecast" from="2025-10-26T06:00:00Z" to="2025-10-26T09:00:00Z">
+            <location altitude="232" latitude="52.5977" longitude="-7.6444">
+                <precipitation unit="mm" value="0.0"/>
+                <symbol id="Cloud" number="4"/>
+            </location>
+        </time>
+        <time datatype="forecast" from="2025-10-26T12:00:00Z" to="2025-10-26T12:00:00Z">
+            <location altitude="232" latitude="52.5977" longitude="-7.6444">
+                <temperature id="TTT" unit="celsius" value="7.7"/>
+                <windDirection id="dd" deg="254.0" name="W"/>
+                <windSpeed id="ff" mps="5.9" beaufort="4" name="Moderate breeze"/>
+                <windGust id="ff_gust" mps="9.9"/>
+                <globalRadiation value="142.1" unit="W/m^2"/>
+                <humidity value="91.8" unit="percent"/>
+                <pressure id="pr" unit="hPa" value="1014.6"/>
+                <cloudiness id="NN" percent="98.8"/>
+                <lowClouds id="LOW" percent="96.6"/>
+                <dewpointTemperature id="TD" unit="celsius" value="6.4"/>
+            </location>
+        </time>
+        <time datatype="forecast" from="2025-10-26T09:00:00Z" to="2025-10-26T12:00:00Z">
+            <location altitude="232" latitude="52.5977" longitude="-7.6444">
+                <precipitation unit="mm" value="0.5"/>
+                <symbol id="Drizzle" number="46"/>
+            </location>
+        </time>
+        <time datatype="forecast" from="2025-10-26T18:00:00Z" to="2025-10-26T18:00:00Z">
+            <location altitude="232" latitude="52.5977" longitude="-7.6444">
+                <temperature id="TTT" unit="celsius" value="9.7"/>
+                <windDirection id="dd" deg="288.1" name="W"/>
+                <windSpeed id="ff" mps="7.5" beaufort="4" name="Moderate breeze"/>
+                <windGust id="ff_gust" mps="12.5"/>
+                <globalRadiation value="73.7" unit="W/m^2"/>
+                <humidity value="94.6" unit="percent"/>
+                <pressure id="pr" unit="hPa" value="1008.9"/>
+                <cloudiness id="NN" percent="99.1"/>
+                <lowClouds id="LOW" percent="66.0"/>
+                <dewpointTemperature id="TD" unit="celsius" value="8.9"/>
+            </location>
+        </time>
+        <time datatype="forecast" from="2025-10-26T12:00:00Z" to="2025-10-26T18:00:00Z">
+            <location altitude="232" latitude="52.5977" longitude="-7.6444">
+                <precipitation unit="mm" value="2.2"/>
+                <symbol id="LightRain" number="9"/>
+            </location>
+        </time>
+        <time datatype="forecast" from="2025-10-27T00:00:00Z" to="2025-10-27T00:00:00Z">
+            <location altitude="232" latitude="52.5977" longitude="-7.6444">
+                <temperature id="TTT" unit="celsius" value="8.6"/>
+                <windDirection id="dd" deg="299.6" name="NW"/>
+                <windSpeed id="ff" mps="8.7" beaufort="5" name="Fresh breeze"/>
+                <windGust id="ff_gust" mps="11.7"/>
+                <globalRadiation value="0.0" unit="W/m^2"/>
+                <humidity value="89.2" unit="percent"/>
+                <pressure id="pr" unit="hPa" value="1008.6"/>
+                <cloudiness id="NN" percent="55.5"/>
+                <lowClouds id="LOW" percent="23.4"/>
+                <dewpointTemperature id="TD" unit="celsius" value="6.9"/>
+            </location>
+        </time>
+        <time datatype="forecast" from="2025-10-26T18:00:00Z" to="2025-10-27T00:00:00Z">
+            <location altitude="232" latitude="52.5977" longitude="-7.6444">
+                <precipitation unit="mm" value="0.0"/>
+                <symbol id="PartlyCloud" number="3"/>
+            </location>
+        </time>
+        <time datatype="forecast" from="2025-10-27T06:00:00Z" to="2025-10-27T06:00:00Z">
+            <location altitude="232" latitude="52.5977" longitude="-7.6444">
+                <temperature id="TTT" unit="celsius" value="7.7"/>
+                <windDirection id="dd" deg="308.1" name="NW"/>
+                <windSpeed id="ff" mps="9.6" beaufort="5" name="Fresh breeze"/>
+                <windGust id="ff_gust" mps="12.1"/>
+                <globalRadiation value="0.0" unit="W/m^2"/>
+                <humidity value="78.8" unit="percent"/>
+                <pressure id="pr" unit="hPa" value="1009.9"/>
+                <cloudiness id="NN" percent="98.7"/>
+                <lowClouds id="LOW" percent="99.8"/>
+                <dewpointTemperature id="TD" unit="celsius" value="4.1"/>
+            </location>
+        </time>
+        <time datatype="forecast" from="2025-10-27T00:00:00Z" to="2025-10-27T06:00:00Z">
+            <location altitude="232" latitude="52.5977" longitude="-7.6444">
+                <precipitation unit="mm" value="0.0"/>
+                <symbol id="Cloud" number="4"/>
+            </location>
+        </time>
+        <time datatype="forecast" from="2025-10-27T12:00:00Z" to="2025-10-27T12:00:00Z">
+            <location altitude="232" latitude="52.5977" longitude="-7.6444">
+                <temperature id="TTT" unit="celsius" value="8.8"/>
+                <windDirection id="dd" deg="327.2" name="NW"/>
+                <windSpeed id="ff" mps="8.7" beaufort="5" name="Fresh breeze"/>
+                <windGust id="ff_gust" mps="13.7"/>
+                <globalRadiation value="122.5" unit="W/m^2"/>
+                <humidity value="70.5" unit="percent"/>
+                <pressure id="pr" unit="hPa" value="1016.4"/>
+                <cloudiness id="NN" percent="43.5"/>
+                <lowClouds id="LOW" percent="43.9"/>
+                <dewpointTemperature id="TD" unit="celsius" value="3.6"/>
+            </location>
+        </time>
+        <time datatype="forecast" from="2025-10-27T06:00:00Z" to="2025-10-27T12:00:00Z">
+            <location altitude="232" latitude="52.5977" longitude="-7.6444">
+                <precipitation unit="mm" value="0.0"/>
+                <symbol id="PartlyCloud" number="3"/>
+            </location>
+        </time>
+        <time datatype="forecast" from="2025-10-27T18:00:00Z" to="2025-10-27T18:00:00Z">
+            <location altitude="232" latitude="52.5977" longitude="-7.6444">
+                <temperature id="TTT" unit="celsius" value="6.2"/>
+                <windDirection id="dd" deg="310.1" name="NW"/>
+                <windSpeed id="ff" mps="3.9" beaufort="3" name="Gentle breeze"/>
+                <windGust id="ff_gust" mps="14.2"/>
+                <globalRadiation value="132.1" unit="W/m^2"/>
+                <humidity value="73.7" unit="percent"/>
+                <pressure id="pr" unit="hPa" value="1019.5"/>
+                <cloudiness id="NN" percent="1.8"/>
+                <lowClouds id="LOW" percent="1.8"/>
+                <dewpointTemperature id="TD" unit="celsius" value="1.7"/>
+            </location>
+        </time>
+        <time datatype="forecast" from="2025-10-27T12:00:00Z" to="2025-10-27T18:00:00Z">
+            <location altitude="232" latitude="52.5977" longitude="-7.6444">
+                <precipitation unit="mm" value="0.0"/>
+                <symbol id="Sun" number="1"/>
+            </location>
+        </time>
+        <time datatype="forecast" from="2025-10-28T00:00:00Z" to="2025-10-28T00:00:00Z">
+            <location altitude="232" latitude="52.5977" longitude="-7.6444">
+                <temperature id="TTT" unit="celsius" value="4.2"/>
+                <windDirection id="dd" deg="262.0" name="W"/>
+                <windSpeed id="ff" mps="2.1" beaufort="2" name="Light breeze"/>
+                <windGust id="ff_gust" mps="9.4"/>
+                <globalRadiation value="0.0" unit="W/m^2"/>
+                <humidity value="89.2" unit="percent"/>
+                <pressure id="pr" unit="hPa" value="1021.5"/>
+                <cloudiness id="NN" percent="7.8"/>
+                <lowClouds id="LOW" percent="4.8"/>
+                <dewpointTemperature id="TD" unit="celsius" value="2.5"/>
+            </location>
+        </time>
+        <time datatype="forecast" from="2025-10-27T18:00:00Z" to="2025-10-28T00:00:00Z">
+            <location altitude="232" latitude="52.5977" longitude="-7.6444">
+                <precipitation unit="mm" value="0.0"/>
+                <symbol id="Sun" number="1"/>
+            </location>
+        </time>
+        <time datatype="forecast" from="2025-10-28T06:00:00Z" to="2025-10-28T06:00:00Z">
+            <location altitude="232" latitude="52.5977" longitude="-7.6444">
+                <temperature id="TTT" unit="celsius" value="6.0"/>
+                <windDirection id="dd" deg="244.5" name="SW"/>
+                <windSpeed id="ff" mps="3.1" beaufort="2" name="Light breeze"/>
+                <windGust id="ff_gust" mps="8.7"/>
+                <globalRadiation value="0.0" unit="W/m^2"/>
+                <humidity value="92.5" unit="percent"/>
+                <pressure id="pr" unit="hPa" value="1021.2"/>
+                <cloudiness id="NN" percent="54.1"/>
+                <lowClouds id="LOW" percent="20.6"/>
+                <dewpointTemperature id="TD" unit="celsius" value="4.8"/>
+            </location>
+        </time>
+        <time datatype="forecast" from="2025-10-28T00:00:00Z" to="2025-10-28T06:00:00Z">
+            <location altitude="232" latitude="52.5977" longitude="-7.6444">
+                <precipitation unit="mm" value="0.0"/>
+                <symbol id="PartlyCloud" number="3"/>
+            </location>
+        </time>
+        <time datatype="forecast" from="2025-10-28T12:00:00Z" to="2025-10-28T12:00:00Z">
+            <location altitude="232" latitude="52.5977" longitude="-7.6444">
+                <temperature id="TTT" unit="celsius" value="9.8"/>
+                <windDirection id="dd" deg="228.1" name="SW"/>
+                <windSpeed id="ff" mps="3.9" beaufort="3" name="Gentle breeze"/>
+                <windGust id="ff_gust" mps="10.7"/>
+                <globalRadiation value="114.8" unit="W/m^2"/>
+                <humidity value="92.6" unit="percent"/>
+                <pressure id="pr" unit="hPa" value="1020.8"/>
+                <cloudiness id="NN" percent="98.8"/>
+                <lowClouds id="LOW" percent="100.0"/>
+                <dewpointTemperature id="TD" unit="celsius" value="8.7"/>
+            </location>
+        </time>
+        <time datatype="forecast" from="2025-10-28T06:00:00Z" to="2025-10-28T12:00:00Z">
+            <location altitude="232" latitude="52.5977" longitude="-7.6444">
+                <precipitation unit="mm" value="0.0"/>
+                <symbol id="Cloud" number="4"/>
+            </location>
+        </time>
+        <time datatype="forecast" from="2025-10-28T18:00:00Z" to="2025-10-28T18:00:00Z">
+            <location altitude="232" latitude="52.5977" longitude="-7.6444">
+                <temperature id="TTT" unit="celsius" value="9.3"/>
+                <windDirection id="dd" deg="265.5" name="W"/>
+                <windSpeed id="ff" mps="5.7" beaufort="4" name="Moderate breeze"/>
+                <windGust id="ff_gust" mps="11.4"/>
+                <globalRadiation value="118.1" unit="W/m^2"/>
+                <humidity value="95.8" unit="percent"/>
+                <pressure id="pr" unit="hPa" value="1019.3"/>
+                <cloudiness id="NN" percent="92.4"/>
+                <lowClouds id="LOW" percent="45.8"/>
+                <dewpointTemperature id="TD" unit="celsius" value="8.7"/>
+            </location>
+        </time>
+        <time datatype="forecast" from="2025-10-28T12:00:00Z" to="2025-10-28T18:00:00Z">
+            <location altitude="232" latitude="52.5977" longitude="-7.6444">
+                <precipitation unit="mm" value="0.5"/>
+                <symbol id="Drizzle" number="46"/>
+            </location>
+        </time>
+        <time datatype="forecast" from="2025-10-29T00:00:00Z" to="2025-10-29T00:00:00Z">
+            <location altitude="232" latitude="52.5977" longitude="-7.6444">
+                <temperature id="TTT" unit="celsius" value="9.0"/>
+                <windDirection id="dd" deg="259.1" name="W"/>
+                <windSpeed id="ff" mps="5.7" beaufort="4" name="Moderate breeze"/>
+                <windGust id="ff_gust" mps="8.3"/>
+                <globalRadiation value="0.0" unit="W/m^2"/>
+                <humidity value="96.3" unit="percent"/>
+                <pressure id="pr" unit="hPa" value="1018.7"/>
+                <cloudiness id="NN" percent="99.0"/>
+                <lowClouds id="LOW" percent="99.5"/>
+                <dewpointTemperature id="TD" unit="celsius" value="8.5"/>
+            </location>
+        </time>
+        <time datatype="forecast" from="2025-10-28T18:00:00Z" to="2025-10-29T00:00:00Z">
+            <location altitude="232" latitude="52.5977" longitude="-7.6444">
+                <precipitation unit="mm" value="0.0"/>
+                <symbol id="Cloud" number="4"/>
+            </location>
+        </time>
+        <time datatype="forecast" from="2025-10-29T06:00:00Z" to="2025-10-29T06:00:00Z">
+            <location altitude="232" latitude="52.5977" longitude="-7.6444">
+                <temperature id="TTT" unit="celsius" value="9.0"/>
+                <windDirection id="dd" deg="269.9" name="W"/>
+                <windSpeed id="ff" mps="5.3" beaufort="3" name="Gentle breeze"/>
+                <windGust id="ff_gust" mps="8.3"/>
+                <globalRadiation value="0.0" unit="W/m^2"/>
+                <humidity value="96.1" unit="percent"/>
+                <pressure id="pr" unit="hPa" value="1017.9"/>
+                <cloudiness id="NN" percent="99.0"/>
+                <lowClouds id="LOW" percent="100.0"/>
+                <dewpointTemperature id="TD" unit="celsius" value="8.4"/>
+            </location>
+        </time>
+        <time datatype="forecast" from="2025-10-29T00:00:00Z" to="2025-10-29T06:00:00Z">
+            <location altitude="232" latitude="52.5977" longitude="-7.6444">
+                <precipitation unit="mm" value="0.7"/>
+                <symbol id="Drizzle" number="46"/>
+            </location>
+        </time>
+        <time datatype="forecast" from="2025-10-29T12:00:00Z" to="2025-10-29T12:00:00Z">
+            <location altitude="232" latitude="52.5977" longitude="-7.6444">
+                <temperature id="TTT" unit="celsius" value="10.0"/>
+                <windDirection id="dd" deg="276.1" name="W"/>
+                <windSpeed id="ff" mps="5.5" beaufort="4" name="Moderate breeze"/>
+                <windGust id="ff_gust" mps="10.3"/>
+                <globalRadiation value="95.8" unit="W/m^2"/>
+                <humidity value="89.6" unit="percent"/>
+                <pressure id="pr" unit="hPa" value="1018.9"/>
+                <cloudiness id="NN" percent="98.8"/>
+                <lowClouds id="LOW" percent="99.3"/>
+                <dewpointTemperature id="TD" unit="celsius" value="8.4"/>
+            </location>
+        </time>
+        <time datatype="forecast" from="2025-10-29T06:00:00Z" to="2025-10-29T12:00:00Z">
+            <location altitude="232" latitude="52.5977" longitude="-7.6444">
+                <precipitation unit="mm" value="0.7"/>
+                <symbol id="Drizzle" number="46"/>
+            </location>
+        </time>
+        <time datatype="forecast" from="2025-10-29T18:00:00Z" to="2025-10-29T18:00:00Z">
+            <location altitude="232" latitude="52.5977" longitude="-7.6444">
+                <temperature id="TTT" unit="celsius" value="8.2"/>
+                <windDirection id="dd" deg="284.4" name="W"/>
+                <windSpeed id="ff" mps="4.0" beaufort="3" name="Gentle breeze"/>
+                <windGust id="ff_gust" mps="11.2"/>
+                <globalRadiation value="103.1" unit="W/m^2"/>
+                <humidity value="85.2" unit="percent"/>
+                <pressure id="pr" unit="hPa" value="1019.7"/>
+                <cloudiness id="NN" percent="49.7"/>
+                <lowClouds id="LOW" percent="48.4"/>
+                <dewpointTemperature id="TD" unit="celsius" value="5.8"/>
+            </location>
+        </time>
+        <time datatype="forecast" from="2025-10-29T12:00:00Z" to="2025-10-29T18:00:00Z">
+            <location altitude="232" latitude="52.5977" longitude="-7.6444">
+                <precipitation unit="mm" value="0.6"/>
+                <symbol id="DrizzleSun" number="40"/>
+            </location>
+        </time>
+        <time datatype="forecast" from="2025-10-30T00:00:00Z" to="2025-10-30T00:00:00Z">
+            <location altitude="232" latitude="52.5977" longitude="-7.6444">
+                <temperature id="TTT" unit="celsius" value="5.3"/>
+                <windDirection id="dd" deg="291.9" name="W"/>
+                <windSpeed id="ff" mps="2.8" beaufort="2" name="Light breeze"/>
+                <windGust id="ff_gust" mps="9.6"/>
+                <globalRadiation value="0.0" unit="W/m^2"/>
+                <humidity value="91.6" unit="percent"/>
+                <pressure id="pr" unit="hPa" value="1022.5"/>
+                <cloudiness id="NN" percent="67.5"/>
+                <lowClouds id="LOW" percent="4.1"/>
+                <dewpointTemperature id="TD" unit="celsius" value="4.0"/>
+            </location>
+        </time>
+        <time datatype="forecast" from="2025-10-29T18:00:00Z" to="2025-10-30T00:00:00Z">
+            <location altitude="232" latitude="52.5977" longitude="-7.6444">
+                <precipitation unit="mm" value="0.0"/>
+                <symbol id="PartlyCloud" number="3"/>
+            </location>
+        </time>
+        <time datatype="forecast" from="2025-10-30T06:00:00Z" to="2025-10-30T06:00:00Z">
+            <location altitude="232" latitude="52.5977" longitude="-7.6444">
+                <temperature id="TTT" unit="celsius" value="3.9"/>
+                <windDirection id="dd" deg="340.6" name="N"/>
+                <windSpeed id="ff" mps="2.3" beaufort="2" name="Light breeze"/>
+                <windGust id="ff_gust" mps="9.6"/>
+                <globalRadiation value="0.0" unit="W/m^2"/>
+                <humidity value="95.1" unit="percent"/>
+                <pressure id="pr" unit="hPa" value="1024.8"/>
+                <cloudiness id="NN" percent="83.3"/>
+                <lowClouds id="LOW" percent="3.2"/>
+                <dewpointTemperature id="TD" unit="celsius" value="3.1"/>
+            </location>
+        </time>
+        <time datatype="forecast" from="2025-10-30T00:00:00Z" to="2025-10-30T06:00:00Z">
+            <location altitude="232" latitude="52.5977" longitude="-7.6444">
+                <precipitation unit="mm" value="0.0"/>
+                <symbol id="PartlyCloud" number="3"/>
+            </location>
+        </time>
+        <time datatype="forecast" from="2025-10-30T12:00:00Z" to="2025-10-30T12:00:00Z">
+            <location altitude="232" latitude="52.5977" longitude="-7.6444">
+                <temperature id="TTT" unit="celsius" value="8.5"/>
+                <windDirection id="dd" deg="33.0" name="NE"/>
+                <windSpeed id="ff" mps="1.4" beaufort="1" name="Light air"/>
+                <windGust id="ff_gust" mps="10.7"/>
+                <globalRadiation value="87.3" unit="W/m^2"/>
+                <humidity value="82.2" unit="percent"/>
+                <pressure id="pr" unit="hPa" value="1027.9"/>
+                <cloudiness id="NN" percent="97.2"/>
+                <lowClouds id="LOW" percent="2.0"/>
+                <dewpointTemperature id="TD" unit="celsius" value="5.6"/>
+            </location>
+        </time>
+        <time datatype="forecast" from="2025-10-30T06:00:00Z" to="2025-10-30T12:00:00Z">
+            <location altitude="232" latitude="52.5977" longitude="-7.6444">
+                <precipitation unit="mm" value="0.0"/>
+                <symbol id="Cloud" number="4"/>
+            </location>
+        </time>
+    </product>
+</weatherdata>
