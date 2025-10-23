@@ -123,20 +123,13 @@ public class WeatherAdapterService {
         Set<Integer> ipmDecisionsParameters = parameters != null ? Arrays.asList(parameters.split(",")).stream()
                 .map(paramstr->Integer.parseInt(paramstr.strip())).collect(Collectors.toSet())
                 : null;
-        
-        try 
+
+        WeatherData theData = weatherDataService.getWeatherData("yr", Map.of("longitude", longitude, "latitude", latitude, "altitude", altitude));//new YrWeatherForecastAdapter().getWeatherForecasts(longitude, latitude, altitude);
+        if(ipmDecisionsParameters != null && ipmDecisionsParameters.size() > 0)
         {
-            WeatherData theData = new YrWeatherForecastAdapter().getWeatherForecasts(longitude, latitude, altitude);
-            if(ipmDecisionsParameters != null && ipmDecisionsParameters.size() > 0)
-            {
-            	theData = new WeatherDataUtil().filterParameters(theData, ipmDecisionsParameters);
-            }
-            return Response.ok().entity(theData).build();
-        } 
-        catch (ParseWeatherDataException ex) 
-        {
-            return Response.serverError().entity(ex.getMessage()).build();
+            theData = new WeatherDataUtil().filterParameters(theData, ipmDecisionsParameters);
         }
+        return Response.ok().entity(theData).build();
 
     }
     
