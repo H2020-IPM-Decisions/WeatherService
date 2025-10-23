@@ -34,6 +34,8 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import jakarta.inject.Inject;
+import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.locationtech.jts.geom.Point;
 import org.wololo.geojson.Feature;
 import org.wololo.geojson.FeatureCollection;
@@ -50,6 +52,10 @@ public class GISUtils {
 	
 	private FeatureCollection allCountryBoundaries = null;
 
+    @Inject
+    @ConfigProperty(name = "net.ipmdecisions.weatherservice.COUNTRY_BOUNDARIES_FILE", defaultValue = "")
+    String countryBoundariesFile;
+
     /**
      * Ref this post: https://gis.stackexchange.com/questions/14449/java-vividsolutions-jts-wgs-84-distance-to-meters
      * @param jtsDistanceAngularUnits
@@ -64,7 +70,7 @@ public class GISUtils {
         if(this.allCountryBoundaries == null)
         {
             try {
-            	Path path = Paths.get(System.getProperty("net.ipmdecisions.weatherservice.COUNTRY_BOUNDARIES_FILE"));
+            	Path path = Paths.get(countryBoundariesFile);
             	
 
             	Stream<String> lines = Files.lines(path);
