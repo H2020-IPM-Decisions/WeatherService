@@ -22,7 +22,7 @@ package net.ipmdecisions.weather.amalgamation.indices;
 
 import java.util.Set;
 
-import javax.enterprise.context.ApplicationScoped;
+import jakarta.enterprise.context.ApplicationScoped;
 
 import net.ipmdecisions.weather.entity.WeatherData;
 

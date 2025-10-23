@@ -26,9 +26,9 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.webcohesion.enunciate.metadata.DocumentationExample;
 import com.webcohesion.enunciate.metadata.rs.TypeHint;
 
+import jakarta.inject.Inject;
 import net.ipmdecisions.weather.entity.serializers.WeatherDataSourceHistoricDeserializer;
 import net.ipmdecisions.weather.util.GISUtils;
-import net.ipmdecisions.weather.util.SystemUtil;
 
 import java.time.Instant;
 import java.time.LocalDate;
@@ -39,6 +39,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.GeometryFactory;
@@ -77,6 +78,10 @@ public class WeatherDataSource implements Comparable {
     
     /** No authentication required for the data source */
     public static String AUTHENTICATION_TYPE_NONE = "NONE";
+
+    @Inject
+    @ConfigProperty(name = "net.ipmdecisions.weatherservice.WEATHER_API_URL", defaultValue = "")
+    String credentials;
 
     
     /** 
@@ -515,7 +520,7 @@ public class WeatherDataSource implements Comparable {
     public String getEndpointFullPath() {
     	return this.getEndpoint().indexOf("{WEATHER_API_URL}") < 0 ?
     			this.getEndpoint()
-    			: this.getEndpoint().replace("{WEATHER_API_URL}", SystemUtil.getWeatherAPIURL());
+    			: this.getEndpoint().replace("{WEATHER_API_URL}", getWeatherAPIURL());
     }
 
     /**
@@ -832,4 +837,10 @@ public class WeatherDataSource implements Comparable {
 	public void setActive(Boolean active) {
 		this.active = active;
 	}
+
+    public String getWeatherAPIURL()
+    {
+        return credentials != null && ! credentials.isBlank() ? credentials
+                : "https://platform.ipmdecisions.net";
+    }
 }
