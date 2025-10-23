@@ -32,8 +32,6 @@ import java.util.stream.Collectors;
 
 import javax.xml.datatype.DatatypeConfigurationException;
 
-import jakarta.inject.Inject;
-import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -58,9 +56,6 @@ public class SLULantMetAdapter {
 
 	private Logger LOGGER = LoggerFactory.getLogger(SLULantMetAdapter.class);
 
-    @Inject
-    @ConfigProperty(name = "net.ipmdecisions.weatherservice.SLU_LANTMET_ADAPTER_CREDENTIALS_PARAMSTRING", defaultValue = "")
-    String credentials;
 	/*
 	 * Parameters used
 	 * centerWGS84n = Latitude (WGS84)
@@ -86,7 +81,11 @@ public class SLULantMetAdapter {
 			+ "&startDate=%s"
 			+ "&endDate=%s"
 			+ "&elementMeasurementTypeList=%s"
-            + credentials;
+			+ "&nDegrees=0&eDegrees=0"
+			+ (System.getProperty("net.ipmdecisions.weatherservice.SLU_LANTMET_ADAPTER_CREDENTIALS_PARAMSTRING") != null
+					? System.getProperty("net.ipmdecisions.weatherservice.SLU_LANTMET_ADAPTER_CREDENTIALS_PARAMSTRING")
+					: "");
+
 	// See the IPM Decisions parameters list for details
 	private Integer[] defaultParameters = {
 			1002, // Mean temp (C) 2m
@@ -149,7 +148,7 @@ public class SLULantMetAdapter {
 		DateTimeFormatter format = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 		WeatherUtils weatherUtils = new WeatherUtils();
 		sluURL = new URL(String.format(Locale.US,
-				SLU_API_URL,
+				SLULantMetAdapter.SLU_API_URL,
 				sluLatitude,
 				sluLongitude,
 				(interval == 3600 ? 1 : 2),
