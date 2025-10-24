@@ -19,7 +19,6 @@
 
 package net.ipmdecisions.weather.entity;
 
-import com.webcohesion.enunciate.metadata.DocumentationExample;
 import org.eclipse.microprofile.openapi.annotations.media.Schema;
 
 /**

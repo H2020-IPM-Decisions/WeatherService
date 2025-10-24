@@ -38,13 +38,13 @@
         </dependencies>
     </dependencyManagement>
     <repositories>
-    <repository>
-      <id>github</id>
-      <name>GitHub Repository</name>
-      <url>https://maven.pkg.github.com/open-meteo/sdk</url>
-    </repository>
-  </repositories>
-    
+        <repository>
+            <id>github</id>
+            <name>GitHub Repository</name>
+            <url>https://maven.pkg.github.com/open-meteo/sdk</url>
+        </repository>
+    </repositories>
+
     <dependencies>
         <dependency>
             <groupId>io.quarkus</groupId>
@@ -80,7 +80,6 @@
             <artifactId>quarkus-test-h2</artifactId>
             <scope>test</scope>
         </dependency>
-        
         <dependency>
             <groupId>com.kjetland</groupId>
             <artifactId>mbknor-jackson-jsonschema_2.13</artifactId>
@@ -91,6 +90,7 @@
             <artifactId>json-schema-validator</artifactId>
             <version>2.2.12</version>
         </dependency>
+
         <dependency>
             <groupId>org.wololo</groupId>
             <artifactId>jts2geojson</artifactId>
@@ -103,6 +103,11 @@
             <version>20231013</version>
         </dependency>
         <dependency>
+            <groupId>io.quarkus</groupId>
+            <artifactId>quarkus-apache-httpclient</artifactId>
+            <version>3.29.0</version>
+        </dependency>
+        <dependency>
             <groupId>jakarta.xml.ws</groupId>
             <artifactId>jakarta.xml.ws-api</artifactId>
             <version>4.0.2</version>
@@ -113,15 +118,15 @@
             <version>3.0.0</version>
         </dependency>
         <dependency>
-        <groupId>net.iakovlev</groupId>
-        <artifactId>timeshape</artifactId>
-        <version>2020d.12</version>
-    </dependency>
-    <dependency>
-        <groupId>com.squareup.okhttp3</groupId>
-        <artifactId>okhttp</artifactId>
-        <version>4.12.0</version>
-    </dependency>
+            <groupId>net.iakovlev</groupId>
+            <artifactId>timeshape</artifactId>
+            <version>2020d.12</version>
+        </dependency>
+        <dependency>
+            <groupId>com.squareup.okhttp3</groupId>
+            <artifactId>okhttp</artifactId>
+            <version>4.12.0</version>
+        </dependency>
         <dependency>
             <groupId>com.open-meteo</groupId>
             <artifactId>sdk</artifactId>
