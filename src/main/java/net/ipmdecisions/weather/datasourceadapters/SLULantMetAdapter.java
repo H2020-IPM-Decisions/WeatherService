@@ -73,8 +73,8 @@ public class SLULantMetAdapter {
 	 * include. Set to 0 to get exactly one point
 	 */
 	private final static String SLU_API_URL = "https://www.ffe.slu.se/lm/json/LantmetDWL.cfm"
-			+ "?centerWGS84n=%d"
-			+ "&centerWGS84e=%d"
+			+ "?WGS84n=%d"
+			+ "&WGS84e=%d"
 			+ "&outputType=JSON"
 			+ "&inputType=GRID"
 			+ "&logIntervalId=%d"
