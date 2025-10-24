@@ -38,13 +38,13 @@
         </dependencies>
     </dependencyManagement>
     <repositories>
-    <repository>
-      <id>github</id>
-      <name>GitHub Repository</name>
-      <url>https://maven.pkg.github.com/open-meteo/sdk</url>
-    </repository>
-  </repositories>
-    
+        <repository>
+            <id>github</id>
+            <name>GitHub Repository</name>
+            <url>https://maven.pkg.github.com/open-meteo/sdk</url>
+        </repository>
+    </repositories>
+
     <dependencies>
         <dependency>
             <groupId>io.quarkus</groupId>
@@ -68,6 +68,10 @@
         </dependency>
         <dependency>
             <groupId>io.quarkus</groupId>
+            <artifactId>quarkus-smallrye-openapi</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.quarkus</groupId>
             <artifactId>quarkus-junit5</artifactId>
             <scope>test</scope>
         </dependency>
@@ -76,7 +80,6 @@
             <artifactId>quarkus-test-h2</artifactId>
             <scope>test</scope>
         </dependency>
-        
         <dependency>
             <groupId>com.kjetland</groupId>
             <artifactId>mbknor-jackson-jsonschema_2.13</artifactId>
@@ -87,30 +90,18 @@
             <artifactId>json-schema-validator</artifactId>
             <version>2.2.12</version>
         </dependency>
+
         <dependency>
             <groupId>org.wololo</groupId>
             <artifactId>jts2geojson</artifactId>
             <version>0.14.3</version>
         </dependency>
-        <!-- Don't upgrade Enunciate until we've refactored from javax.* to jakarta.* -->
-        <dependency>
-            <groupId>com.webcohesion.enunciate</groupId>
-            <artifactId>enunciate-core-annotations</artifactId>
-            <version>2.15.1</version>
-        </dependency>
-        <!-- Don't upgrade Enunciate until we've refactored from javax.* to jakarta.* -->
-        <dependency>
-            <groupId>com.webcohesion.enunciate</groupId>
-            <artifactId>enunciate-rt-util</artifactId>
-            <version>2.15.1</version>
-        </dependency>
-        
+
         <dependency>
             <groupId>org.json</groupId>
             <artifactId>json</artifactId>
             <version>20231013</version>
         </dependency>
-
         <dependency>
             <groupId>io.quarkus</groupId>
             <artifactId>quarkus-apache-httpclient</artifactId>
@@ -127,16 +118,16 @@
             <version>3.0.0</version>
         </dependency>
         <dependency>
-        <groupId>net.iakovlev</groupId>
-        <artifactId>timeshape</artifactId>
-        <version>2020d.12</version>
-    </dependency>
-    <dependency>
-    <groupId>com.squareup.okhttp3</groupId>
-    <artifactId>okhttp</artifactId>
-    <version>4.12.0</version>
+            <groupId>net.iakovlev</groupId>
+            <artifactId>timeshape</artifactId>
+            <version>2020d.12</version>
         </dependency>
-            <dependency>
+        <dependency>
+            <groupId>com.squareup.okhttp3</groupId>
+            <artifactId>okhttp</artifactId>
+            <version>4.12.0</version>
+        </dependency>
+        <dependency>
             <groupId>com.open-meteo</groupId>
             <artifactId>sdk</artifactId>
             <version>1.10.0</version>
