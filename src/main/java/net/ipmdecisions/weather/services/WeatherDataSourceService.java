@@ -23,7 +23,6 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import com.webcohesion.enunciate.metadata.rs.TypeHint;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -53,6 +52,8 @@ import net.ipmdecisions.weather.entity.WeatherDataSource;
 import net.ipmdecisions.weather.entity.WeatherParameter;
 import net.ipmdecisions.weather.util.GISUtils;
 
+import org.eclipse.microprofile.openapi.annotations.enums.SchemaType;
+import org.eclipse.microprofile.openapi.annotations.media.Schema;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.GeometryFactory;
@@ -86,7 +87,7 @@ public class WeatherDataSourceService {
     @GET
     @Path("weatherdatasource")
     @Produces(MediaType.APPLICATION_JSON)
-    @TypeHint(WeatherDataSource[].class)
+    @Schema(type = SchemaType.ARRAY, implementation = WeatherDataSourceBean.class)
     public Response listWeatherDataSources(){
         try
         {
@@ -130,7 +131,7 @@ public class WeatherDataSourceService {
     @Path("weatherdatasource/location")
     @Consumes("application/json")
     @Produces("application/json")
-    @TypeHint(WeatherDataSource[].class)
+    @Schema(type = SchemaType.ARRAY, implementation = WeatherDataSourceBean.class)
     public Response listWeatherDataSourcesForLocationEndpoint(@QueryParam("tolerance") Double tolerance, String geoJson)
     {
         Double toleranceFinal = tolerance == null ? 0.0 : tolerance;
@@ -191,7 +192,7 @@ public class WeatherDataSourceService {
     @GET
     @Path("weatherdatasource/location/point")
     @Produces("application/json")
-    @TypeHint(WeatherDataSource[].class)
+    @Schema(type = SchemaType.ARRAY, implementation = WeatherDataSourceBean.class)
     public Response listWeatherDataSourcesForPointEnd(
             @QueryParam("latitude") Double latitude, 
             @QueryParam("longitude") Double longitude,
@@ -238,7 +239,7 @@ public class WeatherDataSourceService {
     @POST
     @Path("weatherparameter/location")
     @Produces("application/json")
-    @TypeHint(WeatherParameter[].class)
+    @Schema(type = SchemaType.ARRAY, implementation = WeatherDataSourceBean.class)
     public Response listWeatherParametersForLocation(
     		@QueryParam("tolerance") Double tolerance,
     		@QueryParam("includeFallbackParams") String includeFallbackParamsStr,
@@ -290,7 +291,7 @@ public class WeatherDataSourceService {
     @GET
     @Path("weatherparameter/location/point")
     @Produces("application/json")
-    @TypeHint(WeatherParameter[].class)
+    @Schema(type = SchemaType.ARRAY, implementation = WeatherDataSourceBean.class)
     public Response listWeatherParametersForPoint(
     		@QueryParam("latitude") Double latitude, 
             @QueryParam("longitude") Double longitude,
@@ -352,7 +353,7 @@ public class WeatherDataSourceService {
     @GET
     @Path("weatherdatasource/{id}")
     @Produces("application/json")
-    @TypeHint(WeatherDataSource[].class)
+    @Schema(type = SchemaType.ARRAY, implementation = WeatherDataSourceBean.class)
     public Response getWeatherDataSourceById(
     		@PathParam("id") String id
     		)

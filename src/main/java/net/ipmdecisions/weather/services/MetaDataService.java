@@ -26,7 +26,6 @@ import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.github.fge.jsonschema.core.exceptions.ProcessingException;
 import com.kjetland.jackson.jsonSchema.JsonSchemaConfig;
 import com.kjetland.jackson.jsonSchema.JsonSchemaGenerator;
-import com.webcohesion.enunciate.metadata.rs.TypeHint;
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.time.Instant;
@@ -52,6 +51,8 @@ import net.ipmdecisions.weather.entity.QCType;
 import net.ipmdecisions.weather.entity.WeatherParameter;
 import net.ipmdecisions.weather.util.SchemaProvider;
 import net.ipmdecisions.weather.util.SchemaUtils;
+import org.eclipse.microprofile.openapi.annotations.enums.SchemaType;
+import org.eclipse.microprofile.openapi.annotations.media.Schema;
 import org.jboss.resteasy.annotations.GZIP;
 import org.jboss.resteasy.spi.HttpRequest;
 
@@ -164,7 +165,7 @@ public class MetaDataService {
     @GET
     @Path("parameter")
     @Produces(MediaType.APPLICATION_JSON)
-    @TypeHint(WeatherParameter[].class)
+    @Schema(type = SchemaType.ARRAY, implementation = WeatherParameter.class)
     public Response listWeatherParameters()
     {
         try
@@ -187,7 +188,7 @@ public class MetaDataService {
     @GET
     @Path("qc")
     @Produces(MediaType.APPLICATION_JSON)
-    @TypeHint(QCType[].class)
+    @Schema(type = SchemaType.ARRAY, implementation = QCType.class)
     public Response listQCCodes()
     {
         try
@@ -220,7 +221,7 @@ public class MetaDataService {
     @GET
     @Path("amalgamationType")
     @Produces(MediaType.APPLICATION_JSON)
-    @TypeHint(AmalgamationType[].class)
+    @Schema(type = SchemaType.ARRAY, implementation = AmalgamationType.class)
     public Response listAmalgamationCodes()
     {
         try

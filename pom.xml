@@ -68,6 +68,10 @@
         </dependency>
         <dependency>
             <groupId>io.quarkus</groupId>
+            <artifactId>quarkus-smallrye-openapi</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.quarkus</groupId>
             <artifactId>quarkus-junit5</artifactId>
             <scope>test</scope>
         </dependency>
@@ -92,29 +96,11 @@
             <artifactId>jts2geojson</artifactId>
             <version>0.14.3</version>
         </dependency>
-        <!-- Don't upgrade Enunciate until we've refactored from javax.* to jakarta.* -->
-        <dependency>
-            <groupId>com.webcohesion.enunciate</groupId>
-            <artifactId>enunciate-core-annotations</artifactId>
-            <version>2.15.1</version>
-        </dependency>
-        <!-- Don't upgrade Enunciate until we've refactored from javax.* to jakarta.* -->
-        <dependency>
-            <groupId>com.webcohesion.enunciate</groupId>
-            <artifactId>enunciate-rt-util</artifactId>
-            <version>2.15.1</version>
-        </dependency>
-        
+
         <dependency>
             <groupId>org.json</groupId>
             <artifactId>json</artifactId>
             <version>20231013</version>
-        </dependency>
-        
-        <dependency>
-            <groupId>org.apache.httpcomponents</groupId>
-            <artifactId>httpclient</artifactId>
-            <version>4.5.13</version>
         </dependency>
         <dependency>
             <groupId>jakarta.xml.ws</groupId>
@@ -132,11 +118,11 @@
         <version>2020d.12</version>
     </dependency>
     <dependency>
-    <groupId>com.squareup.okhttp3</groupId>
-    <artifactId>okhttp</artifactId>
-    <version>4.12.0</version>
-        </dependency>
-            <dependency>
+        <groupId>com.squareup.okhttp3</groupId>
+        <artifactId>okhttp</artifactId>
+        <version>4.12.0</version>
+    </dependency>
+        <dependency>
             <groupId>com.open-meteo</groupId>
             <artifactId>sdk</artifactId>
             <version>1.10.0</version>

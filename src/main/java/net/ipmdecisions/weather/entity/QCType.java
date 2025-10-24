@@ -19,7 +19,7 @@
 
 package net.ipmdecisions.weather.entity;
 
-import com.webcohesion.enunciate.metadata.DocumentationExample;
+import org.eclipse.microprofile.openapi.annotations.media.Schema;
 
 /**
  * Represents a QC status for a parameter. This is used in the qc property of
@@ -50,7 +50,7 @@ public class QCType {
      * This means that if several tests fails for a parameter, each test can be specified.
      * E.g. If logical test (id=16) and interval test (id=8) fails, then the QC value will be 16 + 8 = 24
      */
-    @DocumentationExample("8")
+    @Schema(examples = "8")
     public Integer getId() {
         return id;
     }
@@ -65,7 +65,7 @@ public class QCType {
     /**
      * @return the name
      */
-    @DocumentationExample("Failed. Interval test")
+    @Schema(examples = "Failed. Interval test")
     public String getName() {
         return name;
     }
@@ -80,7 +80,7 @@ public class QCType {
     /**
      * @return the description
      */
-    @DocumentationExample("Long description goes here")
+    @Schema(examples = "Long description goes here")
     public String getDescription() {
         return description;
     }
