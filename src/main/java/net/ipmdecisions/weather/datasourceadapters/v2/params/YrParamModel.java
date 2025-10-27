@@ -1,6 +1,6 @@
 package net.ipmdecisions.weather.datasourceadapters.v2.params;
 
-import javax.enterprise.context.ApplicationScoped;
+import jakarta.enterprise.context.ApplicationScoped;
 import java.util.Map;
 
 @ApplicationScoped

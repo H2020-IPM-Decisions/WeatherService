@@ -1,13 +1,11 @@
 package net.ipmdecisions.weather.datasourceadapters.v2.client;
 
-import net.ipmdecisions.weather.datasourceadapters.YrWeatherForecastAdapter;
+import jakarta.enterprise.context.ApplicationScoped;
 import net.ipmdecisions.weather.datasourceadapters.v2.client.responsemodel.YrResponse;
 import net.ipmdecisions.weather.datasourceadapters.v2.params.ParamModel;
 import net.ipmdecisions.weather.datasourceadapters.v2.params.YrParamModel;
-import net.ipmdecisions.weather.entity.LocationWeatherData;
 import org.w3c.dom.Document;
 
-import javax.enterprise.context.ApplicationScoped;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import java.net.URL;

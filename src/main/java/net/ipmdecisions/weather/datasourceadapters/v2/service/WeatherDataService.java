@@ -1,13 +1,13 @@
 package net.ipmdecisions.weather.datasourceadapters.v2.service;
 
 import io.quarkus.arc.All;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
 import net.ipmdecisions.weather.datasourceadapters.v2.client.Client;
 import net.ipmdecisions.weather.datasourceadapters.v2.mapper.WeatherDataMapper;
 import net.ipmdecisions.weather.datasourceadapters.v2.params.ParamModel;
 import net.ipmdecisions.weather.entity.WeatherData;
 
-import javax.enterprise.context.ApplicationScoped;
-import javax.inject.Inject;
 import java.util.List;
 import java.util.Map;
 

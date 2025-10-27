@@ -1,12 +1,11 @@
 package net.ipmdecisions.weather.datasourceadapters.v2.client;
 
+import jakarta.enterprise.context.ApplicationScoped;
 import net.ipmdecisions.weather.datasourceadapters.v2.client.responsemodel.MetIrelandResponse;
 import net.ipmdecisions.weather.datasourceadapters.v2.params.MetirelandParamModel;
 import net.ipmdecisions.weather.datasourceadapters.v2.params.ParamModel;
-import net.ipmdecisions.weather.entity.LocationWeatherData;
 import org.xml.sax.SAXException;
 
-import javax.enterprise.context.ApplicationScoped;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
