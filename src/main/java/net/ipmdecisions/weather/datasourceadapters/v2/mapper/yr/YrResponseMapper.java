@@ -1,9 +1,9 @@
 package net.ipmdecisions.weather.datasourceadapters.v2.mapper.yr;
 
 import net.ipmdecisions.weather.datasourceadapters.v2.client.responsemodel.YrResponse;
-import net.ipmdecisions.weather.datasourceadapters.v2.mapper.DocumentElementExtractor;
-import net.ipmdecisions.weather.datasourceadapters.v2.mapper.PrecipitationMapper;
-import net.ipmdecisions.weather.datasourceadapters.v2.mapper.TimeSeriesMapper;
+import net.ipmdecisions.weather.datasourceadapters.v2.mapper.common.DocumentElementExtractor;
+import net.ipmdecisions.weather.datasourceadapters.v2.mapper.common.PrecipitationMapper;
+import net.ipmdecisions.weather.datasourceadapters.v2.mapper.common.TimeSeriesMapper;
 import net.ipmdecisions.weather.entity.LocationWeatherData;
 import net.ipmdecisions.weather.entity.WeatherData;
 import net.ipmdecisions.weather.util.DOMUtils;

@@ -1,4 +1,4 @@
-package net.ipmdecisions.weather.datasourceadapters.v2.mapper;
+package net.ipmdecisions.weather.datasourceadapters.v2.mapper.common;
 
 import net.ipmdecisions.weather.entity.LocationWeatherData;
 
