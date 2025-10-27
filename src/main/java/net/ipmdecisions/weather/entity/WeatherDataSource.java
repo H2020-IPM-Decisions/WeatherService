@@ -23,12 +23,10 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.webcohesion.enunciate.metadata.DocumentationExample;
-import com.webcohesion.enunciate.metadata.rs.TypeHint;
 
+import jakarta.inject.Inject;
 import net.ipmdecisions.weather.entity.serializers.WeatherDataSourceHistoricDeserializer;
 import net.ipmdecisions.weather.util.GISUtils;
-import net.ipmdecisions.weather.util.SystemUtil;
 
 import java.time.Instant;
 import java.time.LocalDate;
@@ -39,6 +37,9 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.eclipse.microprofile.config.inject.ConfigProperty;
+import org.eclipse.microprofile.openapi.annotations.enums.SchemaType;
+import org.eclipse.microprofile.openapi.annotations.media.Schema;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.GeometryFactory;
@@ -77,6 +78,10 @@ public class WeatherDataSource implements Comparable {
     
     /** No authentication required for the data source */
     public static String AUTHENTICATION_TYPE_NONE = "NONE";
+
+    @Inject
+    @ConfigProperty(name = "net.ipmdecisions.weatherservice.WEATHER_API_URL", defaultValue = "")
+    String credentials;
 
     
     /** 
@@ -141,7 +146,7 @@ public class WeatherDataSource implements Comparable {
         /**
          * @return the name of the Organization. E.g. ADAS, NIBIO
          */
-        @DocumentationExample("NIBIO")
+        @Schema(examples="NIBIO")
         public String getName() {
             return name;
         }
@@ -156,7 +161,7 @@ public class WeatherDataSource implements Comparable {
         /**
          * @return the country of the Organization
          */
-        @DocumentationExample("Norway")
+        @Schema(examples="Norway")
         public String getCountry() {
             return country;
         }
@@ -171,7 +176,7 @@ public class WeatherDataSource implements Comparable {
         /**
          * @return the address
          */
-        @DocumentationExample("Postboks 115")
+        @Schema(examples="Postboks 115")
         public String getAddress() {
             return address;
         }
@@ -186,7 +191,7 @@ public class WeatherDataSource implements Comparable {
         /**
          * @return the postal_code
          */
-        @DocumentationExample("1431")
+        @Schema(examples="1431")
         public String getPostal_code() {
             return postal_code;
         }
@@ -201,7 +206,7 @@ public class WeatherDataSource implements Comparable {
         /**
          * @return the city
          */
-        @DocumentationExample("Ås")
+        @Schema(examples="Ås")
         public String getCity() {
             return city;
         }
@@ -217,7 +222,7 @@ public class WeatherDataSource implements Comparable {
          * @return the email. Preferably the email to a person
          * or department responsible for the DSS
          */
-        @DocumentationExample("acme@foobar.com")
+        @Schema(examples="acme@foobar.com")
         public String getEmail() {
             return email;
         }
@@ -268,7 +273,7 @@ public class WeatherDataSource implements Comparable {
          * @return Array of country codes that this service is valid for. 
          * https://en.wikipedia.org/wiki/ISO_3166-1#Current_codes
          */
-        @DocumentationExample(value="NOR", value2="SWE")
+        @Schema(examples={"NOR","SWE"})
         public String[] getCountries() {
             return countries;
         }
@@ -285,13 +290,13 @@ public class WeatherDataSource implements Comparable {
          * If the access type = location, it is a FeatureCollection of points representing
          * weather stations
          */
-        @DocumentationExample(value = "{\n" +
+        @Schema(examples={"{\n" +
             "\"type\": \"FeatureCollection\",\n" +
             "\"features\": [\n" +
             "  {\"type\": \"Feature\", \"geometry\": {\"type\": \"Point\", \"coordinates\": [8.68956,62.98474,5]}, \"properties\": {\"name\": \"Surnadal\", \"id\":\"46\",\"WMOCertified\": 5}},\n" +
             "  {\"type\": \"Feature\", \"geometry\": {\"type\": \"Point\", \"coordinates\": [5.60533332824707,59.0185012817383]}, \"properties\": {\"name\": \"Rygg\", \"id\":\"98\"}}"
             + "]"
-            + "}", value2 = "{\"type\": \"Sphere\"}")
+            + "}","{\"type\": \"Sphere\"}"})
         public String getGeoJSON() {
             return geoJSON;
         }
@@ -327,7 +332,7 @@ public class WeatherDataSource implements Comparable {
              * source does not contain historic/measured data.
              * @jsonExampleOverride "2010-01-01"
              */
-            @TypeHint(String.class)
+            @Schema(type = SchemaType.STRING)
             public LocalDate getStart() {
                 return start;
             }
@@ -346,7 +351,7 @@ public class WeatherDataSource implements Comparable {
              * Example value: <code>2019-01-01</code> or <code>null</code>
              * @jsonExampleOverride null
              */
-            @TypeHint(String.class)
+            @Schema(type = SchemaType.STRING)
             public LocalDate getEnd() {
                 return end;
             }
@@ -363,7 +368,7 @@ public class WeatherDataSource implements Comparable {
          * @return The number of days ahead this data source provides weather 
          * forecasts. If 0, then this is not a weather forecast service
          */
-        @DocumentationExample("0")
+        @Schema(examples="0")
         public int getForecast() {
             return forecast;
         }
@@ -416,7 +421,7 @@ public class WeatherDataSource implements Comparable {
          * These parameters are always available from this service
          * @return These parameters are always available from this service
          */
-        @DocumentationExample(value = "1002", value2 = "2001")
+        @Schema(examples = {"1002","2001"})
         public int[] getCommon() {
             return common;
         }
@@ -433,7 +438,7 @@ public class WeatherDataSource implements Comparable {
          * the locations in this service, but not guaranteed from everywhere
          * @return List of optional parameters
          */
-        @DocumentationExample(value = "1132", value2 = "3103")
+        @Schema(examples = {"1132","3103"})
         public int[] getOptional() {
             return optional;
         }
@@ -444,9 +449,9 @@ public class WeatherDataSource implements Comparable {
         public void setOptional(int[] optional) {
             this.optional = optional;
         }
-    }            
+    }
 
-    @DocumentationExample("no.met.locationforecast")
+    @Schema(examples = "no.met.locationforecast")
     public String getId() {
 		return id;
 	}
@@ -458,7 +463,7 @@ public class WeatherDataSource implements Comparable {
 	/**
      * @return the name
      */
-    @DocumentationExample("Agromet Norway")
+    @Schema(examples = "Agromet Norway")
     public String getName() {
         return name;
     }
@@ -473,7 +478,7 @@ public class WeatherDataSource implements Comparable {
     /**
      * @return the description
      */
-    @DocumentationExample("Weather station network covering major agricultural areas of Norway. Data before 2010 are available by request. Email lmt@nibio.no")
+    @Schema(examples = "Weather station network covering major agricultural areas of Norway. Data before 2010 are available by request. Email lmt@nibio.no")
     public String getDescription() {
         return description;
     }
@@ -488,7 +493,7 @@ public class WeatherDataSource implements Comparable {
     /**
      * @return the public_URL
      */
-    @DocumentationExample("https://lmt.nibio.no/")
+    @Schema(examples = "https://lmt.nibio.no/")
     public String getPublic_URL() {
         return public_URL;
     }
@@ -503,7 +508,7 @@ public class WeatherDataSource implements Comparable {
     /**
      * @return the endpoint
      */
-    @DocumentationExample("https://lmt.nibio.no/services/rest/ipmdecisions/getdata/ OR {WEATHER_API_URL}/api/wx/rest/weatheradapter/yr/")
+    @Schema(examples = "https://lmt.nibio.no/services/rest/ipmdecisions/getdata/ OR {WEATHER_API_URL}/api/wx/rest/weatheradapter/yr/")
     public String getEndpoint() {
         return endpoint;
     }
@@ -515,7 +520,7 @@ public class WeatherDataSource implements Comparable {
     public String getEndpointFullPath() {
     	return this.getEndpoint().indexOf("{WEATHER_API_URL}") < 0 ?
     			this.getEndpoint()
-    			: this.getEndpoint().replace("{WEATHER_API_URL}", SystemUtil.getWeatherAPIURL());
+    			: this.getEndpoint().replace("{WEATHER_API_URL}", getWeatherAPIURL());
     }
 
     /**
@@ -528,7 +533,7 @@ public class WeatherDataSource implements Comparable {
     /**
      * @return the needs_data_control
      */
-    @DocumentationExample("true")
+    @Schema(examples = "true")
     public String getNeeds_data_control() {
         return needs_data_control;
     }
@@ -543,7 +548,7 @@ public class WeatherDataSource implements Comparable {
     /**
      * @return the access_type
      */
-    @DocumentationExample("stations")
+    @Schema(examples = "stations")
     public String getAccess_type() {
         return access_type;
     }
@@ -832,4 +837,10 @@ public class WeatherDataSource implements Comparable {
 	public void setActive(Boolean active) {
 		this.active = active;
 	}
+
+    public String getWeatherAPIURL()
+    {
+        return credentials != null && ! credentials.isBlank() ? credentials
+                : "https://platform.ipmdecisions.net";
+    }
 }

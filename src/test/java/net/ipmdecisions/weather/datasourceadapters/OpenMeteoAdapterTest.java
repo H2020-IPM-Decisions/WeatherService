@@ -56,7 +56,7 @@ public class OpenMeteoAdapterTest {
         System.out.println("getData");
         Double longitude =13.41;
         Double latitude = 52.52;
-        ZoneId tzForLocation = ZoneId.of("Europe/Berlin");
+        ZoneId tzForLocation = ZoneId.of("UTC");
         Instant timeStart = Instant.now().atZone(tzForLocation).toLocalDate().minusDays(2).atStartOfDay(tzForLocation).toInstant();
         Instant timeEnd = Instant.now().atZone(tzForLocation).toLocalDate().plusDays(2).atStartOfDay(tzForLocation).toInstant();
         //Instant timeStart = LocalDate.of(2024, Month.JANUARY, 24).atStartOfDay(tzForLocation).toInstant();

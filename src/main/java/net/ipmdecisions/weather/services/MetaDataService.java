@@ -26,7 +26,6 @@ import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.github.fge.jsonschema.core.exceptions.ProcessingException;
 import com.kjetland.jackson.jsonSchema.JsonSchemaConfig;
 import com.kjetland.jackson.jsonSchema.JsonSchemaGenerator;
-import com.webcohesion.enunciate.metadata.rs.TypeHint;
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.time.Instant;
@@ -36,15 +35,15 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.POST;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.core.Context;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
 
 import net.ipmdecisions.weather.controller.MetaDataBean;
 import net.ipmdecisions.weather.entity.AmalgamationType;
@@ -52,6 +51,8 @@ import net.ipmdecisions.weather.entity.QCType;
 import net.ipmdecisions.weather.entity.WeatherParameter;
 import net.ipmdecisions.weather.util.SchemaProvider;
 import net.ipmdecisions.weather.util.SchemaUtils;
+import org.eclipse.microprofile.openapi.annotations.enums.SchemaType;
+import org.eclipse.microprofile.openapi.annotations.media.Schema;
 import org.jboss.resteasy.annotations.GZIP;
 import org.jboss.resteasy.spi.HttpRequest;
 
@@ -164,7 +165,7 @@ public class MetaDataService {
     @GET
     @Path("parameter")
     @Produces(MediaType.APPLICATION_JSON)
-    @TypeHint(WeatherParameter[].class)
+    @Schema(type = SchemaType.ARRAY, implementation = WeatherParameter.class)
     public Response listWeatherParameters()
     {
         try
@@ -187,7 +188,7 @@ public class MetaDataService {
     @GET
     @Path("qc")
     @Produces(MediaType.APPLICATION_JSON)
-    @TypeHint(QCType[].class)
+    @Schema(type = SchemaType.ARRAY, implementation = QCType.class)
     public Response listQCCodes()
     {
         try
@@ -220,7 +221,7 @@ public class MetaDataService {
     @GET
     @Path("amalgamationType")
     @Produces(MediaType.APPLICATION_JSON)
-    @TypeHint(AmalgamationType[].class)
+    @Schema(type = SchemaType.ARRAY, implementation = AmalgamationType.class)
     public Response listAmalgamationCodes()
     {
         try

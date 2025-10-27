@@ -19,7 +19,7 @@
 
 package net.ipmdecisions.weather.entity;
 
-import com.webcohesion.enunciate.metadata.DocumentationExample;
+import org.eclipse.microprofile.openapi.annotations.media.Schema;
 
 /**
  * Represents an amalgamation type for a parameter. This is used in the amalgamation property of
@@ -47,7 +47,7 @@ public class AmalgamationType {
      * This means that if several tests fails for a parameter, each test can be specified.
      * E.g. If logical test (id=16) and interval test (id=8) fails, then the QC value will be 16 + 8 = 24
      */
-    @DocumentationExample("4")
+    @Schema(examples = "4")
     public Integer getId() {
         return id;
     }
@@ -62,7 +62,7 @@ public class AmalgamationType {
     /**
      * @return the name
      */
-    @DocumentationExample("Calculated")
+    @Schema(examples = "Calculated")
     public String getName() {
         return name;
     }
@@ -77,7 +77,7 @@ public class AmalgamationType {
     /**
      * @return the description
      */
-    @DocumentationExample("The weather parameter is missing from the set of data and has been calculated based on other parameters in the set")
+    @Schema(examples = "The weather parameter is missing from the set of data and has been calculated based on other parameters in the set")
     public String getDescription() {
         return description;
     }

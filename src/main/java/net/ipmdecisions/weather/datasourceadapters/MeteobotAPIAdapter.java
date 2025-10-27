@@ -35,7 +35,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.TimeZone;
 
-import javax.ws.rs.NotAuthorizedException;
+import jakarta.ws.rs.NotAuthorizedException;
 
 import net.ipmdecisions.weather.entity.WeatherData;
 import net.ipmdecisions.weather.util.vips.VIPSWeatherObservation;
@@ -91,7 +91,7 @@ public class MeteobotAPIAdapter {
             LOGGER.debug(meteobotURL.toString());
             HttpURLConnection connection = (HttpURLConnection) meteobotURL.openConnection();
             String userpass = userName + ":" + password;
-            String basicAuth = "Basic " + javax.xml.bind.DatatypeConverter.printBase64Binary(userpass.getBytes());
+            String basicAuth = "Basic " + jakarta.xml.bind.DatatypeConverter.printBase64Binary(userpass.getBytes());
             connection.setRequestProperty("Authorization", basicAuth);
             
             int responseCode = connection.getResponseCode();
@@ -146,7 +146,7 @@ public class MeteobotAPIAdapter {
 
             URLConnection connection = meteobotURL.openConnection();
             String userpass = userName + ":" + password;
-            String basicAuth = "Basic " + javax.xml.bind.DatatypeConverter.printBase64Binary(userpass.getBytes());
+            String basicAuth = "Basic " + jakarta.xml.bind.DatatypeConverter.printBase64Binary(userpass.getBytes());
             connection.setRequestProperty("Authorization", basicAuth);
 
             BufferedReader in;
