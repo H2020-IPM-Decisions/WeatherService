@@ -1,6 +1,6 @@
-package net.ipmdecisions.weather.datasourceadapters.v2.mapper.fmi;
+package net.ipmdecisions.weather.datasourceadapters.v2.mapper.fmiforecast;
 
-import net.ipmdecisions.weather.datasourceadapters.v2.client.responsemodel.FMIResponse;
+import net.ipmdecisions.weather.datasourceadapters.v2.client.responsemodel.FMIForecastResponse;
 import net.ipmdecisions.weather.entity.LocationWeatherData;
 import net.ipmdecisions.weather.entity.WeatherData;
 import net.ipmdecisions.weather.util.vips.VIPSWeatherObservation;
@@ -8,35 +8,34 @@ import net.ipmdecisions.weather.util.vips.VIPSWeatherObservation;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
-import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
-public class FMIMapper {
+public class FMIForecastMapper {
 
     private static final int INTERVAL_SECONDS = 3600;
     private static final int DEFAULT_QC = 1;
 
-    private FMIMapper() {}
+    private FMIForecastMapper() {}
 
-    public static WeatherData toWeatherData(FMIResponse fmiResponse) {
+    public static WeatherData toWeatherData(FMIForecastResponse fmiForecastResponse) {
 
-        FMIParsingResult parsed = FMIXmlExtractor.extract(fmiResponse.data());
+        FMIForecastParsingResult parsed = FMIForecastXmlExtractor.extract(fmiForecastResponse.data());
         List<VIPSWeatherObservation> observations = buildObservations(parsed);
 
         return buildWeatherData(observations,
-                fmiResponse.params().getLongitude(),
-                fmiResponse.params().getLatitude(),
+                fmiForecastResponse.params().getLongitude(),
+                fmiForecastResponse.params().getLatitude(),
                 DEFAULT_QC);
     }
 
-    private static List<VIPSWeatherObservation> buildObservations(FMIParsingResult parsed) {
+    private static List<VIPSWeatherObservation> buildObservations(FMIForecastParsingResult parsed) {
         List<VIPSWeatherObservation> list = new ArrayList<>();
         List<String> parameterNames = parsed.getParameterNames();
         List<Long> timestamps = parsed.getTimestamps();
         double[][] values = parsed.getValues();
 
         List<String> vipsCodes = parameterNames.stream()
-                .map(FMIParameterMapper::mapToVipsCode)
+                .map(FMIForecastParameterMapper::mapToVipsCode)
                 .collect(Collectors.toList());
 
         for (int t = 0; t < timestamps.size(); t++) {
@@ -64,7 +63,7 @@ public class FMIMapper {
 
         Integer[] parameters = observations.stream()
                 .map(VIPSWeatherObservation::getElementMeasurementTypeId)
-                .map(FMIParameterMapper::getIPMParameterId)
+                .map(FMIForecastParameterMapper::getIPMParameterId)
                 .filter(Objects::nonNull)
                 .distinct()
                 .toArray(Integer[]::new);
@@ -90,7 +89,7 @@ public class FMIMapper {
         Arrays.fill(qcPerParam, defaultQC);
 
         for (VIPSWeatherObservation obs : observations) {
-            Integer ipmId = FMIParameterMapper.getIPMParameterId(obs.getElementMeasurementTypeId());
+            Integer ipmId = FMIForecastParameterMapper.getIPMParameterId(obs.getElementMeasurementTypeId());
             if (ipmId == null) continue;
             long row = timeStart.until(obs.getTimeMeasured().toInstant(), ChronoUnit.SECONDS) / INTERVAL_SECONDS;
             Integer col = paramIndex.get(ipmId);

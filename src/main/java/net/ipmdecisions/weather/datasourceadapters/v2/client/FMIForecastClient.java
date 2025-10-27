@@ -1,8 +1,8 @@
 package net.ipmdecisions.weather.datasourceadapters.v2.client;
 
 import jakarta.enterprise.context.ApplicationScoped;
-import net.ipmdecisions.weather.datasourceadapters.v2.client.responsemodel.FMIResponse;
-import net.ipmdecisions.weather.datasourceadapters.v2.params.FMIParamModel;
+import net.ipmdecisions.weather.datasourceadapters.v2.client.responsemodel.FMIForecastResponse;
+import net.ipmdecisions.weather.datasourceadapters.v2.params.FMIForecastParamModel;
 import net.ipmdecisions.weather.datasourceadapters.v2.params.ParamModel;
 
 import java.io.IOException;
@@ -15,11 +15,11 @@ import java.time.format.DateTimeFormatter;
 import java.util.Scanner;
 
 @ApplicationScoped
-public class FMIClient implements Client{
+public class FMIForecastClient implements Client{
 
     public Object getData(ParamModel paramModel)
     {
-        var params = (FMIParamModel) paramModel;
+        var params = (FMIForecastParamModel) paramModel;
         double latitude = params.getLatitude();
         double longitude = params.getLongitude();
         try
@@ -34,7 +34,7 @@ public class FMIClient implements Client{
                     latitude, longitude,
                     UTCTodayAtMidnight.format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ssX"))
             )).openStream(), "UTF-8").useDelimiter("\\A").next();
-            return new FMIResponse(data, params);
+            return new FMIForecastResponse(data, params);
 
         } catch(IOException ex)
         {

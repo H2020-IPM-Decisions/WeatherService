@@ -1,9 +1,9 @@
 package net.ipmdecisions.weather.datasourceadapters.v2.mapper;
 
-import net.ipmdecisions.weather.datasourceadapters.v2.client.responsemodel.FMIResponse;
+import net.ipmdecisions.weather.datasourceadapters.v2.client.responsemodel.FMIForecastResponse;
 import net.ipmdecisions.weather.datasourceadapters.v2.client.responsemodel.MetIrelandResponse;
 import net.ipmdecisions.weather.datasourceadapters.v2.client.responsemodel.YrResponse;
-import net.ipmdecisions.weather.datasourceadapters.v2.mapper.fmi.FMIMapper;
+import net.ipmdecisions.weather.datasourceadapters.v2.mapper.fmiforecast.FMIForecastMapper;
 import net.ipmdecisions.weather.datasourceadapters.v2.mapper.metireland.MetIrelandResponseMapper;
 import net.ipmdecisions.weather.datasourceadapters.v2.mapper.yr.YrResponseMapper;
 import net.ipmdecisions.weather.entity.WeatherData;
@@ -16,8 +16,8 @@ public class WeatherDataMapper {
         if(data instanceof YrResponse) {
             return YrResponseMapper.toWeatherData((YrResponse) data);
         }
-        if(data instanceof FMIResponse) {
-            return FMIMapper.toWeatherData((FMIResponse) data);
+        if(data instanceof FMIForecastResponse) {
+            return FMIForecastMapper.toWeatherData((FMIForecastResponse) data);
         }
         return new WeatherData();
     }

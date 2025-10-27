@@ -1,20 +1,20 @@
 /*
- * Copyright (c) 2020 NIBIO <http://www.nibio.no/>. 
- * 
+ * Copyright (c) 2020 NIBIO <http://www.nibio.no/>.
+ *
  * This file is part of IPM Decisions Weather Service.
  * IPM Decisions Weather Service is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * IPM Decisions Weather Service is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Affero General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with IPM Decisions Weather Service.  If not, see <http://www.gnu.org/licenses/>.
- * 
+ *
  */
 
 package net.ipmdecisions.weather.datasourceadapters.finnishmeteorologicalinstitute;
@@ -41,9 +41,9 @@ import net.ipmdecisions.weather.util.vips.WeatherUtils;
  * @author Tor-Einar Skog <tor-einar.skog@nibio.no>
  */
 public class FinnishMeteorologicalInstituteAdapter {
-    
+
     private final WeatherUtils weatherUtils;
-    
+
     public FinnishMeteorologicalInstituteAdapter()
     {
         this.weatherUtils = new WeatherUtils();
@@ -63,7 +63,7 @@ public class FinnishMeteorologicalInstituteAdapter {
             String obsAsString = obsAsStringWithPositionPrefix[1];
             ObjectMapper mapper = new ObjectMapper();
             List<VIPSWeatherObservation> observations = mapper.readValue(obsAsString, new TypeReference<List<VIPSWeatherObservation>>(){});
-            
+
             // If global radiation has been requested, try to get it (not all stations
             // measure it) and add to collection.
             if(ipmDecisionsParameters.contains(5001))
@@ -89,11 +89,11 @@ public class FinnishMeteorologicalInstituteAdapter {
                     end7DayPeriod = end7DayPeriod.plus(7, ChronoUnit.DAYS);
                 }
             }
-            
+
             observations = observations.stream()
                     .filter(obs->ipmDecisionsParameters.contains(this.weatherUtils.getIPMParameterId(obs.getElementMeasurementTypeId())))
                     .collect(Collectors.toList());
-            
+
             return this.weatherUtils.getWeatherDataFromVIPSWeatherObservations(observations, Double.valueOf(latLongStr[1]), Double.valueOf(latLongStr[0]), 1);
             /*
             Integer[] parameters = observations.stream()
@@ -148,6 +148,20 @@ public class FinnishMeteorologicalInstituteAdapter {
             ex.printStackTrace();
             return null;
         }
+    }
+
+    /**
+     * Get 36 hour forecasts from FMI
+     * @param longitude
+     * @param latitude
+     * @return
+     */
+    public WeatherData getWeatherForecasts(Double longitude, Double latitude) {
+        FmiOpenDataAccess dA = new FmiOpenDataAccess();
+        FmiOpenDataForecastParser fP = new FmiOpenDataForecastParser();
+        String forecastXML = dA.getForecastData(longitude, latitude);
+        List<VIPSWeatherObservation> forecastObs = fP.getVIPSWeatherObservations(forecastXML);
+        return this.weatherUtils.getWeatherDataFromVIPSWeatherObservations(forecastObs, longitude, latitude,1);
     }
 
 }

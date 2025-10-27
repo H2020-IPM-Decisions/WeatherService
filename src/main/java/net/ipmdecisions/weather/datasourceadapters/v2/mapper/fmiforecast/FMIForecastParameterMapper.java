@@ -1,11 +1,11 @@
-package net.ipmdecisions.weather.datasourceadapters.v2.mapper.fmi;
+package net.ipmdecisions.weather.datasourceadapters.v2.mapper.fmiforecast;
 
 import java.util.Map;
 
 /**
  * Central mapping between raw FMI parameter names and VIPS/IPM codes.
  */
-public class FMIParameterMapper {
+public class FMIForecastParameterMapper {
 
     private static final Map<String, String> RAW_TO_VIPS = Map.of(
             "Temperature", "TM",
@@ -27,7 +27,7 @@ public class FMIParameterMapper {
             "DP", 1901
     );
 
-    private FMIParameterMapper() {}
+    private FMIForecastParameterMapper() {}
 
     public static String mapToVipsCode(String rawName) {
         return RAW_TO_VIPS.get(rawName);

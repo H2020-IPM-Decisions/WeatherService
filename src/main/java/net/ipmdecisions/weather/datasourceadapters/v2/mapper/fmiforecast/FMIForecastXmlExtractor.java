@@ -1,4 +1,4 @@
-package net.ipmdecisions.weather.datasourceadapters.v2.mapper.fmi;
+package net.ipmdecisions.weather.datasourceadapters.v2.mapper.fmiforecast;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -13,16 +13,16 @@ import java.util.List;
 import java.util.logging.Logger;
 import org.xml.sax.InputSource;
 
-public class FMIXmlExtractor {
+public class FMIForecastXmlExtractor {
 
-    private static final Logger LOG = Logger.getLogger(FMIXmlExtractor.class.getName());
+    private static final Logger LOG = Logger.getLogger(FMIForecastXmlExtractor.class.getName());
     private static final String TAG_FIELD = "swe:field";
     private static final String TAG_POSITIONS = "gmlcov:positions";
     private static final String TAG_VALUES = "gml:doubleOrNilReasonTupleList";
 
-    private FMIXmlExtractor() {}
+    private FMIForecastXmlExtractor() {}
 
-    public static FMIParsingResult extract(String xml) {
+    public static FMIForecastParsingResult extract(String xml) {
         try {
             Document doc = buildSecureBuilder().parse(new InputSource(new StringReader(xml)));
 
@@ -74,7 +74,7 @@ public class FMIXmlExtractor {
             }
 
             double[][] matrix = rows.toArray(new double[0][]);
-            return new FMIParsingResult(parameterNames, timestamps, matrix);
+            return new FMIForecastParsingResult(parameterNames, timestamps, matrix);
 
         } catch (Exception e) {
             LOG.warning("Failed to parse FMI XML: " + e.getMessage());

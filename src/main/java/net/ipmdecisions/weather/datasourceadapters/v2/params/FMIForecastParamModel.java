@@ -5,7 +5,7 @@ import jakarta.enterprise.context.ApplicationScoped;
 import java.util.Map;
 
 @ApplicationScoped
-public class FMIParamModel implements ParamModel{
+public class FMIForecastParamModel implements ParamModel{
 
     Double longitude;
     Double latitude;

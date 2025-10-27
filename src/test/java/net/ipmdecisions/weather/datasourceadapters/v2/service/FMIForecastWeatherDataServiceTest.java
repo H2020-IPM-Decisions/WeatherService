@@ -1,8 +1,8 @@
 package net.ipmdecisions.weather.datasourceadapters.v2.service;
 
 import net.ipmdecisions.weather.datasourceadapters.v2.client.Client;
-import net.ipmdecisions.weather.datasourceadapters.v2.client.responsemodel.FMIResponse;
-import net.ipmdecisions.weather.datasourceadapters.v2.params.FMIParamModel;
+import net.ipmdecisions.weather.datasourceadapters.v2.client.responsemodel.FMIForecastResponse;
+import net.ipmdecisions.weather.datasourceadapters.v2.params.FMIForecastParamModel;
 import net.ipmdecisions.weather.datasourceadapters.v2.params.ParamModel;
 import org.junit.jupiter.api.Test;
 
@@ -15,7 +15,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 
-class FMIWeatherDataServiceTest {
+class FMIForecastWeatherDataServiceTest {
 
     @Test
     void test_mapping_of_yr_response() throws Exception {
@@ -26,7 +26,7 @@ class FMIWeatherDataServiceTest {
 
         var metClient = mock(Client.class);
         var metParams = mock(ParamModel.class);
-        var fmiParamModel = new FMIParamModel();
+        var fmiParamModel = new FMIForecastParamModel();
         Map<String, Object> params = Map.of(
                 "latitude", 60.1695,
                 "longitude", 24.9354
@@ -36,7 +36,7 @@ class FMIWeatherDataServiceTest {
         when(metClient.supports("FMI")).thenReturn(true);
         when(metParams.supports("FMI")).thenReturn(true);
 
-        when(metClient.getData(any(ParamModel.class))).thenReturn(new FMIResponse(xml, fmiParamModel));
+        when(metClient.getData(any(ParamModel.class))).thenReturn(new FMIForecastResponse(xml, fmiParamModel));
 
         var service = new WeatherDataService(
                 List.of(metClient),
@@ -53,8 +53,8 @@ class FMIWeatherDataServiceTest {
                 () -> assertEquals(result.getTimeStart(), Instant.parse("2025-10-27T07:00:00Z")),
                 () -> assertEquals(result.getTimeEnd(), Instant.parse("2025-10-29T11:00:00Z")),
                 () -> assertEquals(result.getInterval(), Integer.valueOf(3600)),
-                () -> assertEquals(locationWeatherData.getLongitude(), Double.valueOf(-7.644361)),
-                () -> assertEquals(locationWeatherData.getLatitude(), Double.valueOf(52.597709)),
+                () -> assertEquals(locationWeatherData.getLongitude(), Double.valueOf(24.9354)),
+                () -> assertEquals(locationWeatherData.getLatitude(), Double.valueOf(60.1695)),
                 () -> assertEquals(locationWeatherData.getAltitude(), Double.valueOf(0.0)),
                 () -> assertEquals(locationWeatherData.getData().length, 53)
 
