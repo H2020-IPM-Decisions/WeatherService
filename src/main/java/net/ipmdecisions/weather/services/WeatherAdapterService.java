@@ -201,8 +201,8 @@ public class WeatherAdapterService {
         Set<Integer> ipmDecisionsParameters = parameters != null ? Arrays.asList(parameters.split(",")).stream()
                 .map(paramstr->Integer.parseInt(paramstr.strip())).collect(Collectors.toSet())
                 : null;
-        
-        WeatherData theData = new FinnishMeteorologicalInstituteAdapter().getWeatherForecasts(longitude, latitude);
+
+        var theData = weatherDataService.getWeatherData("FMI", Map.of("longitude", longitude, "latitude", latitude));
         if(ipmDecisionsParameters != null && ipmDecisionsParameters.size() > 0)
         {
         	theData = new WeatherDataUtil().filterParameters(theData, ipmDecisionsParameters);
