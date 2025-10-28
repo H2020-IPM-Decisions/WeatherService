@@ -1,14 +1,12 @@
 package net.ipmdecisions.weather.datasourceadapters.v2.mapper.fmiforecast;
 
 import net.ipmdecisions.weather.datasourceadapters.v2.client.responsemodel.FMIForecastResponse;
-import net.ipmdecisions.weather.entity.LocationWeatherData;
+import net.ipmdecisions.weather.datasourceadapters.v2.mapper.common.VIPSWeatherObservationMapper;
 import net.ipmdecisions.weather.entity.WeatherData;
 import net.ipmdecisions.weather.util.vips.VIPSWeatherObservation;
 
 import java.time.Instant;
-import java.time.temporal.ChronoUnit;
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class FMIForecastMapper {
 
@@ -18,14 +16,17 @@ public class FMIForecastMapper {
     private FMIForecastMapper() {}
 
     public static WeatherData toWeatherData(FMIForecastResponse fmiForecastResponse) {
-
         FMIForecastParsingResult parsed = FMIForecastXmlExtractor.extract(fmiForecastResponse.data());
         List<VIPSWeatherObservation> observations = buildObservations(parsed);
-
-        return buildWeatherData(observations,
+        return VIPSWeatherObservationMapper.toWeatherData(
+                observations,
                 fmiForecastResponse.params().getLongitude(),
                 fmiForecastResponse.params().getLatitude(),
-                DEFAULT_QC);
+                INTERVAL_SECONDS,
+                DEFAULT_QC,
+                FMIForecastParameterMapper::getIPMParameterId,
+                true
+        );
     }
 
     private static List<VIPSWeatherObservation> buildObservations(FMIForecastParsingResult parsed) {
@@ -36,7 +37,7 @@ public class FMIForecastMapper {
 
         List<String> vipsCodes = parameterNames.stream()
                 .map(FMIForecastParameterMapper::mapToVipsCode)
-                .collect(Collectors.toList());
+                .toList();
 
         for (int t = 0; t < timestamps.size(); t++) {
             long epoch = timestamps.get(t);
@@ -54,57 +55,5 @@ public class FMIForecastMapper {
         }
         Collections.sort(list);
         return list;
-    }
-
-    private static WeatherData buildWeatherData(List<VIPSWeatherObservation> observations,
-                                                Double longitude,
-                                                Double latitude,
-                                                Integer defaultQC) {
-
-        Integer[] parameters = observations.stream()
-                .map(VIPSWeatherObservation::getElementMeasurementTypeId)
-                .map(FMIForecastParameterMapper::getIPMParameterId)
-                .filter(Objects::nonNull)
-                .distinct()
-                .toArray(Integer[]::new);
-
-        Map<Integer, Integer> paramIndex = new HashMap<>();
-        for (int i = 0; i < parameters.length; i++) {
-            paramIndex.put(parameters[i], i);
-        }
-
-        Instant timeStart = observations.get(0).getTimeMeasured().toInstant();
-        Instant timeEnd = observations.get(observations.size() - 1).getTimeMeasured().toInstant();
-        long rows = 1 + timeStart.until(timeEnd, ChronoUnit.SECONDS) / INTERVAL_SECONDS;
-
-        LocationWeatherData locationData = new LocationWeatherData(
-                longitude,
-                latitude,
-                0.0,
-                (int) rows,
-                parameters.length
-        );
-
-        Integer[] qcPerParam = new Integer[parameters.length];
-        Arrays.fill(qcPerParam, defaultQC);
-
-        for (VIPSWeatherObservation obs : observations) {
-            Integer ipmId = FMIForecastParameterMapper.getIPMParameterId(obs.getElementMeasurementTypeId());
-            if (ipmId == null) continue;
-            long row = timeStart.until(obs.getTimeMeasured().toInstant(), ChronoUnit.SECONDS) / INTERVAL_SECONDS;
-            Integer col = paramIndex.get(ipmId);
-            if (col != null && row >= 0 && row < rows) {
-                locationData.setValue((int) row, col, obs.getValue());
-            }
-        }
-        locationData.setQC(qcPerParam);
-
-        WeatherData wd = new WeatherData();
-        wd.setInterval(INTERVAL_SECONDS);
-        wd.setTimeStart(timeStart);
-        wd.setTimeEnd(timeEnd);
-        wd.setWeatherParameters(parameters);
-        wd.addLocationWeatherData(locationData);
-        return wd;
     }
 }

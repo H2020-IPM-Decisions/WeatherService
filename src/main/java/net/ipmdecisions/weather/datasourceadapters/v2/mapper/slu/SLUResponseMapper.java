@@ -5,12 +5,10 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import net.ipmdecisions.weather.datasourceadapters.v2.client.responsemodel.SLUResponse;
 import net.ipmdecisions.weather.datasourceadapters.v2.mapper.common.ParameterMapper;
-import net.ipmdecisions.weather.entity.LocationWeatherData;
+import net.ipmdecisions.weather.datasourceadapters.v2.mapper.common.VIPSWeatherObservationMapper;
 import net.ipmdecisions.weather.entity.WeatherData;
 import net.ipmdecisions.weather.util.vips.VIPSWeatherObservation;
 
-import java.time.Instant;
-import java.time.temporal.ChronoUnit;
 import java.util.*;
 
 public class SLUResponseMapper {
@@ -25,75 +23,29 @@ public class SLUResponseMapper {
 
         double longitude = sluResponse.params().getLongitude();
         double latitude = sluResponse.params().getLatitude();
-        List<VIPSWeatherObservation> observations = null;
+        List<VIPSWeatherObservation> observations;
         try {
             observations = OBJECT_MAPPER.readValue(
                     sluResponse.data(),
                     new TypeReference<List<VIPSWeatherObservation>>() {}
             );
-            return getWeatherDataFromVIPSWeatherObservations(observations, longitude, latitude, 0);
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
-    }
 
-    private static WeatherData getWeatherDataFromVIPSWeatherObservations(List<VIPSWeatherObservation> observations,
-                                                                         Double longitude,
-                                                                         Double latitude,
-                                                                         Integer defaultQC) {
         if (observations == null || observations.isEmpty()) {
             return null;
         }
 
-        observations.sort(Comparator.comparing(o -> o.getTimeMeasured().toInstant()));
-
-        Integer[] parameters = observations.stream()
-                .map(obs -> ParameterMapper.getIPMParameterId(obs.getElementMeasurementTypeId()))
-                .filter(Objects::nonNull)
-                .distinct()
-                .sorted() // deterministic order
-                .toArray(Integer[]::new);
-
-        Map<Integer,Integer> paramIndexById = new HashMap<>();
-        for (int i = 0; i < parameters.length; i++) {
-            paramIndexById.put(parameters[i], i);
-        }
-
-        Instant timeStart = observations.get(0).getTimeMeasured().toInstant();
-        Instant timeEnd = observations.get(observations.size() - 1).getTimeMeasured().toInstant();
-        long rows = 1 + timeStart.until(timeEnd, ChronoUnit.SECONDS) / INTERVAL_SECONDS;
-
-        LocationWeatherData locationData = new LocationWeatherData(
+        return VIPSWeatherObservationMapper.toWeatherData(
+                observations,
                 longitude,
                 latitude,
-                0.0,
-                (int) rows,
-                parameters.length
+                INTERVAL_SECONDS,
+                0,
+                ParameterMapper::getIPMParameterId,
+                true
         );
-
-        WeatherData weatherData = new WeatherData();
-        weatherData.setInterval(INTERVAL_SECONDS);
-        weatherData.setTimeStart(timeStart);
-        weatherData.setTimeEnd(timeEnd);
-        weatherData.setWeatherParameters(parameters);
-
-        Integer[] qcPerParam = new Integer[parameters.length];
-        Arrays.fill(qcPerParam, defaultQC);
-        locationData.setQC(qcPerParam);
-
-        observations.stream()
-                .map(obs -> new AbstractMap.SimpleEntry<>(ParameterMapper.getIPMParameterId(obs.getElementMeasurementTypeId()), obs))
-                .filter(e -> e.getKey() != null)
-                .forEach(e -> {
-                    long row = timeStart.until(e.getValue().getTimeMeasured().toInstant(), ChronoUnit.SECONDS) / INTERVAL_SECONDS;
-                    Integer col = paramIndexById.get(e.getKey());
-                    if (col != null) {
-                        locationData.setValue((int) row, col, e.getValue().getValue());
-                    }
-                });
-
-        weatherData.addLocationWeatherData(locationData);
-        return weatherData;
     }
 
 
