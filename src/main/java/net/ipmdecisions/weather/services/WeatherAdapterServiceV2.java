@@ -197,4 +197,79 @@ public class WeatherAdapterServiceV2 {
         }
         return Response.ok().entity(theData).build();
     }
+
+    @GET
+    @POST
+    @Path("lantmet/")
+    @GZIP
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getSLULantMetObservations(
+            @QueryParam("longitude") Double longitude,
+            @QueryParam("latitude") Double latitude,
+            @QueryParam("timeStart") String timeStart,
+            @QueryParam("timeEnd") String timeEnd,
+            @QueryParam("interval") Integer logInterval,
+            @QueryParam("parameters") String parameters,
+            @QueryParam("ignoreErrors") String ignoreErrors
+    )
+    {
+        List<Integer> ipmDecisionsParameters = parameters != null ? Arrays.asList(parameters.split(",")).stream()
+                .map(paramstr->Integer.parseInt(paramstr.strip())).collect(Collectors.toList())
+                : null;
+
+
+        Instant timeStartInstant;
+        Instant timeEndInstant;
+
+        // Date parsing
+        // Is it a ISO-8601 timestamp or date?
+        DateTimeFormatter dtf = DateTimeFormatter.ISO_DATE;
+        try
+        {
+            timeStartInstant = ZonedDateTime.parse(timeStart).toInstant();
+            timeEndInstant = ZonedDateTime.parse(timeEnd).toInstant();
+        }
+        catch(DateTimeParseException ex)
+        {
+
+            timeStartInstant = LocalDate.parse(timeStart, dtf).atStartOfDay(ZoneId.of("GMT+1")).toInstant();//.atZone().toInstant();
+            timeEndInstant = LocalDate.parse(timeEnd, dtf).atStartOfDay(ZoneId.of("GMT+1")).toInstant();//.atZone(ZoneId.of("Europe/Helsinki")).toInstant();
+        }
+
+        Boolean ignoreErrorsB = ignoreErrors != null ? ignoreErrors.equals("true") : false;
+
+
+        // Default is hourly, optional is daily
+        logInterval = (logInterval == null || logInterval != 86400) ? 3600 : 86400;
+
+        if(longitude == null || latitude == null)
+        {
+            return Response.status(Status.BAD_REQUEST).entity("Missing longitude and/or latitude. Please correct this.").build();
+        }
+
+
+            //WeatherData theData = new SLULantMetAdapter().getData(
+            //        longitude, latitude,
+            //        timeStartInstant,timeEndInstant,
+            //        logInterval,
+            //        ipmDecisionsParameters
+            //);
+            var theData = weatherDataService.getWeatherData("SLU", Map.of(
+                    "longitude", longitude,
+                    "latitude", latitude,
+                    "timeStart", timeStartInstant,
+                    "timeEnd", timeEndInstant,
+                    "interval", logInterval,
+                    "ignoreErrors", ignoreErrorsB,
+                    "parameters", ipmDecisionsParameters
+            ));
+            if(theData == null)
+            {
+                return Response.noContent().build();
+            }
+
+            return Response.ok().entity(theData).build();
+
+
+    }
 }
