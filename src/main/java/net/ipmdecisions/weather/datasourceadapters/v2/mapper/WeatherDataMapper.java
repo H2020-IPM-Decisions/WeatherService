@@ -1,9 +1,7 @@
 package net.ipmdecisions.weather.datasourceadapters.v2.mapper;
 
-import net.ipmdecisions.weather.datasourceadapters.v2.client.responsemodel.FMIForecastResponse;
-import net.ipmdecisions.weather.datasourceadapters.v2.client.responsemodel.MetIrelandResponse;
-import net.ipmdecisions.weather.datasourceadapters.v2.client.responsemodel.SLUResponse;
-import net.ipmdecisions.weather.datasourceadapters.v2.client.responsemodel.YrResponse;
+import net.ipmdecisions.weather.datasourceadapters.v2.client.responsemodel.*;
+import net.ipmdecisions.weather.datasourceadapters.v2.mapper.davisfruit.DavisFruitMapper;
 import net.ipmdecisions.weather.datasourceadapters.v2.mapper.fmiforecast.FMIForecastMapper;
 import net.ipmdecisions.weather.datasourceadapters.v2.mapper.metireland.MetIrelandResponseMapper;
 import net.ipmdecisions.weather.datasourceadapters.v2.mapper.slu.SLUResponseMapper;
@@ -23,6 +21,9 @@ public class WeatherDataMapper {
         }
         if(data instanceof SLUResponse) {
             return SLUResponseMapper.toWeatherData((SLUResponse) data);
+        }
+        if(data instanceof DavisFruitResponse) {
+            return DavisFruitMapper.toWeatherData((DavisFruitResponse) data);
         }
         return new WeatherData();
     }
