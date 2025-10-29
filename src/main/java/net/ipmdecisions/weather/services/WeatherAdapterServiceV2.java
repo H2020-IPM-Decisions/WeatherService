@@ -1,5 +1,6 @@
 package net.ipmdecisions.weather.services;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.inject.Inject;
@@ -272,6 +273,70 @@ public class WeatherAdapterServiceV2 {
         }
         catch(IOException ex)
         {
+            return Response.serverError().entity(ex).build();
+        }
+        catch(NotAuthorizedException ex)
+        {
+            return Response.status(Status.UNAUTHORIZED).entity(ex.getMessage()).build();
+        }
+    }
+
+    @POST
+    @Path("meteobot/")
+    @GZIP
+    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getMeteobotObservations(
+            @FormParam("weatherStationId") Integer weatherStationId,
+            @FormParam("timeStart") String timeStart,
+            @FormParam("timeEnd") String timeEnd,
+            @FormParam("interval") Integer logInterval,
+            @FormParam("parameters") String parameters,
+            @FormParam("ignoreErrors") String ignoreErrors,
+            @FormParam("credentials") String credentials
+    )
+    {
+        // We only accept requests for hourly data
+        if(!logInterval.equals(3600))
+        {
+            return Response.status(Status.BAD_REQUEST).entity("This service only provides hourly data").build();
+        }
+        try
+        {
+            JsonNode json = new ObjectMapper().readTree(credentials);
+            String userName = json.get("userName").asText();
+            String password = json.get("password").asText();
+
+            Set<Integer> ipmDecisionsParameters = new HashSet(Arrays.asList(parameters.split(",")).stream()
+                    .map(paramstr->Integer.parseInt(paramstr.strip())).collect(Collectors.toList()));
+
+
+            // Date parsing
+            LocalDate startDate, endDate;
+            try
+            {
+                startDate = LocalDate.parse(timeStart);
+                endDate = LocalDate.parse(timeEnd);
+            }
+            catch(DateTimeParseException ex)
+            {
+                ZonedDateTime zStartDate = ZonedDateTime.parse(timeStart);
+                ZonedDateTime zEndDate = ZonedDateTime.parse(timeEnd);
+                startDate = zStartDate.toLocalDate();
+                endDate = zEndDate.toLocalDate();
+            }
+
+            //LOGGER.debug("timeStart=" + timeStart + " => startDate=" + startDate + ". timeEnd=" + timeEnd + " => endDate=" + endDate);
+            Boolean ignoreErrorsB = ignoreErrors != null ? ignoreErrors.equals("true") : false;
+
+            //WeatherData theData = new MeteobotAPIAdapter().getWeatherData(weatherStationId,userName,password,startDate, endDate);
+            WeatherData theData = weatherDataService.getWeatherData("mateobot", Map.of("stationID", weatherStationId, "userName", userName,"password", password, "startDate", startDate, "endDate", endDate));
+            //LOGGER.debug(this.getWeatherDataUtil().serializeWeatherData(this.getWeatherDataUtil().filterParameters(theData, ipmDecisionsParameters)));
+            return Response.ok().entity(this.getWeatherDataUtil().filterParameters(theData, ipmDecisionsParameters)).build();
+        }
+        catch(JsonProcessingException ex)
+        {
+            ex.printStackTrace();
             return Response.serverError().entity(ex).build();
         }
         catch(NotAuthorizedException ex)
