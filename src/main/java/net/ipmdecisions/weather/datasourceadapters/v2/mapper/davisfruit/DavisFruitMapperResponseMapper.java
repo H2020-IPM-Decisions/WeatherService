@@ -11,7 +11,7 @@ import java.time.Instant;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class DavisFruitMapper {
+public class DavisFruitMapperResponseMapper {
 
     private static final String[][] ELEMENT_MEASUREMENT_TYPES = {
             {"RAIN","RR","SUM"},
@@ -58,7 +58,7 @@ public class DavisFruitMapper {
                 0.0,
                 INTERVAL_SECONDS,
                 DEFAULT_QC,
-                DavisFruitMapper::mapVipsToIpm,
+                DavisFruitMapperResponseMapper::mapVipsToIpm,
                 false
         );
     }
