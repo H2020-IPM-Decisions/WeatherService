@@ -5,6 +5,7 @@ import net.ipmdecisions.weather.datasourceadapters.v2.mapper.davisfruit.DavisFru
 import net.ipmdecisions.weather.datasourceadapters.v2.mapper.fmiforecast.FMIForecastMapper;
 import net.ipmdecisions.weather.datasourceadapters.v2.mapper.mateobot.MateobotResponseMapper;
 import net.ipmdecisions.weather.datasourceadapters.v2.mapper.metireland.MetIrelandResponseMapper;
+import net.ipmdecisions.weather.datasourceadapters.v2.mapper.metos.MetosResponseMapper;
 import net.ipmdecisions.weather.datasourceadapters.v2.mapper.slu.SLUResponseMapper;
 import net.ipmdecisions.weather.datasourceadapters.v2.mapper.yr.YrResponseMapper;
 import net.ipmdecisions.weather.entity.WeatherData;
@@ -28,6 +29,9 @@ public class WeatherDataMapper {
         }
         if (data instanceof MateobotResponse) {
             return MateobotResponseMapper.toWeatherData((MateobotResponse) data);
+        }
+        if (data instanceof MetosResponse) {
+            return MetosResponseMapper.toWeatherData((MetosResponse) data);
         }
         return new WeatherData();
     }
