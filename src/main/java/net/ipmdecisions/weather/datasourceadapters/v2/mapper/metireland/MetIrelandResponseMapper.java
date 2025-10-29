@@ -1,7 +1,9 @@
 package net.ipmdecisions.weather.datasourceadapters.v2.mapper.metireland;
 
 import net.ipmdecisions.weather.datasourceadapters.v2.client.responsemodel.MetIrelandResponse;
-import net.ipmdecisions.weather.datasourceadapters.v2.mapper.DocumentElementExtractor;
+import net.ipmdecisions.weather.datasourceadapters.v2.mapper.common.DocumentElementExtractor;
+import net.ipmdecisions.weather.datasourceadapters.v2.mapper.common.PrecipitationMapper;
+import net.ipmdecisions.weather.datasourceadapters.v2.mapper.common.TimeSeriesMapper;
 import net.ipmdecisions.weather.entity.LocationWeatherData;
 import net.ipmdecisions.weather.entity.WeatherData;
 import net.ipmdecisions.weather.util.DOMUtils;
@@ -49,14 +51,12 @@ public class MetIrelandResponseMapper {
 
             // Instantaneous values
             DocumentElementExtractor.extract(timeNode, locationNode, timeStart, irelandValues, INTERVAL_SECONDS);
-
-            // Aggregated precipitation
-            MetIrelandParcipitationAggregator.aggregateParcipitation(timeNode, locationNode, timeStart, rrMap, INTERVAL_SECONDS);
+            PrecipitationMapper.aggregate(timeNode, locationNode, timeStart, rrMap, INTERVAL_SECONDS);
         }
 
-        MetIrelandParcipitationAggregator.applyToLocation(rrMap, irelandValues);
+        PrecipitationMapper.apply(rrMap, 2, irelandValues);
+        TimeSeriesMapper.finalizeHourly(irelandValues, 2, 0, 1, 3);
 
-        irelandValues = MetIrelandTimeSeriesMapper.finalizeHourly(irelandValues);
         irelandValues.setLongitude(longitude);
         irelandValues.setLatitude(latitude);
         irelandValues.setAltitude(altitude);

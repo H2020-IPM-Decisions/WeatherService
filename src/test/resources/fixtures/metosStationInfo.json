@@ -1,0 +1,107 @@
+{
+  "name" : {
+    "original" : "000012DE",
+    "custom" : ""
+  },
+  "rights" : "rw",
+  "info" : {
+    "device_id" : 7,
+    "device_name" : "iMetos 3.3",
+    "uid" : "243B1F055B3277DD",
+    "firmware" : "08.621.20250625",
+    "hardware" : "29-0503",
+    "programmed" : "2025.07.18 14:08",
+    "apn_table" : 3,
+    "description" : "iMetos 3.3, hw: 29-0503, fw: 08.621.20250625"
+  },
+  "dates" : {
+    "min_date" : "2005-03-08 12:50:00",
+    "max_date" : "2025-10-26 15:00:01",
+    "created_at" : "2011-04-22 09:52:17",
+    "last_communication" : "2025-10-27 01:04:32"
+  },
+  "position" : {
+    "altitude" : 71,
+    "geo" : {
+      "coordinates" : [ 23.8627337, 55.3960648 ]
+    },
+    "timezoneCode" : "Europe/Vilnius"
+  },
+  "config" : {
+    "timezone_offset" : 180,
+    "dst" : false,
+    "precision_reduction" : 0.2,
+    "scheduler" : 16777215,
+    "schedulerOld" : "FFFFFF000000000000000000000000000000000000000000",
+    "fixed_transfer_interval" : 0,
+    "rain_monitor" : 0,
+    "water_level_monitor" : 0,
+    "data_interval" : 0,
+    "activity_mode" : 0,
+    "emergency_sms_number" : "+37065610839",
+    "measuring_interval" : 15,
+    "logging_interval" : 60,
+    "frequent_measurement" : false,
+    "gps_disabled" : false,
+    "server_domain" : "",
+    "server_url" : "",
+    "server_port" : "",
+    "sensor_settings" : {
+      "4" : 4,
+      "5" : 40
+    },
+    "frost_monitoring" : {
+      "enabled" : false,
+      "threshold" : 5,
+      "interval" : 10,
+      "sensor_code" : 501,
+      "sensor_channel" : 2
+    },
+    "min_battery" : 6000,
+    "max_battery" : 6700,
+    "custom_response" : ""
+  },
+  "metadata" : {
+    "last_battery" : "6424"
+  },
+  "networking" : {
+    "type" : "UMTS",
+    "mcc" : "246",
+    "mnc" : "02",
+    "mcc_sim" : "246",
+    "mnc_sim" : "02",
+    "country" : "Lithuania",
+    "apn" : "banga",
+    "usernme" : "",
+    "password" : "",
+    "simid" : "8937002191000550657",
+    "rssi_pct" : "19",
+    "imei" : "352889061093720",
+    "modem" : {
+      "brand" : "Sierra Wireless",
+      "type" : "SL8082TR Product",
+      "fwversion" : "R7.54.2.A1.201701061226.SL8082TR 2023972 010617 12:26",
+      "sn" : "CHQ1178103640"
+    },
+    "provider" : "N/A",
+    "provider_sim" : "N/A",
+    "username" : "",
+    "roaming" : false,
+    "meid" : "352889061093720"
+  },
+  "warnings" : {
+    "sms_numbers" : [ {
+      "num" : "+37065610839",
+      "name" : "Sergejus",
+      "active" : true
+    } ],
+    "sensors" : [ "7,7,0,6100" ]
+  },
+  "flags" : {
+    "imeteopro" : false
+  },
+  "licenses" : {
+    "Forecast" : false,
+    "models" : [ ]
+  }
+}

@@ -1,20 +1,20 @@
 /*
- * Copyright (c) 2020 NIBIO <http://www.nibio.no/>. 
- * 
+ * Copyright (c) 2020 NIBIO <http://www.nibio.no/>.
+ *
  * This file is part of IPM Decisions Weather Service.
  * IPM Decisions Weather Service is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * IPM Decisions Weather Service is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Affero General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with IPM Decisions Weather Service.  If not, see <http://www.gnu.org/licenses/>.
- * 
+ *
  */
 
 package net.ipmdecisions.weather.services;
@@ -29,7 +29,11 @@ import java.time.ZonedDateTime;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.format.DateTimeParseException;
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.Date;
 import java.util.stream.Collectors;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.FormParam;
@@ -43,12 +47,13 @@ import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.Response.Status;
 import net.ipmdecisions.weather.datasourceadapters.DavisFruitwebAdapter;
+import net.ipmdecisions.weather.datasourceadapters.MetIrelandWeatherForecastAdapter;
 import net.ipmdecisions.weather.datasourceadapters.MeteobotAPIAdapter;
 import net.ipmdecisions.weather.datasourceadapters.MetosAPIAdapter;
 import net.ipmdecisions.weather.datasourceadapters.ParseWeatherDataException;
 import net.ipmdecisions.weather.datasourceadapters.SLULantMetAdapter;
+import net.ipmdecisions.weather.datasourceadapters.YrWeatherForecastAdapter;
 import net.ipmdecisions.weather.datasourceadapters.finnishmeteorologicalinstitute.FinnishMeteorologicalInstituteAdapter;
-import net.ipmdecisions.weather.datasourceadapters.v2.service.WeatherDataService;
 import net.ipmdecisions.weather.entity.WeatherData;
 import net.ipmdecisions.weather.entity.WeatherDataSourceException;
 import net.ipmdecisions.weather.util.WeatherDataUtil;
@@ -57,6 +62,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.time.format.DateTimeFormatter;
+import java.util.TimeZone;
 import jakarta.inject.Inject;
 import javax.xml.datatype.DatatypeConfigurationException;
 import net.ipmdecisions.weather.controller.AmalgamationBean;
@@ -64,35 +70,32 @@ import net.ipmdecisions.weather.datasourceadapters.OpenMeteoAdapter;
 import net.ipmdecisions.weather.datasourceadapters.dmi.DMIPointWebDataParser;
 
 /**
- * Some weather data sources may agree to deliver their weather data in the 
- * platform’s format directly. For the data sources that do not, adapters have 
- * to be programmed. The adapter's role is to download the data from the 
- * specified source and transform it into the platform's format. If the platform 
- * is using an adapter to download the weather data from a data source, the 
+ * Some weather data sources may agree to deliver their weather data in the
+ * platform’s format directly. For the data sources that do not, adapters have
+ * to be programmed. The adapter's role is to download the data from the
+ * specified source and transform it into the platform's format. If the platform
+ * is using an adapter to download the weather data from a data source, the
  * adapter's endpoint is specified in the weather data source catalogue.
- * 
+ *
  * @copyright 2020-2024 <a href="http://www.nibio.no/">NIBIO</a>
  * @author Tor-Einar Skog <tor-einar.skog@nibio.no>
  */
 @Path("rest/weatheradapter")
 public class WeatherAdapterService {
-	
+
     private static Logger LOGGER = LoggerFactory.getLogger(WeatherAdapterService.class);
-    
+
     @Inject
     AmalgamationBean amalgamationBean;
 
-    @Inject
-    WeatherDataService weatherDataService;
-
     private WeatherDataUtil weatherDataUtil;
-    
+
     /**
-     * Get 9 day weather forecasts from <a href="https://www.met.no/en" target="new">The Norwegian Meteorological Institute</a>'s 
-     * <a href="https://api.met.no/weatherapi/locationforecast/1.9/documentation" target="new">Locationforecast API</a> 
+     * Get 9 day weather forecasts from <a href="https://www.met.no/en" target="new">The Norwegian Meteorological Institute</a>'s
+     * <a href="https://api.met.no/weatherapi/locationforecast/1.9/documentation" target="new">Locationforecast API</a>
      * @param longitude WGS84 Decimal degrees
      * @param latitude WGS84 Decimal degrees
-     * @param altitude Meters above sea level. This is used for correction of 
+     * @param altitude Meters above sea level. This is used for correction of
      * temperatures (outside of Norway, where the local topological model is used)
      * @pathExample /rest/weatheradapter/yr/?longitude=14.3711&latitude=67.2828&altitude=70
      * @return the weather forecast formatted in the IPM Decision platform's weather data format
@@ -103,10 +106,10 @@ public class WeatherAdapterService {
     @GZIP
     @Produces(MediaType.APPLICATION_JSON)
     public Response getYRForecasts(
-                    @QueryParam("longitude") Double longitude,
-                    @QueryParam("latitude") Double latitude,
-                    @QueryParam("altitude") Double altitude,
-                    @QueryParam("parameters") String parameters
+            @QueryParam("longitude") Double longitude,
+            @QueryParam("latitude") Double latitude,
+            @QueryParam("altitude") Double altitude,
+            @QueryParam("parameters") String parameters
     )
     {
         if(longitude == null || latitude == null)
@@ -117,23 +120,30 @@ public class WeatherAdapterService {
         {
             altitude = 0.0;
         }
-        
+
         Set<Integer> ipmDecisionsParameters = parameters != null ? Arrays.asList(parameters.split(",")).stream()
                 .map(paramstr->Integer.parseInt(paramstr.strip())).collect(Collectors.toSet())
                 : null;
 
-        WeatherData theData = weatherDataService.getWeatherData("yr", Map.of("longitude", longitude, "latitude", latitude, "altitude", altitude));//new YrWeatherForecastAdapter().getWeatherForecasts(longitude, latitude, altitude);
-        if(ipmDecisionsParameters != null && ipmDecisionsParameters.size() > 0)
+        try
         {
-            theData = new WeatherDataUtil().filterParameters(theData, ipmDecisionsParameters);
+            WeatherData theData = new YrWeatherForecastAdapter().getWeatherForecasts(longitude, latitude, altitude);
+            if(ipmDecisionsParameters != null && ipmDecisionsParameters.size() > 0)
+            {
+                theData = new WeatherDataUtil().filterParameters(theData, ipmDecisionsParameters);
+            }
+            return Response.ok().entity(theData).build();
         }
-        return Response.ok().entity(theData).build();
+        catch (ParseWeatherDataException ex)
+        {
+            return Response.serverError().entity(ex.getMessage()).build();
+        }
 
     }
-    
+
     /**
-     * Get 9 day weather forecasts from <a href="https://data.gov.ie/" target="new">Met Éireann (Ireland)</a>'s 
-     * <a href="https://data.gov.ie/dataset/met-eireann-weather-forecast-api" target="new">Locationforecast API</a> 
+     * Get 9 day weather forecasts from <a href="https://data.gov.ie/" target="new">Met Éireann (Ireland)</a>'s
+     * <a href="https://data.gov.ie/dataset/met-eireann-weather-forecast-api" target="new">Locationforecast API</a>
      * @param longitude WGS84 Decimal degrees
      * @param latitude WGS84 Decimal degrees
      * @pathExample /rest/weatheradapter/meteireann/?longitude=-7.644361&latitude=52.597709&parameters=1001, 3001
@@ -145,10 +155,10 @@ public class WeatherAdapterService {
     @GZIP
     @Produces(MediaType.APPLICATION_JSON)
     public Response getMetIrelandForecasts(
-                    @QueryParam("longitude") Double longitude,
-                    @QueryParam("latitude") Double latitude,
-                    @QueryParam("altitude") Double altitude,
-                    @QueryParam("parameters") String parameters
+            @QueryParam("longitude") Double longitude,
+            @QueryParam("latitude") Double latitude,
+            @QueryParam("altitude") Double altitude,
+            @QueryParam("parameters") String parameters
     )
     {
         if(longitude == null || latitude == null)
@@ -159,23 +169,30 @@ public class WeatherAdapterService {
         {
             altitude = 0.0;
         }
-        
+
         Set<Integer> ipmDecisionsParameters = parameters != null ? Arrays.asList(parameters.split(",")).stream()
                 .map(paramstr->Integer.parseInt(paramstr.strip())).collect(Collectors.toSet())
                 : null;
 
-        WeatherData theData = weatherDataService.getWeatherData("meteireann", Map.of("longitude", longitude, "latitude", latitude, "altitude", altitude));
-        if(ipmDecisionsParameters != null && ipmDecisionsParameters.size() > 0)
+        try
         {
-            theData = new WeatherDataUtil().filterParameters(theData, ipmDecisionsParameters);
+            WeatherData theData = new MetIrelandWeatherForecastAdapter().getWeatherForecasts(longitude, latitude, altitude);
+            if(ipmDecisionsParameters != null && ipmDecisionsParameters.size() > 0)
+            {
+                theData = new WeatherDataUtil().filterParameters(theData, ipmDecisionsParameters);
+            }
+            return Response.ok().entity(theData).build();
         }
-        return Response.ok().entity(theData).build();
+        catch (ParseWeatherDataException ex)
+        {
+            return Response.serverError().entity(ex.getMessage()).build();
+        }
 
     }
-    
+
     /**
      * Get 36 hour forecasts from FMI (The Finnish Meteorological Institute),
-     * using their OpenData services at https://en.ilmatieteenlaitos.fi/open-data 
+     * using their OpenData services at https://en.ilmatieteenlaitos.fi/open-data
      * @param longitude WGS84 Decimal degrees
      * @param latitude WGS84 Decimal degrees
 
@@ -188,32 +205,32 @@ public class WeatherAdapterService {
     @GZIP
     @Produces(MediaType.APPLICATION_JSON)
     public Response getFMIForecasts(
-                    @QueryParam("longitude") Double longitude,
-                    @QueryParam("latitude") Double latitude,
-                    @QueryParam("parameters") String parameters
+            @QueryParam("longitude") Double longitude,
+            @QueryParam("latitude") Double latitude,
+            @QueryParam("parameters") String parameters
     )
     {
         if(longitude == null || latitude == null)
         {
             return Response.status(Response.Status.BAD_REQUEST).entity("Missing longitude and/or latitude. Please correct this.").build();
         }
-        
+
         Set<Integer> ipmDecisionsParameters = parameters != null ? Arrays.asList(parameters.split(",")).stream()
                 .map(paramstr->Integer.parseInt(paramstr.strip())).collect(Collectors.toSet())
                 : null;
-        
+
         WeatherData theData = new FinnishMeteorologicalInstituteAdapter().getWeatherForecasts(longitude, latitude);
         if(ipmDecisionsParameters != null && ipmDecisionsParameters.size() > 0)
         {
-        	theData = new WeatherDataUtil().filterParameters(theData, ipmDecisionsParameters);
+            theData = new WeatherDataUtil().filterParameters(theData, ipmDecisionsParameters);
         }
         return Response.ok().entity(theData).build();
     }
-    
+
     /**
      * Get weather observations in the IPM Decision's weather data format from the Finnish Meteorological Institute https://en.ilmatieteenlaitos.fi/
      * Access is made through the Institute's open data API: https://en.ilmatieteenlaitos.fi/open-data
-     * 
+     *
      * @param weatherStationId The weather station id (FMISID) in the open data API https://en.ilmatieteenlaitos.fi/observation-stations?filterKey=groups&filterQuery=weather
      * @param timeStart Start of weather data period (ISO-8601 Timestamp, e.g. 2020-06-12T00:00:00+03:00)
      * @param timeEnd End of weather data period (ISO-8601 Timestamp, e.g. 2020-07-03T00:00:00+03:00)
@@ -221,7 +238,7 @@ public class WeatherAdapterService {
      * @param parameters Comma separated list of the requested weather parameters, given by <a href="/rest/parameter" target="new">their codes</a>
      * @param ignoreErrors Set to "true" if you want the service to return weather data regardless of there being errors in the service
      * @pathExample /rest/weatheradapter/fmi/?weatherStationId=101104&interval=3600&ignoreErrors=true&timeStart=2020-06-12T00:00:00%2B03:00&timeEnd=2020-07-03T00:00:00%2B03:00&parameters=1002,3002
-     * @return 
+     * @return
      */
     @GET
     @POST
@@ -238,12 +255,12 @@ public class WeatherAdapterService {
     )
     {
         List<Integer> ipmDecisionsParameters = Arrays.asList(parameters.split(",")).stream()
-                    .map(paramstr->Integer.parseInt(paramstr.strip())).collect(Collectors.toList());
-        
-        
+                .map(paramstr->Integer.parseInt(paramstr.strip())).collect(Collectors.toList());
+
+
         Instant timeStartInstant;
         Instant timeEndInstant;
-        
+
         // Date parsing
         // Is it a ISO-8601 timestamp or date?
         try
@@ -255,11 +272,11 @@ public class WeatherAdapterService {
         {
             DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd");
             timeStartInstant = LocalDate.parse(timeStart, dtf).atStartOfDay(ZoneId.of("Europe/Helsinki")).toInstant();//.atZone().toInstant();
-            timeEndInstant = LocalDate.parse(timeEnd, dtf).atStartOfDay(ZoneId.of("Europe/Helsinki")).toInstant();//.atZone(ZoneId.of("Europe/Helsinki")).toInstant();     
+            timeEndInstant = LocalDate.parse(timeEnd, dtf).atStartOfDay(ZoneId.of("Europe/Helsinki")).toInstant();//.atZone(ZoneId.of("Europe/Helsinki")).toInstant();
         }
-        
+
         Boolean ignoreErrorsB = ignoreErrors != null ? ignoreErrors.equals("true") : false;
-        
+
         // We only accept requests for hourly data
         if(!logInterval.equals(3600))
         {
@@ -268,12 +285,12 @@ public class WeatherAdapterService {
 
         WeatherData theData = new FinnishMeteorologicalInstituteAdapter().getHourlyData(weatherStationId, timeStartInstant, timeEndInstant, ipmDecisionsParameters, ignoreErrorsB);
 
-        return Response.ok().entity(theData).build();       
+        return Response.ok().entity(theData).build();
     }
-    
+
     /**
      * Get weather observations and forecasts in the IPM Decision's weather data format from the Danish Meteorological Institute
-     * 
+     *
      * @param longitude WGS84 Decimal degrees
      * @param latitude WGS84 Decimal degrees
      * @param timeStart Start of weather data period (ISO-8601 Timestamp, e.g. 2020-06-12T00:00:00+03:00)
@@ -282,7 +299,7 @@ public class WeatherAdapterService {
      * @param parameters Comma separated list of the requested weather parameters, given by <a href="/rest/parameter" target="new">their codes</a>
      * @param ignoreErrors Set to "true" if you want the service to return weather data regardless of there being errors in the service
      * @pathExample /rest/weatheradapter/dmipoint?latitude=56.488&longitude=9.583&parameters=2001&timeStart=2021-10-01&timeEnd=2021-10-20&interval=86400
-     * @return 
+     * @return
      */
     @GET
     @POST
@@ -299,14 +316,14 @@ public class WeatherAdapterService {
             @QueryParam("ignoreErrors") String ignoreErrors
     )
     {
-         Set<Integer> ipmDecisionsParameters = parameters != null ? Arrays.asList(parameters.split(",")).stream()
-                    .map(paramstr->Integer.parseInt(paramstr.strip())).collect(Collectors.toSet())
-                 : null;
-        
-        
+        Set<Integer> ipmDecisionsParameters = parameters != null ? Arrays.asList(parameters.split(",")).stream()
+                .map(paramstr->Integer.parseInt(paramstr.strip())).collect(Collectors.toSet())
+                : null;
+
+
         Instant timeStartInstant;
         Instant timeEndInstant;
-        
+
         // Date parsing
         // Is it a ISO-8601 timestamp or date?
         try
@@ -318,24 +335,24 @@ public class WeatherAdapterService {
         {
             DateTimeFormatter dtf = DateTimeFormatter.ISO_DATE;
             timeStartInstant = LocalDate.parse(timeStart, dtf).atStartOfDay(ZoneId.of("Europe/Copenhagen")).toInstant();
-            timeEndInstant = LocalDate.parse(timeEnd, dtf).atStartOfDay(ZoneId.of("Europe/Copenhagen")).toInstant(); 
+            timeEndInstant = LocalDate.parse(timeEnd, dtf).atStartOfDay(ZoneId.of("Europe/Copenhagen")).toInstant();
         }
-        
+
         Boolean ignoreErrorsB = ignoreErrors != null ? ignoreErrors.equals("true") : false;
-        
-        
+
+
         // Default is hourly, optional is daily
         logInterval = (logInterval == null || logInterval != 86400) ? 3600 : 86400;
-        
+
         if(longitude == null || latitude == null)
         {
             return Response.status(Response.Status.BAD_REQUEST).entity("Missing longitude and/or latitude. Please correct this.").build();
         }
-        
+
         try
         {
             WeatherData theData = new DMIPointWebDataParser().getData(
-                    longitude, latitude, 
+                    longitude, latitude,
                     Date.from(timeStartInstant), Date.from(timeEndInstant),
                     logInterval
             );
@@ -345,7 +362,7 @@ public class WeatherAdapterService {
             }
             if(ipmDecisionsParameters != null && ipmDecisionsParameters.size() > 0)
             {
-            	theData = new WeatherDataUtil().filterParameters(theData, ipmDecisionsParameters);
+                theData = new WeatherDataUtil().filterParameters(theData, ipmDecisionsParameters);
             }
             return Response.ok().entity(theData).build();
         }
@@ -355,11 +372,11 @@ public class WeatherAdapterService {
         }
 
     }
-    
+
     /**
      * Get weather observations and forecasts in the IPM Decision's weather data format from the LantMet service
      * of the Swedish University of Agricultural Sciences
-     * 
+     *
      * @param longitude WGS84 Decimal degrees
      * @param latitude WGS84 Decimal degrees
      * @param timeStart Start of weather data period (ISO-8601 Timestamp, e.g. 2020-06-12T00:00:00+03:00)
@@ -368,7 +385,7 @@ public class WeatherAdapterService {
      * @param parameters Comma separated list of the requested weather parameters, given by <a href="/rest/parameter" target="new">their codes</a>
      * @param ignoreErrors Set to "true" if you want the service to return weather data regardless of there being errors in the service
      * @pathExample /rest/weatheradapter/dmipoint?latitude=56.488&longitude=9.583&parameters=2001&timeStart=2021-10-01&timeEnd=2021-10-20&interval=86400
-     * @return 
+     * @return
      */
     @GET
     @POST
@@ -385,14 +402,14 @@ public class WeatherAdapterService {
             @QueryParam("ignoreErrors") String ignoreErrors
     )
     {
-         List<Integer> ipmDecisionsParameters = parameters != null ? Arrays.asList(parameters.split(",")).stream()
-                    .map(paramstr->Integer.parseInt(paramstr.strip())).collect(Collectors.toList())
-                 : null;
-        
-        
+        List<Integer> ipmDecisionsParameters = parameters != null ? Arrays.asList(parameters.split(",")).stream()
+                .map(paramstr->Integer.parseInt(paramstr.strip())).collect(Collectors.toList())
+                : null;
+
+
         Instant timeStartInstant;
         Instant timeEndInstant;
-        
+
         // Date parsing
         // Is it a ISO-8601 timestamp or date?
         DateTimeFormatter dtf = DateTimeFormatter.ISO_DATE;
@@ -403,26 +420,26 @@ public class WeatherAdapterService {
         }
         catch(DateTimeParseException ex)
         {
-            
+
             timeStartInstant = LocalDate.parse(timeStart, dtf).atStartOfDay(ZoneId.of("GMT+1")).toInstant();//.atZone().toInstant();
-            timeEndInstant = LocalDate.parse(timeEnd, dtf).atStartOfDay(ZoneId.of("GMT+1")).toInstant();//.atZone(ZoneId.of("Europe/Helsinki")).toInstant();     
+            timeEndInstant = LocalDate.parse(timeEnd, dtf).atStartOfDay(ZoneId.of("GMT+1")).toInstant();//.atZone(ZoneId.of("Europe/Helsinki")).toInstant();
         }
-        
+
         Boolean ignoreErrorsB = ignoreErrors != null ? ignoreErrors.equals("true") : false;
-        
-        
+
+
         // Default is hourly, optional is daily
         logInterval = (logInterval == null || logInterval != 86400) ? 3600 : 86400;
-        
+
         if(longitude == null || latitude == null)
         {
             return Response.status(Response.Status.BAD_REQUEST).entity("Missing longitude and/or latitude. Please correct this.").build();
         }
-        
+
         try
         {
             WeatherData theData = new SLULantMetAdapter().getData(
-                    longitude, latitude, 
+                    longitude, latitude,
                     timeStartInstant,timeEndInstant,
                     logInterval,
                     ipmDecisionsParameters
@@ -431,7 +448,7 @@ public class WeatherAdapterService {
             {
                 return Response.noContent().build();
             }
-            
+
             return Response.ok().entity(theData).build();
         }
         catch(DatatypeConfigurationException | IOException | WeatherDataSourceException ex)
@@ -441,10 +458,10 @@ public class WeatherAdapterService {
         }
 
     }
-    
+
     /**
      * Get weather observations and forecasts in the IPM Decision's weather data format from the Open-Meteo.com service
-     * 
+     *
      * @param longitude WGS84 Decimal degrees
      * @param latitude WGS84 Decimal degrees
      * @param timeStart Start of weather data period (ISO-8601 Timestamp, e.g. 2020-06-12T00:00:00+03:00)
@@ -453,7 +470,7 @@ public class WeatherAdapterService {
      * @param parameters Comma separated list of the requested weather parameters, given by <a href="/rest/parameter" target="new">their codes</a>
      * @param ignoreErrors Set to "true" if you want the service to return weather data regardless of there being errors in the service
      * @pathExample /rest/weatheradapter/openmeteo?latitude=56.488&longitude=9.583&parameters=2001&timeStart=2021-10-01&timeEnd=2021-10-20&interval=86400
-     * @return 
+     * @return
      */
     @GET
     @POST
@@ -471,13 +488,13 @@ public class WeatherAdapterService {
     )
     {
         List<Integer> ipmDecisionsParameters = parameters != null ? Arrays.asList(parameters.split(",")).stream()
-                    .map(paramstr->Integer.valueOf(paramstr.strip())).collect(Collectors.toList())
-                 : null;
-        
+                .map(paramstr->Integer.valueOf(paramstr.strip())).collect(Collectors.toList())
+                : null;
+
         ZoneId tzForLocation = amalgamationBean.getTimeZoneForLocation(longitude, latitude);
         Instant timeStartInstant;
         Instant timeEndInstant;
-        
+
         // Date parsing
         // Is it a ISO-8601 timestamp or date?
         DateTimeFormatter dtf = DateTimeFormatter.ISO_DATE;
@@ -488,22 +505,22 @@ public class WeatherAdapterService {
         }
         catch(DateTimeParseException ex)
         {
-            
+
             timeStartInstant = LocalDate.parse(timeStart, dtf).atStartOfDay(tzForLocation).toInstant();
             timeEndInstant = LocalDate.parse(timeEnd, dtf).atStartOfDay(tzForLocation).toInstant();
         }
-        
+
         Boolean ignoreErrorsB = ignoreErrors != null ? ignoreErrors.equals("true") : false;
-        
-        
+
+
         // Default is hourly, optional is daily
         logInterval = (logInterval == null || logInterval != 86400) ? 3600 : 86400;
-        
+
         if(longitude == null || latitude == null)
         {
             return Response.status(Response.Status.BAD_REQUEST).entity("Missing longitude and/or latitude. Please correct this.").build();
         }
-        
+
         try
         {
             WeatherData theData = new OpenMeteoAdapter().getData(
@@ -516,7 +533,7 @@ public class WeatherAdapterService {
             {
                 return Response.noContent().build();
             }
-            
+
             return Response.ok().entity(theData).build();
         }
         catch(WeatherDataSourceException ex)
@@ -525,15 +542,15 @@ public class WeatherAdapterService {
         }
 
     }
-    
+
     /**
-     * Get weather observations in the IPM Decision's weather data format from the the network of MeteoBot stations 
+     * Get weather observations in the IPM Decision's weather data format from the the network of MeteoBot stations
      * [https://meteobot.com/en/]
-     * 
-     * This is a network of privately owned weather stations, which all require 
+     *
+     * This is a network of privately owned weather stations, which all require
      * authentication to access.
-     * 
-     * @param weatherStationId The weather station id 
+     *
+     * @param weatherStationId The weather station id
      * @param timeStart Start of weather data period (ISO-8601 Timestamp, e.g. 2020-06-12T00:00:00+03:00)
      * @param timeEnd End of weather data period (ISO-8601 Timestamp, e.g. 2020-07-03T00:00:00+03:00)
      * @param logInterval The measuring interval in seconds. Please note that the only allowed interval in this version is 3600 (hourly)
@@ -548,7 +565,7 @@ public class WeatherAdapterService {
      *   timeEnd:2020-07-03
      *   parameters:1002,3002,2001
      *   credentials:{"userName":"XXXXX","password":"XXXX"}
-     * @return 
+     * @return
      */
     @POST
     @Path("meteobot/")
@@ -577,9 +594,9 @@ public class WeatherAdapterService {
             String password = json.get("password").asText();
 
             Set<Integer> ipmDecisionsParameters = new HashSet(Arrays.asList(parameters.split(",")).stream()
-                        .map(paramstr->Integer.parseInt(paramstr.strip())).collect(Collectors.toList()));
-            
-            
+                    .map(paramstr->Integer.parseInt(paramstr.strip())).collect(Collectors.toList()));
+
+
             // Date parsing
             LocalDate startDate, endDate;
             try
@@ -594,7 +611,7 @@ public class WeatherAdapterService {
                 startDate = zStartDate.toLocalDate();
                 endDate = zEndDate.toLocalDate();
             }
-            
+
             //LOGGER.debug("timeStart=" + timeStart + " => startDate=" + startDate + ". timeEnd=" + timeEnd + " => endDate=" + endDate);
             Boolean ignoreErrorsB = ignoreErrors != null ? ignoreErrors.equals("true") : false;
 
@@ -612,15 +629,15 @@ public class WeatherAdapterService {
             return Response.status(Status.UNAUTHORIZED).entity(ex.getMessage()).build();
         }
     }
-    
+
     /**
-     * Get weather observations in the IPM Decision's weather data format from the the network of Pessl Instruments Metos stations 
+     * Get weather observations in the IPM Decision's weather data format from the the network of Pessl Instruments Metos stations
      * [https://metos.at/]
-     * 
-     * This is a network of privately owned weather stations, which all require 
+     *
+     * This is a network of privately owned weather stations, which all require
      * authentication to access.
-     * 
-     * @param weatherStationId The weather station id 
+     *
+     * @param weatherStationId The weather station id
      * @param timeStart Start of weather data period (ISO-8601 Timestamp, e.g. 2020-06-12T00:00:00+03:00)
      * @param timeEnd End of weather data period (ISO-8601 Timestamp, e.g. 2020-07-03T00:00:00+03:00)
      * @param logInterval The measuring interval in seconds. Please note that the only allowed interval in this version is 3600 (hourly)
@@ -635,7 +652,7 @@ public class WeatherAdapterService {
      *   timeEnd:2020-07-03
      *   parameters:1002,3002,2001
      *   credentials:{"userName":"XXXXX","password":"XXXX"}
-     * @return 
+     * @return
      */
     @POST
     @Path("metos/")
@@ -664,7 +681,7 @@ public class WeatherAdapterService {
             String privateKey = json.get("password").asText();
 
             Set<Integer> ipmDecisionsParameters = new HashSet(Arrays.asList(parameters.split(",")).stream()
-                        .map(paramstr->Integer.parseInt(paramstr.strip())).collect(Collectors.toList()));
+                    .map(paramstr->Integer.parseInt(paramstr.strip())).collect(Collectors.toList()));
             // Date parsing
             LocalDate startDate, endDate;
             try
@@ -686,11 +703,11 @@ public class WeatherAdapterService {
             if(theData != null)
             {
                 //LOGGER.debug(this.getWeatherDataUtil().serializeWeatherData(this.getWeatherDataUtil().filterParameters(theData, ipmDecisionsParameters)));
-            	return Response.ok().entity(this.getWeatherDataUtil().filterParameters(theData, ipmDecisionsParameters)).build();
+                return Response.ok().entity(this.getWeatherDataUtil().filterParameters(theData, ipmDecisionsParameters)).build();
             }
             else
             {
-            	return Response.status(Status.NO_CONTENT).build();
+                return Response.status(Status.NO_CONTENT).build();
             }
         }
         catch(ParseWeatherDataException | GeneralSecurityException | IOException ex)
@@ -702,15 +719,15 @@ public class WeatherAdapterService {
             return Response.status(Status.UNAUTHORIZED).entity(ex.getMessage()).build();
         }
     }
-    
+
     /**
-     * Get weather observations in the IPM Decision's weather data format from the the network of Fruitweb attached stations 
+     * Get weather observations in the IPM Decision's weather data format from the the network of Fruitweb attached stations
      * [https://www.fruitweb.info/en/]
-     * 
-     * This is a network of privately owned weather stations, which all require 
+     *
+     * This is a network of privately owned weather stations, which all require
      * authentication to access.
-     * 
-     * @param weatherStationId The weather station id 
+     *
+     * @param weatherStationId The weather station id
      * @param timeZoneId e.g. "Europe/Oslo". Optional. Default is UTC
      * @param timeStart Start of weather data period (ISO-8601 Timestamp, e.g. 2020-06-12T00:00:00+03:00)
      * @param timeEnd End of weather data period (ISO-8601 Timestamp, e.g. 2020-07-03T00:00:00+03:00)
@@ -726,7 +743,7 @@ public class WeatherAdapterService {
      *   timeEnd:2020-07-03
      *   parameters:1002,3002,2001
      *   credentials:{"userName":"XXXXX","password":"XXXX"}
-     * @return 
+     * @return
      */
     @POST
     @Path("davisfruitweb/")
@@ -758,7 +775,7 @@ public class WeatherAdapterService {
             String password = json.get("password").asText();
 
             Set<Integer> ipmDecisionsParameters = new HashSet(Arrays.asList(parameters.split(",")).stream()
-                        .map(paramstr->Integer.valueOf(paramstr.strip())).collect(Collectors.toList()));
+                    .map(paramstr->Integer.valueOf(paramstr.strip())).collect(Collectors.toList()));
             // Date parsing
             LocalDate startDate, endDate;
             try
@@ -776,8 +793,8 @@ public class WeatherAdapterService {
 
             Boolean ignoreErrorsB = ignoreErrors != null ? ignoreErrors.equals("true") : false;
 
-            
-            
+
+
             WeatherData theData = new DavisFruitwebAdapter().getWeatherData(weatherStationId, password, startDate, endDate, timeZone);
             //LOGGER.debug(this.getWeatherDataUtil().serializeWeatherData(this.getWeatherDataUtil().filterParameters(theData, ipmDecisionsParameters)));
             return Response.ok().entity(this.getWeatherDataUtil().filterParameters(theData, ipmDecisionsParameters)).build();
@@ -791,9 +808,9 @@ public class WeatherAdapterService {
             return Response.status(Status.UNAUTHORIZED).entity(ex.getMessage()).build();
         }
     }
-    
-    
-    
+
+
+
     private WeatherDataUtil getWeatherDataUtil()
     {
         if(this.weatherDataUtil == null)
@@ -802,16 +819,16 @@ public class WeatherAdapterService {
         }
         return this.weatherDataUtil;
     }
-    
+
     /**
      * Through URL decoding, some chars like "+" may get lost. We try to fix this.
-     * 
+     *
      * @param timestampStr
      * @return
      */
     private String tryToFixTimestampString(String timestampStr)
     {
-    	// Date parsing
+        // Date parsing
         // Is it a ISO-8601 timestamp or date?
         try
         {
@@ -821,20 +838,20 @@ public class WeatherAdapterService {
         }
         catch(DateTimeParseException ex1)
         {
-        	// Something went wrong
-        	// Hypothesis 1: The + is missing
-        	String mod1 = timestampStr.replace(" ", "+");
-        	try
-        	{
-	        	ZonedDateTime.parse(mod1).toInstant();
-	            // All is well, return modified
-	            return mod1;
-        	}
-        	catch(DateTimeParseException ex2)
+            // Something went wrong
+            // Hypothesis 1: The + is missing
+            String mod1 = timestampStr.replace(" ", "+");
+            try
             {
-        		// No more hypothesis - return original
-        		return timestampStr;
-            } 
+                ZonedDateTime.parse(mod1).toInstant();
+                // All is well, return modified
+                return mod1;
+            }
+            catch(DateTimeParseException ex2)
+            {
+                // No more hypothesis - return original
+                return timestampStr;
+            }
         }
     }
 }
