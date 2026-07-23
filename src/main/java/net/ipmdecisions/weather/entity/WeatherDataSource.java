@@ -24,7 +24,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
-import jakarta.inject.Inject;
 import net.ipmdecisions.weather.entity.serializers.WeatherDataSourceHistoricDeserializer;
 import net.ipmdecisions.weather.util.GISUtils;
 
@@ -37,7 +36,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.eclipse.microprofile.config.inject.ConfigProperty;
+import org.eclipse.microprofile.config.ConfigProvider;
 import org.eclipse.microprofile.openapi.annotations.enums.SchemaType;
 import org.eclipse.microprofile.openapi.annotations.media.Schema;
 import org.locationtech.jts.geom.Coordinate;
@@ -79,11 +78,6 @@ public class WeatherDataSource implements Comparable {
     /** No authentication required for the data source */
     public static String AUTHENTICATION_TYPE_NONE = "NONE";
 
-    @Inject
-    @ConfigProperty(name = "net.ipmdecisions.weatherservice.WEATHER_API_URL", defaultValue = "")
-    String credentials;
-
-    
     /** 
      * <p>
      * This implies http POST and sending 
@@ -840,7 +834,9 @@ public class WeatherDataSource implements Comparable {
 
     public String getWeatherAPIURL()
     {
-        return credentials != null && ! credentials.isBlank() ? credentials
-                : "https://platform.ipmdecisions.net";
+        return ConfigProvider.getConfig()
+            .getOptionalValue("net.ipmdecisions.weatherservice.WEATHER_API_URL", String.class)
+            .filter(value -> !value.isBlank())
+            .orElse("https://platform.ipmdecisions.net");
     }
 }
