@@ -25,7 +25,6 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.logging.Level;
 import java.util.stream.Collectors;
 
 import java.io.*;
@@ -44,7 +43,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 /**
- *
+ * 
  * @author Tor-Einar Skog <tor-einar.skog@nibio.no>
  * @author Brita Linnestad <brita.linnestad@nibio.no>
  *
@@ -62,6 +61,9 @@ public class LeafWetnessCalculator implements IndiceCalculator {
         this.objectMapper.setDateFormat(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX"));
     }
 
+    /**
+     * Calculates the specified leaf wetness index for the given weather data.
+     */
     @Override
     public WeatherData calculateIndice(WeatherData weatherData, Integer weatherParameter) {
 
@@ -78,16 +80,16 @@ public class LeafWetnessCalculator implements IndiceCalculator {
         {
             try {
                 //System.out.println(this.objectMapper.writeValueAsString(weatherData));
-                weatherData = this.calculateFromLSTM(weatherData);
+                weatherData = this.calculateFromLSTM(weatherData, weatherParameter);
                 LOGGER.debug("Calculationg LWD using the LSTM model!");
             } catch (IOException | NullPointerException ex) {
                 LOGGER.debug("LSTM docker not reachable, ConstantRH is used for LWD-calculation");
-                weatherData = this.calculateFromConstantRH(weatherData);
+                weatherData = this.calculateFromConstantRH(weatherData, weatherParameter);
                 //java.util.logging.Logger.getLogger(LeafWetnessCalculator.class.getName()).log(Level.SEVERE, null, ex);
             }       
         } // If not: Use the simple constant RH method 
         else {
-            weatherData = this.calculateFromConstantRH(weatherData);
+            weatherData = this.calculateFromConstantRH(weatherData, weatherParameter);
         }
 
         return weatherData;
@@ -100,7 +102,7 @@ public class LeafWetnessCalculator implements IndiceCalculator {
      * @param weatherData
      * @return
      */
-    public WeatherData calculateFromConstantRH(WeatherData weatherData) {
+    public WeatherData calculateFromConstantRH(WeatherData weatherData, Integer weatherParameter) {
         //LOGGER.debug("Running calculateFromConstantRH");
         // Look for RH (3001, 3002)
         List<Integer> rhParamsInDataset = this.getParamsInDataSet(weatherData, List.of(3001, 3002));
@@ -127,7 +129,7 @@ public class LeafWetnessCalculator implements IndiceCalculator {
             });
             // Add the missing parameter to end of parameter list in weather data
             List<Integer> wpList = new ArrayList<>(Arrays.asList(weatherData.getWeatherParameters()));
-            wpList.add(3101);
+            wpList.add(weatherParameter != null ? weatherParameter : 3101);
             weatherData.setWeatherParameters(wpList.toArray(new Integer[wpList.size()]));
         }
         return weatherData;
@@ -139,7 +141,7 @@ public class LeafWetnessCalculator implements IndiceCalculator {
      * @return
      * @throws IOException 
      */
-    public WeatherData calculateFromLSTM(WeatherData weatherData) throws MalformedURLException, NullPointerException, IOException {
+    public WeatherData calculateFromLSTM(WeatherData weatherData, Integer weatherParameter) throws MalformedURLException, NullPointerException, IOException {
 
 
         //System.out.println(oMapper.writeValueAsString(weatherData));
@@ -278,7 +280,7 @@ public class LeafWetnessCalculator implements IndiceCalculator {
             
             // Add the missing parameter to end of parameter list in weather data
             List<Integer> wpList = new ArrayList<>(Arrays.asList(weatherData.getWeatherParameters()));
-            wpList.add(3101);
+            wpList.add(weatherParameter != null ? weatherParameter : 3101);
             weatherData.setWeatherParameters(wpList.toArray(new Integer[wpList.size()]));
                 
         }
