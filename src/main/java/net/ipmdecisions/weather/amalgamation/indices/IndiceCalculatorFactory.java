@@ -29,7 +29,8 @@ public class IndiceCalculatorFactory {
 
 	public synchronized static IndiceCalculator getIndiceCalculator(Integer weatherParameterId)
 	{
-		if(weatherParameterId.equals(3101))
+		// Being pragmatic - calculating leaf wetness for any of the three leaf wetness parameters (3101, 3102, 3103) will use the same calculator.
+		if(weatherParameterId.equals(3101) || weatherParameterId.equals(3102) || weatherParameterId.equals(3103))
 		{
 			return new LeafWetnessCalculator();
 		}

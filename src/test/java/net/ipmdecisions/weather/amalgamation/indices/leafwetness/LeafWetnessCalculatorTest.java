@@ -91,7 +91,7 @@ public class LeafWetnessCalculatorTest {
         WeatherData weatherData = oMapper.readValue(weatherDataJson, WeatherData.class);
         LeafWetnessCalculator instance = new LeafWetnessCalculator();
         
-        WeatherData result = instance.calculateFromConstantRH(weatherData);
+        WeatherData result = instance.calculateFromConstantRH(weatherData, 3101);
         
         assertNotNull(result);
         
@@ -124,7 +124,7 @@ public class LeafWetnessCalculatorTest {
             try {
                 // Can this be mocked or fixed in CI/CD?
                 System.setProperty("net.ipmdecisions.weatherservice.LWD_LSTM_HOSTNAME", "http://localhost:5000");
-                WeatherData result = instance.calculateFromLSTM(weatherData);
+                WeatherData result = instance.calculateFromLSTM(weatherData, 3101);
                 for (LocationWeatherData lwd : result.getLocationWeatherData()) {
                     Double[] bt = lwd.getColumn(result.getParameterIndex(3101));
                     testLWD(bt);
@@ -139,7 +139,7 @@ public class LeafWetnessCalculatorTest {
             try {
                 // Can this be mocked or fixed in CI/CD?
                 System.setProperty("net.ipmdecisions.weatherservice.LWD_LSTM_HOSTNAME", "http://localhost:5000");
-                WeatherData result = instance.calculateFromLSTM(weatherData);
+                WeatherData result = instance.calculateFromLSTM(weatherData, 3101);
                 for (LocationWeatherData lwd : result.getLocationWeatherData()) {
                     Double[] bt = lwd.getColumn(result.getParameterIndex(3101));
                     testLWD(bt);
