@@ -1,20 +1,20 @@
 /*
- * Copyright (c) 2020 NIBIO <http://www.nibio.no/>. 
- * 
+ * Copyright (c) 2020 NIBIO <http://www.nibio.no/>.
+ *
  * This file is part of IPMDecisionsWeatherService.
  * IPMDecisionsWeatherService is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * IPMDecisionsWeatherService is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Affero General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with IPMDecisionsWeatherService.  If not, see <http://www.gnu.org/licenses/>.
- * 
+ *
  */
 
 package net.ipmdecisions.weather.datasourceadapters;
@@ -48,21 +48,21 @@ import org.xml.sax.SAXException;
  */
 public class YrWeatherForecastAdapter {
     Integer[] parameters = {
-        1001, // Instantaneous temperature at 2m (Celcius)
-        3001, // Instantaneous RH at 2m (%)
-        2001, // Precipitation (mm)
-        4002 // Instantaneous wind speed at 2m
+            1001, // Instantaneous temperature at 2m (Celcius)
+            3001, // Instantaneous RH at 2m (%)
+            2001, // Precipitation (mm)
+            4002 // Instantaneous wind speed at 2m
     };
     // Make sure QC is just as long as parameters
     // This indicates that each parameter has been controlled by the supplier, and that everything's OK
     Integer[] QC = {1,1,1,1};
-    
+
 
     private final static String YR_API_URL = "https://api.met.no/weatherapi/locationforecast/2.0/classic?lat=%f&lon=%f&altitude=%d";
-    
 
-    
-    public WeatherData getWeatherForecasts(Double longitude, Double latitude, Double altitude) throws ParseWeatherDataException 
+
+
+    public WeatherData getWeatherForecasts(Double longitude, Double latitude, Double altitude) throws ParseWeatherDataException
     {
         URL yrURL;
         LocationWeatherData yrValues;
@@ -78,11 +78,11 @@ public class YrWeatherForecastAdapter {
             connection.setRequestProperty("User-Agent", "net.ipmdecisions.weatherapi/BETA-07 IPMDecisions@adas.co.uk");
             connection.connect();
             // Find earliest and latest forecast time stamp
-            
-            
+
+
             //System.out.println("yrURL=" + yrURL.toString());
-            
-            
+
+
             // Parse with DOM parser
             DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
             DocumentBuilder db = dbf.newDocumentBuilder();
@@ -100,7 +100,7 @@ public class YrWeatherForecastAdapter {
                 Instant fromTime = Instant.parse(node.getAttributes().getNamedItem("from").getNodeValue());
                 Instant toTime = Instant.parse(node.getAttributes().getNamedItem("to").getNodeValue());
                 Node node2 = DOMUtils.getNode("location", node.getChildNodes());
-                
+
                 // TODO: Handle different kinds of elements and durations?
                 // The instantaneous measured values
                 if(fromTime.compareTo(toTime) == 0 && DOMUtils.getNode("temperature", node2.getChildNodes()) != null)
@@ -134,7 +134,7 @@ public class YrWeatherForecastAdapter {
                 {
                     // Precip is aggregated for the from-to period and timestamped
                     // With the toTime
-                    Long row = timeStart.until(toTime, ChronoUnit.SECONDS)/interval; 
+                    Long row = timeStart.until(toTime, ChronoUnit.SECONDS)/interval;
                     Long currentPeriodDuration = (RRMap.get(row) == null) ? null : Long.valueOf(RRMap.get(row).split("_")[0]);
                     Long candidatePeriodDuration = fromTime.until(toTime,ChronoUnit.SECONDS);
                     if(currentPeriodDuration == null || currentPeriodDuration > candidatePeriodDuration)
@@ -186,7 +186,7 @@ public class YrWeatherForecastAdapter {
         }
         return yrValues;
     }
-    
+
     private LocationWeatherData getInterpolatedData (LocationWeatherData yrValues, Integer column)
     {
         for(Integer i = 0; i< yrValues.getLength();i++)
@@ -207,7 +207,7 @@ public class YrWeatherForecastAdapter {
                         lastValueBeforeHole = yrValues.getValue(i, column);
                     }
                 }
-                
+
                 while(firstValueAfterHole == null && i <= yrValues.getLength())
                 {
                     i++;
@@ -226,58 +226,58 @@ public class YrWeatherForecastAdapter {
             }
         }
         return yrValues;
-}
-    
-    /**
-    private List<WeatherObservation> getInterpolatedObservations(WeatherObservation start, WeatherObservation end, String elementMeasurementTypeId)
-    {
-        List<WeatherObservation> retVal = new ArrayList<>();
-        Calendar cal = Calendar.getInstance();
-        Double difference = end.getValue() - start.getValue();
-        Long steps = (end.getTimeMeasured().getTime() - start.getTimeMeasured().getTime()) / 3600000;
-        Double delta = difference/steps;
-        cal.setTime(start.getTimeMeasured());
-        cal.add(Calendar.HOUR_OF_DAY, 1);
-        int counter = 1;
-        while(cal.getTime().compareTo(end.getTimeMeasured()) < 0)
-        {
-            WeatherObservation interpolated = new WeatherObservation();
-            interpolated.setElementMeasurementTypeId(elementMeasurementTypeId);
-            interpolated.setLogIntervalId(WeatherObservation.LOG_INTERVAL_ID_1H);
-            interpolated.setTimeMeasured(cal.getTime());
-            interpolated.setValue(start.getValue() + (delta * counter++));
-            retVal.add(interpolated);
-            cal.add(Calendar.HOUR_OF_DAY, 1);
-        }
-        return retVal;
     }
-    * */
+
+    /**
+     private List<WeatherObservation> getInterpolatedObservations(WeatherObservation start, WeatherObservation end, String elementMeasurementTypeId)
+     {
+     List<WeatherObservation> retVal = new ArrayList<>();
+     Calendar cal = Calendar.getInstance();
+     Double difference = end.getValue() - start.getValue();
+     Long steps = (end.getTimeMeasured().getTime() - start.getTimeMeasured().getTime()) / 3600000;
+     Double delta = difference/steps;
+     cal.setTime(start.getTimeMeasured());
+     cal.add(Calendar.HOUR_OF_DAY, 1);
+     int counter = 1;
+     while(cal.getTime().compareTo(end.getTimeMeasured()) < 0)
+     {
+     WeatherObservation interpolated = new WeatherObservation();
+     interpolated.setElementMeasurementTypeId(elementMeasurementTypeId);
+     interpolated.setLogIntervalId(WeatherObservation.LOG_INTERVAL_ID_1H);
+     interpolated.setTimeMeasured(cal.getTime());
+     interpolated.setValue(start.getValue() + (delta * counter++));
+     retVal.add(interpolated);
+     cal.add(Calendar.HOUR_OF_DAY, 1);
+     }
+     return retVal;
+     }
+     * */
 
     private String getStringFromInputStream(InputStream is) {
         BufferedReader br = null;
-		StringBuilder sb = new StringBuilder();
+        StringBuilder sb = new StringBuilder();
 
-		String line;
-		try {
+        String line;
+        try {
 
-			br = new BufferedReader(new InputStreamReader(is));
-			while ((line = br.readLine()) != null) {
-				sb.append(line);
-			}
+            br = new BufferedReader(new InputStreamReader(is));
+            while ((line = br.readLine()) != null) {
+                sb.append(line);
+            }
 
-		} catch (IOException e) {
-			e.printStackTrace();
-		} finally {
-			if (br != null) {
-				try {
-					br.close();
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-			}
-		}
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            if (br != null) {
+                try {
+                    br.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
 
-		return sb.toString();
+        return sb.toString();
     }
-    
+
 }
